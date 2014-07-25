@@ -1,4 +1,4 @@
-package com.hipchalytics.storm.dao;
+package com.hipchalytics.hipchat.dao;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;

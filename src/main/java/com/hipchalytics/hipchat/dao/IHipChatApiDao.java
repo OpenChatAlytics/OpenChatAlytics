@@ -1,4 +1,4 @@
-package com.hipchalytics.storm.dao;
+package com.hipchalytics.hipchat.dao;
 
 import com.hipchalytics.model.Message;
 import com.hipchalytics.model.Room;

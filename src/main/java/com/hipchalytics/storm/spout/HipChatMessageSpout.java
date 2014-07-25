@@ -3,12 +3,12 @@ package com.hipchalytics.storm.spout;
 import com.google.common.collect.Lists;
 import com.hipchalytics.config.ConfigurationConstants;
 import com.hipchalytics.config.HipChalyticsConfig;
+import com.hipchalytics.hipchat.dao.HipChatApiDaoFactory;
+import com.hipchalytics.hipchat.dao.IHipChatApiDao;
 import com.hipchalytics.model.FatMessage;
 import com.hipchalytics.model.Message;
 import com.hipchalytics.model.Room;
 import com.hipchalytics.model.User;
-import com.hipchalytics.storm.dao.HipChatApiDaoFactory;
-import com.hipchalytics.storm.dao.IHipChatApiDao;
 import com.hipchalytics.util.YamlUtils;
 
 import org.joda.time.DateTime;
