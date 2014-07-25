@@ -1,4 +1,7 @@
-package com.hipchalytics.storm.spout;
+package com.hipchalytics.storm;
+
+import com.hipchalytics.storm.bolt.EntityExtractionBolt;
+import com.hipchalytics.storm.spout.HipChatMessageSpout;
 
 import backtype.storm.generated.StormTopology;
 import backtype.storm.topology.TopologyBuilder;
@@ -18,6 +21,9 @@ public class HipChalyticsStormTopology {
     public StormTopology get() {
         TopologyBuilder topologyBuilder = new TopologyBuilder();
         topologyBuilder.setSpout(HipChatMessageSpout.SPOUT_ID, new HipChatMessageSpout());
+
+        topologyBuilder.setBolt(EntityExtractionBolt.BOLT_ID, new EntityExtractionBolt())
+            .shuffleGrouping(HipChatMessageSpout.SPOUT_ID);
 
         return topologyBuilder.createTopology();
     }
