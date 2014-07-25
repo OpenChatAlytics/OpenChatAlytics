@@ -1,1 +1,4 @@
 authTokens: [0]
+timeZone: 'America/New_York'
+apiDateFormat: 'YYYY-MM-dd'
+baseHipChatURL: 'https://api.hipchat.com/v1/'

@@ -18,6 +18,7 @@ import org.codehaus.jackson.map.type.MapType;
 import org.codehaus.jackson.map.type.TypeFactory;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
+import org.joda.time.Interval;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.slf4j.Logger;
@@ -45,10 +46,8 @@ public class JsonHipChatDao implements IHipChatApiDao {
     private final Random rand;
     private final ObjectMapper objMapper;
 
-    public static final String TIMEZONE_ID = "America/New_York";
-    public static final DateTimeZone dtz = DateTimeZone.forID(TIMEZONE_ID);
-    public static final DateTimeFormatter API_DATE_FORMAT =
-        DateTimeFormat.forPattern("YYYY-MM-dd").withZone(dtz);
+    public final DateTimeZone dtz;
+    public final DateTimeFormatter apiDateFormat;
 
     private static final String AUTH_TOKEN_PARAM = "auth_token";
     private static final Logger LOG = LoggerFactory.getLogger(JsonHipChatDao.class);
@@ -59,11 +58,10 @@ public class JsonHipChatDao implements IHipChatApiDao {
         this.resource = client.resource(config.baseHipChatURL);
         this.config = config;
         this.rand = new Random(System.currentTimeMillis());
+        this.dtz = DateTimeZone.forID(config.timeZone);
+        this.apiDateFormat = DateTimeFormat.forPattern(config.apiDateFormat).withZone(dtz);
         this.objMapper = new ObjectMapper();
         objMapper.registerModule(new HipChalyticsJsonModule());
-        // getMessages(new DateTime().minus(Days.FIVE), new DateTime(), new Room(150109, null, null,
-        // null, null, 0, false,
-        // false, null, null));
     }
 
     /**
@@ -114,18 +112,20 @@ public class JsonHipChatDao implements IHipChatApiDao {
     public List<Message> getMessages(DateTime start, DateTime end, Room room) {
         DateTime curDate = start;
         List<Message> messages = Lists.newArrayList();
-        WebResource userResource = resource.path("rooms/history");
-        userResource = addTokenQueryParam(userResource)
+        WebResource roomsResource = resource.path("rooms/history");
+        roomsResource = addTokenQueryParam(roomsResource)
             .queryParam("room_id", String.valueOf(room.getRoomId()))
-            .queryParam("timezone", TIMEZONE_ID);
+            .queryParam("timezone", config.timeZone);
+        Interval messageInterval = new Interval(start, end);
         while (curDate.isBefore(end) || curDate.equals(end)) {
-            userResource = userResource.queryParam("date", curDate.toString(API_DATE_FORMAT));
-            String jsonStr = userResource.get(String.class);
-            Collection<Message> userCol = deserializeJsonStr(jsonStr, "messages", Message.class,
-                                                             objMapper);
-            for (Message message : userCol) {
-                message.setRoomId(room.getRoomId());
-                messages.add(message);
+            roomsResource = roomsResource.queryParam("date", curDate.toString(apiDateFormat));
+            String jsonStr = roomsResource.get(String.class);
+            Collection<Message> messageCol = deserializeJsonStr(jsonStr, "messages", Message.class,
+                                                                objMapper);
+            for (Message message : messageCol) {
+                if (messageInterval.contains(message.getDate())) {
+                    messages.add(message);
+                }
             }
             curDate = curDate.plusDays(1);
         }

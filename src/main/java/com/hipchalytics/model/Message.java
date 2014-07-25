@@ -18,15 +18,13 @@ public class Message implements Serializable {
     private final String fromName;
     private final int fromUserId;
     private final String message;
-    private int roomId;
 
     private static final long serialVersionUID = -4370348419961560257L;
 
-    public Message(DateTime date, String fromName, int fromUserId, int roomId, String message) {
+    public Message(DateTime date, String fromName, int fromUserId, String message) {
         this.date = date;
         this.fromName = fromName;
         this.fromUserId = fromUserId;
-        this.roomId = roomId;
         this.message = message;
     }
 
@@ -40,14 +38,6 @@ public class Message implements Serializable {
 
     public int getFromUserId() {
         return fromUserId;
-    }
-
-    public int getRoomId() {
-        return roomId;
-    }
-
-    public void setRoomId(int roomId) {
-        this.roomId = roomId;
     }
 
     public String getMessage() {

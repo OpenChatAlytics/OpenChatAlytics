@@ -19,4 +19,8 @@ public class HipChalyticsConfig implements Serializable {
 
     public String baseHipChatURL = "https://api.hipchat.com/v1/";
 
+    public String apiDateFormat;
+
+    public String timeZone;
+
 }

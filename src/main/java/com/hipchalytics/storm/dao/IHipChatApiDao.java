@@ -44,9 +44,9 @@ public interface IHipChatApiDao {
      * Gets the list of messages in a room for a particular date range
      *
      * @param start
-     *            The start date inclusive
+     *            The start date time inclusive
      * @param end
-     *            The end date inclusive
+     *            The end date time exclusive
      * @param room
      *            The room or which messages will be fetched from
      * @return A list of messages containing the room ID

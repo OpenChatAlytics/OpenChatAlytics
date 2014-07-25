@@ -44,7 +44,7 @@ public class MessageDeserializer extends JsonDeserializer<Message> {
         }
         String message = node.get("message").asText();
 
-        return new Message(date, fromName, fromUserId, -1, message);
+        return new Message(date, fromName, fromUserId, message);
     }
 
 }
