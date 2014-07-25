@@ -23,4 +23,6 @@ public class HipChalyticsConfig implements Serializable {
 
     public String timeZone;
 
+    public int apiRetries = 3;
+
 }

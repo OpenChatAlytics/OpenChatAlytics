@@ -59,7 +59,6 @@ public class HipChatMessageSpout extends BaseRichSpout {
                 User user = users.get(message.getFromUserId());
                 messagesToEmit.add(new FatMessage(message, user, room));
             }
-
         }
         for (FatMessage fatMessage : messagesToEmit) {
             collector.emit(new Values(fatMessage));

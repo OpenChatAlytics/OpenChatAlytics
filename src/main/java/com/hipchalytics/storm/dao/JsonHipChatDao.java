@@ -8,6 +8,8 @@ import com.hipchalytics.model.Room;
 import com.hipchalytics.model.User;
 import com.hipchalytics.model.json.HipChalyticsJsonModule;
 import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.ClientResponse.Status;
+import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
 
@@ -70,8 +72,7 @@ public class JsonHipChatDao implements IHipChatApiDao {
     @Override
     public Map<Integer, Room> getRooms() {
         WebResource roomResource = resource.path("rooms/list");
-        roomResource = addTokenQueryParam(roomResource);
-        String jsonStr = roomResource.accept(MediaType.APPLICATION_JSON).get(String.class);
+        String jsonStr = getJsonResultWithRetries(roomResource, config.apiRetries);
         Collection<Room> roomCol = deserializeJsonStr(jsonStr, "rooms", Room.class, objMapper);
         Map<Integer, Room> result = Maps.newHashMapWithExpectedSize(roomCol.size());
         for (Room room : roomCol) {
@@ -87,8 +88,7 @@ public class JsonHipChatDao implements IHipChatApiDao {
     @Override
     public Map<Integer, User> getUsers() {
         WebResource userResource = resource.path("users/list");
-        userResource = addTokenQueryParam(userResource);
-        String jsonStr = userResource.accept(MediaType.APPLICATION_JSON).get(String.class);
+        String jsonStr = getJsonResultWithRetries(userResource, config.apiRetries);
         Collection<User> userCol = deserializeJsonStr(jsonStr, "users", User.class, objMapper);
         Map<Integer, User> result = Maps.newHashMapWithExpectedSize(userCol.size());
         for (User user : userCol) {
@@ -113,13 +113,12 @@ public class JsonHipChatDao implements IHipChatApiDao {
         DateTime curDate = start;
         List<Message> messages = Lists.newArrayList();
         WebResource roomsResource = resource.path("rooms/history");
-        roomsResource = addTokenQueryParam(roomsResource)
-            .queryParam("room_id", String.valueOf(room.getRoomId()))
+        roomsResource = roomsResource.queryParam("room_id", String.valueOf(room.getRoomId()))
             .queryParam("timezone", config.timeZone);
         Interval messageInterval = new Interval(start, end);
         while (curDate.isBefore(end) || curDate.equals(end)) {
             roomsResource = roomsResource.queryParam("date", curDate.toString(apiDateFormat));
-            String jsonStr = roomsResource.get(String.class);
+            String jsonStr = getJsonResultWithRetries(roomsResource, config.apiRetries);
             Collection<Message> messageCol = deserializeJsonStr(jsonStr, "messages", Message.class,
                                                                 objMapper);
             for (Message message : messageCol) {
@@ -130,6 +129,31 @@ public class JsonHipChatDao implements IHipChatApiDao {
             curDate = curDate.plusDays(1);
         }
         return messages;
+    }
+
+    /**
+     * Helper method for doing GETs with <code>retries</code> number of retries in case of 403
+     * errors.
+     *
+     * @param resource
+     *            The resource to GET data from
+     * @param retries
+     *            The number of retries if a 403 is encountered.
+     * @return The JSON result string.
+     */
+    private String getJsonResultWithRetries(WebResource resource, int retries) {
+        resource = addTokenQueryParam(resource);
+        while (retries >= 0) {
+            try {
+                String jsonStr = resource.accept(MediaType.APPLICATION_JSON).get(String.class);
+                return jsonStr;
+            } catch (UniformInterfaceException e) {
+                if (e.getResponse().getStatus() == Status.FORBIDDEN.getStatusCode()) {
+                    retries--;
+                }
+            }
+        }
+        return "{}";
     }
 
     /**
