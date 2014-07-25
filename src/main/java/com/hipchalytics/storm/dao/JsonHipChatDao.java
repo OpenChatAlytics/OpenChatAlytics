@@ -78,7 +78,6 @@ public class JsonHipChatDao implements IHipChatApiDao {
         for (Room room : roomCol) {
             result.put(room.getRoomId(), room);
         }
-        System.out.println(result);
         return result;
     }
 
