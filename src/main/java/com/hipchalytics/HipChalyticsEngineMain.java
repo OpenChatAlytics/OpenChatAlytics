@@ -2,7 +2,7 @@ package com.hipchalytics;
 
 import com.hipchalytics.config.HipChalyticsConfig;
 import com.hipchalytics.storm.HipChalyticsService;
-import com.hipchalytics.storm.spout.HipChalyticsStormTopology;
+import com.hipchalytics.storm.HipChalyticsStormTopology;
 import com.hipchalytics.util.YamlUtils;
 
 import java.io.FileNotFoundException;
