@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence xmlns="http://java.sun.com/xml/ns/persistence"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_1_0.xsd"
+    version="1.0">
+
+    <persistence-unit name="hipchalytics-db"
+        transaction-type="RESOURCE_LOCAL">
+        <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+        <properties>
+            <!-- if this is true, hibernate will print (to stdout) the SQL 
+                it executes, so you can check it to ensure it's not doing anything crazy -->
+            <property name="hibernate.show_sql" value="true" />
+            <property name="hibernate.format_sql" value="true" />
+            <!-- this tell Hibernate to update the DDL when it starts, very 
+                useful for development, dangerous in production -->
+            <property name="hibernate.hbm2ddl.auto" value="update" />
+            <property name="java.naming.factory.initial" value=""/>
+            <property name="hibernate.dialect" value="org.hibernate.dialect.H2Dialect" />
+            <property name="hibernate.connection.driver_class" value="org.h2.Driver" />
+            <property name="hibernate.connection.url" value="jdbc:h2:/mnt/hipchalytics" />
+            <property name="hibernate.connection.username" value="" />
+            <property name="hibernate.connection.password" value="" />
+            <property name="hibernate.hbm2ddl.auto" value="update" />
+            <property name="jadira.usertype.autoRegisterUserTypes" value="true" />
+            <property name="hibernate.connection.CharSet" value="utf-8" />
+            <property name="hibernate.connection.characterEncoding" value="utf-8" />
+            <property name="hibernate.connection.useUnicode" value="true" />
+        </properties>
+        
+    </persistence-unit>
+</persistence>

@@ -1,9 +1,15 @@
 package com.hipchalytics.db.dao;
 
+import com.google.common.util.concurrent.AbstractIdleService;
 import com.hipchalytics.config.HipChalyticsConfig;
-import com.hipchalytics.model.Entity;
+import com.hipchalytics.model.HipchatEntity;
 
+import org.hibernate.HibernateException;
 import org.joda.time.DateTime;
+
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
 
 /**
  * Implementation of the {@link IHipChalyticsDao} using SQL lite
@@ -11,12 +17,14 @@ import org.joda.time.DateTime;
  * @author giannis
  *
  */
-public class HipChalyticsLiteDaoImpl implements IHipChalyticsDao {
+public class HipChalyticsLiteDaoImpl extends AbstractIdleService implements IHipChalyticsDao {
 
     private final HipChalyticsConfig config;
+    private final EntityManager entityManager;
 
     public HipChalyticsLiteDaoImpl(HipChalyticsConfig hconfig) {
         this.config = hconfig;
+        this.entityManager = createEntityManager();
     }
 
     /**
@@ -24,19 +32,38 @@ public class HipChalyticsLiteDaoImpl implements IHipChalyticsDao {
      */
     @Override
     public DateTime getLastMessagePullTime() {
+
         return new DateTime(System.currentTimeMillis());
     }
 
     @Override
-    public void persistEntity(Entity entity) {
-        // TODO Auto-generated method stub
+    public void persistEntity(HipchatEntity entity) {
+        entityManager.getTransaction().begin();
+        entityManager.persist(entity);
+        entityManager.getTransaction().commit();
+    }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public HipchatEntity getEntity(HipchatEntity entity) {
+        return null;
     }
 
     @Override
-    public void getEntity(Entity entity) {
-        // TODO Auto-generated method stub
-
+    protected void shutDown() throws Exception {
+        entityManager.close();
     }
 
+    @Override
+    protected void startUp() throws Exception {
+    }
+
+    private EntityManager createEntityManager() throws HibernateException {
+        EntityManagerFactory entityManagerFactory =
+            Persistence.createEntityManagerFactory("hipchalytics-db");
+        return entityManagerFactory.createEntityManager();
+
+    }
 }

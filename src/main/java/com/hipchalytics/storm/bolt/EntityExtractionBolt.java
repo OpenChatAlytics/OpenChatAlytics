@@ -4,7 +4,9 @@ import com.google.common.collect.Lists;
 import com.google.common.io.Resources;
 import com.hipchalytics.config.ConfigurationConstants;
 import com.hipchalytics.config.HipChalyticsConfig;
-import com.hipchalytics.model.Entity;
+import com.hipchalytics.db.dao.HipChalyticsDaoFactory;
+import com.hipchalytics.db.dao.IHipChalyticsDao;
+import com.hipchalytics.model.HipchatEntity;
 import com.hipchalytics.model.FatMessage;
 import com.hipchalytics.model.Message;
 import com.hipchalytics.util.YamlUtils;
@@ -32,7 +34,9 @@ public class EntityExtractionBolt extends BaseRichBolt {
     private static final Logger LOG = LoggerFactory.getLogger(EntityExtractionBolt.class);
     private static final long serialVersionUID = -1586393277809132608L;
     private static final String HIPCHAT_ENTITY_FIELD_STR = "hipchat-entity";
+
     private AbstractSequenceClassifier<CoreLabel> classifier;
+    private IHipChalyticsDao dbDao;
 
     @Override
     public void prepare(@SuppressWarnings("rawtypes") Map conf, TopologyContext context,
@@ -41,7 +45,7 @@ public class EntityExtractionBolt extends BaseRichBolt {
         HipChalyticsConfig hconfig = YamlUtils.readYamlFromString(configYaml,
                                                                   HipChalyticsConfig.class);
         classifier = getClassifier(hconfig);
-
+        dbDao = HipChalyticsDaoFactory.getHipchalyticsDao(hconfig);
     }
 
     private AbstractSequenceClassifier<CoreLabel> getClassifier(HipChalyticsConfig hconfig) {
@@ -57,13 +61,17 @@ public class EntityExtractionBolt extends BaseRichBolt {
         FatMessage fatMessage = (FatMessage) input.getValue(0);
         if (fatMessage == null) {
             LOG.warn("Got a null tuple");
+            return;
         }
-        List<Entity> entities = extractEntities(fatMessage.getMessage());
 
+        List<HipchatEntity> entities = extractEntities(fatMessage.getMessage());
+        for (HipchatEntity entity : entities) {
+            dbDao.persistEntity(entity);
+        }
     }
 
-    private List<Entity> extractEntities(Message message) {
-        List<Entity> entities = Lists.newArrayList();
+    private List<HipchatEntity> extractEntities(Message message) {
+        List<HipchatEntity> entities = Lists.newArrayList();
         List<List<CoreLabel>> results = classifier.classify(message.getMessage());
         LOG.info("DEBUG:" + results);
         return entities;
