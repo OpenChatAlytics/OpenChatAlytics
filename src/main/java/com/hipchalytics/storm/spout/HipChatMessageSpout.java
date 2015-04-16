@@ -3,6 +3,8 @@ package com.hipchalytics.storm.spout;
 import com.google.common.collect.Lists;
 import com.hipchalytics.config.ConfigurationConstants;
 import com.hipchalytics.config.HipChalyticsConfig;
+import com.hipchalytics.db.dao.HipChalyticsDaoFactory;
+import com.hipchalytics.db.dao.IHipChalyticsDao;
 import com.hipchalytics.hipchat.dao.HipChatApiDaoFactory;
 import com.hipchalytics.hipchat.dao.IHipChatApiDao;
 import com.hipchalytics.model.FatMessage;
@@ -36,8 +38,8 @@ public class HipChatMessageSpout extends BaseRichSpout {
 
     private IHipChatApiDao hipchatDao;
     private DateTimeZone dtz;
-    private DateTime lastPullTime;
     private SpoutOutputCollector collector;
+    private IHipChalyticsDao dbDao;
 
     public static final String SPOUT_ID = "HIP_CHAT_MESSAGE_SPOUT_ID";
     public static final String HIPCHAT_MESSAGE_FIELD_STR = "hipchat-message";
@@ -46,14 +48,17 @@ public class HipChatMessageSpout extends BaseRichSpout {
 
     @Override
     public void nextTuple() {
-        Map<Integer, Room> rooms = hipchatDao.getRooms();
-        DateTime endDate = roundDateTime(new DateTime(System.currentTimeMillis()).withZone(dtz));
-        if (lastPullTime.isEqual(endDate) || lastPullTime.isAfter(endDate)) {
+        DateTime newPullEndDate = truncateDateTimeToHour(DateTime.now(dtz));
+        DateTime lastPullTime = truncateDateTimeToHour(dbDao.getLastMessagePullTime());
+        if (lastPullTime.isEqual(newPullEndDate) || lastPullTime.isAfter(newPullEndDate)) {
+            LOG.info("Not ready to pull data yet. Last pull time was {}, new pull end date was {}",
+                     lastPullTime, newPullEndDate);
             return;
         }
+        Map<Integer, Room> rooms = hipchatDao.getRooms();
         List<FatMessage> messagesToEmit = Lists.newArrayList();
         for (Room room : rooms.values()) {
-            List<Message> messages = hipchatDao.getMessages(lastPullTime, endDate, room);
+            List<Message> messages = hipchatDao.getMessages(lastPullTime, newPullEndDate, room);
             Map<Integer, User> users = hipchatDao.getUsers();
             for (Message message : messages) {
                 User user = users.get(message.getFromUserId());
@@ -71,15 +76,16 @@ public class HipChatMessageSpout extends BaseRichSpout {
     }
 
     @Override
-    public void open(Map conf, TopologyContext context, SpoutOutputCollector collector) {
+    public void open(@SuppressWarnings("rawtypes") Map conf, TopologyContext context,
+            SpoutOutputCollector collector) {
         String configYaml = (String) conf.get(ConfigurationConstants.HIPCHALYTICS_CONFIG.txt);
         HipChalyticsConfig hconfig = YamlUtils.readYamlFromString(configYaml,
                                                                   HipChalyticsConfig.class);
         LOG.info("Loaded config...");
         hipchatDao = HipChatApiDaoFactory.getHipChatApiDao(hconfig);
+        dbDao = HipChalyticsDaoFactory.getHipchalyticsDao(hconfig);
         LOG.info("Got HipChat API DAO...");
         dtz = DateTimeZone.forID(hconfig.timeZone);
-        lastPullTime = roundDateTime(new DateTime(System.currentTimeMillis()).withZone(dtz));
         this.collector = collector;
     }
 
@@ -88,7 +94,7 @@ public class HipChatMessageSpout extends BaseRichSpout {
         fields.declare(new Fields(HIPCHAT_MESSAGE_FIELD_STR));
     }
 
-    private DateTime roundDateTime(DateTime dateTime) {
+    private DateTime truncateDateTimeToHour(DateTime dateTime) {
         return dateTime.withMinuteOfHour(0).withSecondOfMinute(0).withMillisOfSecond(0);
     }
 

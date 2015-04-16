@@ -25,4 +25,6 @@ public class HipChalyticsConfig implements Serializable {
 
     public int apiRetries = 3;
 
+    public String classifier;
+
 }

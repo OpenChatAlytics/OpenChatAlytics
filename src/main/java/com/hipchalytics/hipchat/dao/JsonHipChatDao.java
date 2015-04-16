@@ -63,7 +63,7 @@ public class JsonHipChatDao implements IHipChatApiDao {
         this.dtz = DateTimeZone.forID(config.timeZone);
         this.apiDateFormat = DateTimeFormat.forPattern(config.apiDateFormat).withZone(dtz);
         this.objMapper = new ObjectMapper();
-        objMapper.registerModule(new HipChalyticsJsonModule());
+        this.objMapper.registerModule(new HipChalyticsJsonModule());
     }
 
     /**
@@ -193,8 +193,7 @@ public class JsonHipChatDao implements IHipChatApiDao {
                                                            type);
             re = objMapper.readValue(jsonStr, thetype);
         } catch (IOException e) {
-            LOG.error("Got {} when trying to deserialize list of {}", colClassElements,
-                      e.getMessage(), e);
+            LOG.error("Got exception when trying to deserialize list of {}", colClassElements, e);
             return Lists.newArrayListWithExpectedSize(0);
         }
         return re.get(mapElement);

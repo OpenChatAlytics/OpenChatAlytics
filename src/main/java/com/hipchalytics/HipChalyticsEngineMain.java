@@ -22,7 +22,7 @@ public class HipChalyticsEngineMain {
                                                                    HipChalyticsConfig.class);
         HipChalyticsService hipChopilyticsService = new HipChalyticsService(hipchatTopology.get(),
                                                                             config);
-        hipChopilyticsService.startAsync();
+        hipChopilyticsService.startAsync().awaitRunning();
 
     }
 

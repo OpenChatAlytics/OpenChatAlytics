@@ -16,9 +16,9 @@ public class HipChalyticsDaoFactory {
         // hide constructor
     }
 
-    public static IHipChalyticsDao getHipChatApiDao(HipChalyticsConfig hconfig) {
+    public static IHipChalyticsDao getHipchalyticsDao(HipChalyticsConfig hconfig) {
         if (hipchalyticsDaoImpl == null) {
-            hipchalyticsDaoImpl = new HipChalyticsDaoImpl(hconfig);
+            hipchalyticsDaoImpl = new HipChalyticsLiteDaoImpl(hconfig);
         }
         return hipchalyticsDaoImpl;
     }
