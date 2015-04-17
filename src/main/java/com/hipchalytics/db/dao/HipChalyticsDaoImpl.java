@@ -3,8 +3,10 @@ package com.hipchalytics.db.dao;
 import com.google.common.util.concurrent.AbstractIdleService;
 import com.hipchalytics.config.HipChalyticsConfig;
 import com.hipchalytics.model.HipchatEntity;
+import com.hipchalytics.model.LastPullTime;
 
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.joda.time.Interval;
 
 import java.util.List;
@@ -24,12 +26,12 @@ import javax.persistence.criteria.Root;
  * @author giannis
  *
  */
-public class HipChalyticsLiteDaoImpl extends AbstractIdleService implements IHipChalyticsDao {
+public class HipChalyticsDaoImpl extends AbstractIdleService implements IHipChalyticsDao {
 
     private final EntityManager entityManager;
     private final EntityManagerFactory entityManagerFactory;
 
-    public HipChalyticsLiteDaoImpl(HipChalyticsConfig hconfig) {
+    public HipChalyticsDaoImpl(HipChalyticsConfig hconfig) {
         this.entityManagerFactory =
             Persistence.createEntityManagerFactory(hconfig.persistenceUnitName);
         this.entityManager = entityManagerFactory.createEntityManager();
@@ -40,13 +42,41 @@ public class HipChalyticsLiteDaoImpl extends AbstractIdleService implements IHip
      */
     @Override
     public DateTime getLastMessagePullTime() {
+        String query = String.format("FROM %s", LastPullTime.class.getSimpleName());
+        List<LastPullTime> result = entityManager.createQuery(query, LastPullTime.class)
+                                                 .getResultList();
 
-        return new DateTime(System.currentTimeMillis());
+        if (result == null || result.size() == 0) {
+            return new DateTime(0).withZone(DateTimeZone.UTC);
+        }
+        return result.get(0).getTime();
+    }
+
+    /**
+     * Update the last pull time
+     *
+     * @param time
+     *            Time to set it to
+     */
+    @Override
+    public void setLastMessagePullTime(DateTime time) {
+        LastPullTime lastPullTime = entityManager.find(LastPullTime.class, LastPullTime.ID);
+
+        entityManager.getTransaction().begin();
+        if (lastPullTime != null) {
+            lastPullTime.setTime(time);
+        } else {
+            lastPullTime = new LastPullTime(time);
+            entityManager.persist(lastPullTime);
+        }
+        entityManager.getTransaction().commit();
     }
 
     @Override
     public void persistEntity(HipchatEntity entity) {
         entityManager.getTransaction().begin();
+        String queryStr = String.format("DELETE FROM %s", LastPullTime.class.getSimpleName());
+        entityManager.createQuery(queryStr).executeUpdate();
         entityManager.persist(entity);
         entityManager.getTransaction().commit();
     }
@@ -86,7 +116,7 @@ public class HipChalyticsLiteDaoImpl extends AbstractIdleService implements IHip
      * {@inheritDoc}
      */
     @Override
-    public Long getTotalMentionsForEntity(String entity, Interval interval) {
+    public long getTotalMentionsForEntity(String entity, Interval interval) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Long> query = cb.createQuery(Long.class);
         Root<HipchatEntity> from = query.from(HipchatEntity.class);
@@ -100,12 +130,17 @@ public class HipChalyticsLiteDaoImpl extends AbstractIdleService implements IHip
                     cb.between(from.get("mentionTime"), startDateParam,
                                endDateParam));
 
-        return entityManager.createQuery(query)
-                            .setParameter(entityParam, entity)
-                            .setParameter(startDateParam, interval.getStart())
-                            .setParameter(endDateParam, interval.getEnd())
-                            .getSingleResult();
+        Long result =  entityManager.createQuery(query)
+                                    .setParameter(entityParam, entity)
+                                    .setParameter(startDateParam, interval.getStart())
+                                    .setParameter(endDateParam, interval.getEnd())
+                                    .getSingleResult();
 
+        if (result == null) {
+            return 0;
+        } else {
+            return result;
+        }
     }
 
     @Override

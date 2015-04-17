@@ -1,6 +1,6 @@
 package com.hipchalytics.model;
 
-import com.google.common.base.Objects;
+import com.google.common.base.MoreObjects;
 
 import java.io.Serializable;
 
@@ -39,10 +39,10 @@ public class FatMessage implements Serializable {
 
     @Override
     public String toString() {
-        return Objects.toStringHelper(this)
-            .add("message", message)
-            .add("user", user)
-            .add("room", room).toString();
+        return MoreObjects.toStringHelper(this.getClass())
+                          .add("message", message)
+                          .add("user", user)
+                          .add("room", room).toString();
     }
 
 }

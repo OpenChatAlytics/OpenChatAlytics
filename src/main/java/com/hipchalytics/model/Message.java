@@ -1,6 +1,6 @@
 package com.hipchalytics.model;
 
-import com.google.common.base.Objects;
+import com.google.common.base.MoreObjects;
 
 import org.joda.time.DateTime;
 
@@ -46,12 +46,12 @@ public class Message implements Serializable {
 
     @Override
     public String toString() {
-        return Objects.toStringHelper(this.getClass())
-            .add("date", date)
-            .add("fromName", fromName)
-            .add("fromUserId", fromUserId)
-            .add("message", message)
-            .toString();
+        return MoreObjects.toStringHelper(this.getClass())
+                          .add("date", date)
+                          .add("fromName", fromName)
+                          .add("fromUserId", fromUserId)
+                          .add("message", message)
+                          .toString();
     }
 
 }

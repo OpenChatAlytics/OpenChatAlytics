@@ -18,7 +18,7 @@ public class HipChalyticsDaoFactory {
 
     public static IHipChalyticsDao getHipchalyticsDao(HipChalyticsConfig hconfig) {
         if (hipchalyticsDaoImpl == null) {
-            hipchalyticsDaoImpl = new HipChalyticsLiteDaoImpl(hconfig);
+            hipchalyticsDaoImpl = new HipChalyticsDaoImpl(hconfig);
         }
         return hipchalyticsDaoImpl;
     }

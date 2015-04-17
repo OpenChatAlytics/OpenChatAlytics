@@ -22,6 +22,14 @@ public interface IHipChalyticsDao extends Service {
     public DateTime getLastMessagePullTime();
 
     /**
+     * Update the last pull time to a new one
+     *
+     * @param time
+     *            The time to update to
+     */
+    public void setLastMessagePullTime(DateTime time);
+
+    /**
      * Persists an entity to the database
      *
      * @param entity
@@ -62,5 +70,5 @@ public interface IHipChalyticsDao extends Service {
      *            exclusive of the end time.
      * @return The total number of times the entity was mentioned in the given time interval
      */
-    public Long getTotalMentionsForEntity(String entity, Interval interval);
+    public long getTotalMentionsForEntity(String entity, Interval interval);
 }

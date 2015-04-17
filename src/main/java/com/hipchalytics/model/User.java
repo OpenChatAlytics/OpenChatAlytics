@@ -1,6 +1,6 @@
 package com.hipchalytics.model;
 
-import com.google.common.base.Objects;
+import com.google.common.base.MoreObjects;
 
 import org.joda.time.DateTime;
 
@@ -98,21 +98,21 @@ public class User {
 
     @Override
     public String toString() {
-        return Objects.toStringHelper(this.getClass())
-            .add("userId", userId)
-            .add("email", email)
-            .add("deleted", deleted)
-            .add("groupAdmin", groupAdmin)
-            .add("name", name)
-            .add("mentionName", mentionName)
-            .add("photoUrl", photoUrl)
-            .add("lastActiveDate", lastActiveDate)
-            .add("creationDate", creationDate)
-            .add("status", status)
-            .add("statusMessage", statusMessage)
-            .add("timezone", timezone)
-            .add("title", title)
-            .toString();
+        return MoreObjects.toStringHelper(this.getClass())
+                          .add("userId", userId)
+                          .add("email", email)
+                          .add("deleted", deleted)
+                          .add("groupAdmin", groupAdmin)
+                          .add("name", name)
+                          .add("mentionName", mentionName)
+                          .add("photoUrl", photoUrl)
+                          .add("lastActiveDate", lastActiveDate)
+                          .add("creationDate", creationDate)
+                          .add("status", status)
+                          .add("statusMessage", statusMessage)
+                          .add("timezone", timezone)
+                          .add("title", title)
+                          .toString();
     }
 
 }

@@ -1,6 +1,6 @@
 package com.hipchalytics.model;
 
-import com.google.common.base.Objects;
+import com.google.common.base.MoreObjects;
 
 import org.joda.time.DateTime;
 
@@ -84,18 +84,18 @@ public class Room implements Serializable {
 
     @Override
     public String toString() {
-        return Objects.toStringHelper(this.getClass())
-            .add("roomId", roomId)
-            .add("name", name)
-            .add("topic", topic)
-            .add("lastActiveDate", lastActiveDate)
-            .add("creationDate", creationDate)
-            .add("ownerUserId", ownerUserId)
-            .add("archived", archived)
-            .add("privateRoom", privateRoom)
-            .add("guestAccessURL", guestAccessURL)
-            .add("xmppJid", xmppJid)
-            .toString();
+        return MoreObjects.toStringHelper(this.getClass())
+                          .add("roomId", roomId)
+                          .add("name", name)
+                          .add("topic", topic)
+                          .add("lastActiveDate", lastActiveDate)
+                          .add("creationDate", creationDate)
+                          .add("ownerUserId", ownerUserId)
+                          .add("archived", archived)
+                          .add("privateRoom", privateRoom)
+                          .add("guestAccessURL", guestAccessURL)
+                          .add("xmppJid", xmppJid)
+                          .toString();
     }
 
 }
