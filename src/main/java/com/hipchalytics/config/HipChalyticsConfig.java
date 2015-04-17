@@ -25,7 +25,7 @@ public class HipChalyticsConfig implements Serializable {
 
     public int apiRetries = 3;
 
-    public String classifier;
+    public String classifier = "classifiers/english.all.3class.distsim.crf.ser.gz";
 
     public String persistenceUnitName = "hipchalytics-db";
 
