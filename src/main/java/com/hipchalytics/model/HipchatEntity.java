@@ -19,20 +19,24 @@ import javax.persistence.Table;
  *
  */
 @Entity
-@Table(name = "entities")
+@Table(name = HipchatEntity.ENTITY_TABLE_NAME)
 public class HipchatEntity implements Serializable {
+
+    public static final String ENTITY_TABLE_NAME = "ENTITIES";
+    public static final String ENTITY_VALUE_COLUMN = "ENTITY_VALUE";
+    public static final String OCCURENCES_COLUMN = "OCCURRENCES";
+    public static final String MENTION_TIME_COLUMN = "MENTION_TIME";
 
     public static final long serialVersionUID = -4845804080646234253L;
 
     private String entityValue;
-    private int occurrences;
-
+    private long occurrences;
     private DateTime mentionTime;
 
     public HipchatEntity() {
     }
 
-    public HipchatEntity(String entityValue, int occurrences, DateTime mentionTime) {
+    public HipchatEntity(String entityValue, long occurrences, DateTime mentionTime) {
         this.entityValue = entityValue;
         this.occurrences = occurrences;
         this.mentionTime = mentionTime;
@@ -48,19 +52,19 @@ public class HipchatEntity implements Serializable {
     }
 
     @Id
-    @Column
+    @Column(name = ENTITY_VALUE_COLUMN)
     public String getEntityValue() {
         return entityValue;
     }
 
     @Id
-    @Column
-    public int getOccurrences() {
+    @Column(name = OCCURENCES_COLUMN)
+    public long getOccurrences() {
         return occurrences;
     }
 
     @Id
-    @Column
+    @Column(name = MENTION_TIME_COLUMN)
     @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
     public DateTime getMentionTime() {
         return mentionTime;
@@ -70,7 +74,7 @@ public class HipchatEntity implements Serializable {
         this.entityValue = entityValue;
     }
 
-    protected void setOccurrences(int occurrences) {
+    protected void setOccurrences(long occurrences) {
         this.occurrences = occurrences;
     }
 

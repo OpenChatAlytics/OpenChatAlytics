@@ -27,4 +27,6 @@ public class HipChalyticsConfig implements Serializable {
 
     public String classifier;
 
+    public String persistenceUnitName = "hipchalytics-db";
+
 }
