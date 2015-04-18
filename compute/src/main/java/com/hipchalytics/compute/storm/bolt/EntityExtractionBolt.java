@@ -61,6 +61,7 @@ public class EntityExtractionBolt extends BaseRichBolt {
                                                                   HipChalyticsConfig.class);
         classifier = getClassifier(hconfig);
         dbDao = HipChalyticsDaoFactory.getHipchalyticsDao(hconfig);
+        dbDao.startAsync().awaitRunning();
     }
 
     /**
@@ -140,6 +141,11 @@ public class EntityExtractionBolt extends BaseRichBolt {
     @Override
     public void declareOutputFields(OutputFieldsDeclarer fields) {
         fields.declare(new Fields(HIPCHAT_ENTITY_FIELD_STR));
+    }
+
+    @Override
+    public void cleanup() {
+        dbDao.stopAsync().awaitTerminated();
     }
 
 }

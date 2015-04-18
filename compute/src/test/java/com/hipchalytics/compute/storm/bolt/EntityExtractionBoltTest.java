@@ -10,6 +10,7 @@ import com.hipchalytics.core.model.User;
 import org.apache.storm.guava.collect.Maps;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -24,12 +25,12 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
- * Tests {@link HipChatMessageSpout}.
+ * Tests {@link EntityExtractionBolt}.
  *
  * @author giannis
  *
  */
-public class HipChatMessageSpout {
+public class EntityExtractionBoltTest {
 
     private EntityExtractionBolt underTest;
 
@@ -72,4 +73,8 @@ public class HipChatMessageSpout {
         assertEquals(date, entity.getMentionTime());
     }
 
+    @After
+    public void tearDown() throws Exception {
+        underTest.cleanup();
+    }
 }
