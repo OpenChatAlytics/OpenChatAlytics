@@ -1,10 +1,12 @@
 package com.hipchalytics.compute.db.dao;
 
+import com.google.common.base.Optional;
 import com.google.common.util.concurrent.AbstractIdleService;
 import com.hipchalytics.compute.config.HipChalyticsConfig;
 import com.hipchalytics.core.model.HipchatEntity;
 import com.hipchalytics.core.model.LastPullTime;
 
+import org.apache.storm.guava.collect.Lists;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Interval;
@@ -14,10 +16,12 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
+import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.ParameterExpression;
+import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
 /**
@@ -72,11 +76,12 @@ public class HipChalyticsDaoImpl extends AbstractIdleService implements IHipChal
         entityManager.getTransaction().commit();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void persistEntity(HipchatEntity entity) {
         entityManager.getTransaction().begin();
-        String queryStr = String.format("DELETE FROM %s", LastPullTime.class.getSimpleName());
-        entityManager.createQuery(queryStr).executeUpdate();
         entityManager.persist(entity);
         entityManager.getTransaction().commit();
     }
@@ -93,30 +98,54 @@ public class HipChalyticsDaoImpl extends AbstractIdleService implements IHipChal
      * {@inheritDoc}
      */
     @Override
-    public List<HipchatEntity> getAllEntityMentions(String entity, Interval interval) {
+    public List<HipchatEntity> getAllEntityMentions(String entity, Interval interval,
+            Optional<String> roomName, Optional<String> username) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<HipchatEntity> query = cb.createQuery(HipchatEntity.class);
         Root<HipchatEntity> from = query.from(HipchatEntity.class);
         ParameterExpression<String> entityParam = cb.parameter(String.class);
         ParameterExpression<DateTime> startDateParam = cb.parameter(DateTime.class);
         ParameterExpression<DateTime> endDateParam = cb.parameter(DateTime.class);
-        query.where(cb.equal(from.get("entityValue"), entityParam),
-                    cb.between(from.get("mentionTime"), startDateParam,
-                               endDateParam));
 
-        return entityManager.createQuery(query)
-                            .setParameter(entityParam, entity)
-                            .setParameter(startDateParam, interval.getStart())
-                            .setParameter(endDateParam, interval.getEnd())
-                            .getResultList();
+        List<Predicate> wherePredicates = Lists.newArrayListWithCapacity(4);
+        wherePredicates.add(cb.equal(from.get("entityValue"), entityParam));
+        wherePredicates.add(cb.between(from.get("mentionTime"), startDateParam,
+                                       endDateParam));
 
+        // Add the optional parameters
+        ParameterExpression<String> roomNameParam = null;
+        if (roomName.isPresent()) {
+            roomNameParam = cb.parameter(String.class);
+            wherePredicates.add(cb.equal(from.get("roomName"), roomNameParam));
+        }
+        ParameterExpression<String> usernameParam = null;
+        if (username.isPresent()) {
+            usernameParam = cb.parameter(String.class);
+            wherePredicates.add(cb.equal(from.get("username"), usernameParam));
+        }
+
+        query.where(wherePredicates.toArray(new Predicate[wherePredicates.size()]));
+
+        TypedQuery<HipchatEntity> finalQuery =
+                entityManager.createQuery(query)
+                             .setParameter(entityParam, entity)
+                             .setParameter(startDateParam, interval.getStart())
+                             .setParameter(endDateParam, interval.getEnd());
+        if (roomName.isPresent()) {
+            finalQuery.setParameter(roomNameParam, roomName.get());
+        }
+        if (username.isPresent()) {
+            finalQuery.setParameter(usernameParam, username.get());
+        }
+        return finalQuery.getResultList();
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public long getTotalMentionsForEntity(String entity, Interval interval) {
+    public long getTotalMentionsForEntity(String entity, Interval interval,
+            Optional<String> roomName, Optional<String> username) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Long> query = cb.createQuery(Long.class);
         Root<HipchatEntity> from = query.from(HipchatEntity.class);
@@ -126,20 +155,44 @@ public class HipChalyticsDaoImpl extends AbstractIdleService implements IHipChal
         Expression<Long> sum = cb.sum(from.get("occurrences"));
 
         query.select(sum.alias("occurrences"));
-        query.where(cb.equal(from.get("entityValue"), entityParam),
-                    cb.between(from.get("mentionTime"), startDateParam,
-                               endDateParam));
 
-        Long result =  entityManager.createQuery(query)
-                                    .setParameter(entityParam, entity)
-                                    .setParameter(startDateParam, interval.getStart())
-                                    .setParameter(endDateParam, interval.getEnd())
-                                    .getSingleResult();
+        List<Predicate> wherePredicates = Lists.newArrayListWithCapacity(4);
+        wherePredicates.add(cb.equal(from.get("entityValue"), entityParam));
+        wherePredicates.add(cb.between(from.get("mentionTime"), startDateParam,
+                                       endDateParam));
 
-        if (result == null) {
+        // Add the optional parameters
+        ParameterExpression<String> roomNameParam = null;
+        if (roomName.isPresent()) {
+            roomNameParam = cb.parameter(String.class);
+            wherePredicates.add(cb.equal(from.get("roomName"), roomNameParam));
+        }
+        ParameterExpression<String> usernameParam = null;
+        if (username.isPresent()) {
+            usernameParam = cb.parameter(String.class);
+            wherePredicates.add(cb.equal(from.get("username"), usernameParam));
+        }
+
+        query.where(wherePredicates.toArray(new Predicate[wherePredicates.size()]));
+
+        TypedQuery<Long> finalQuery =
+                entityManager.createQuery(query)
+                             .setParameter(entityParam, entity)
+                             .setParameter(startDateParam, interval.getStart())
+                             .setParameter(endDateParam, interval.getEnd());
+        if (roomName.isPresent()) {
+            finalQuery.setParameter(roomNameParam, roomName.get());
+        }
+        if (username.isPresent()) {
+            finalQuery.setParameter(usernameParam, username.get());
+        }
+
+        List<Long> result = finalQuery.getResultList();
+
+        if (result == null || result.isEmpty() || result.get(0) == null) {
             return 0;
         } else {
-            return result;
+            return result.get(0);
         }
     }
 

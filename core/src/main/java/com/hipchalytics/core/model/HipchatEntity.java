@@ -26,29 +26,27 @@ public class HipchatEntity implements Serializable {
     public static final String ENTITY_VALUE_COLUMN = "ENTITY_VALUE";
     public static final String OCCURENCES_COLUMN = "OCCURRENCES";
     public static final String MENTION_TIME_COLUMN = "MENTION_TIME";
+    public static final String ROOM_NAME_COLUMN = "ROOM_NAME";
+    public static final String USER_NAME_COLUMN = "USER_NAME";
 
     public static final long serialVersionUID = -4845804080646234253L;
 
     private String entityValue;
     private long occurrences;
     private DateTime mentionTime;
+    private String username;
+    private String roomName;
 
     public HipchatEntity() {
     }
 
-    public HipchatEntity(String entityValue, long occurrences, DateTime mentionTime) {
+    public HipchatEntity(String entityValue, long occurrences, DateTime mentionTime,
+            String username, String roomName) {
         this.entityValue = entityValue;
         this.occurrences = occurrences;
         this.mentionTime = mentionTime;
-    }
-
-    @Override
-    public String toString() {
-        return MoreObjects.toStringHelper(this.getClass())
-                          .add("entityValue", entityValue)
-                          .add("occurrences", occurrences)
-                          .add("mentionTime", mentionTime)
-                          .toString();
+        this.username = username;
+        this.roomName = roomName;
     }
 
     @Id
@@ -70,6 +68,18 @@ public class HipchatEntity implements Serializable {
         return mentionTime;
     }
 
+    @Id
+    @Column(name = USER_NAME_COLUMN)
+    public String getUsername() {
+        return username;
+    }
+
+    @Id
+    @Column(name = ROOM_NAME_COLUMN)
+    public String getRoomName() {
+        return roomName;
+    }
+
     protected void setEntityValue(String entityValue) {
         this.entityValue = entityValue;
     }
@@ -80,6 +90,25 @@ public class HipchatEntity implements Serializable {
 
     protected void setMentionTime(DateTime mentionTime) {
         this.mentionTime = mentionTime;
+    }
+
+    protected void setUsername(String username) {
+        this.username = username;
+    }
+
+    protected void setRoomName(String roomName) {
+        this.roomName = roomName;
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this.getClass())
+                          .add("entityValue", entityValue)
+                          .add("occurrences", occurrences)
+                          .add("mentionTime", mentionTime)
+                          .add("username", username)
+                          .add("roomName", roomName)
+                          .toString();
     }
 
 }

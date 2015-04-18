@@ -86,7 +86,7 @@ public class EntityExtractionBolt extends BaseRichBolt {
             return;
         }
 
-        List<HipchatEntity> entities = extractEntities(fatMessage.getMessage());
+        List<HipchatEntity> entities = extractEntities(fatMessage);
         for (HipchatEntity entity : entities) {
             dbDao.persistEntity(entity);
         }
@@ -95,12 +95,13 @@ public class EntityExtractionBolt extends BaseRichBolt {
     /**
      * Given a message this method uses a classifier to extract entities.
      *
-     * @param message
+     * @param fatMessage
      *            The message containing the text to parse.
      * @return A list of entities from the text
      */
     @VisibleForTesting
-    protected List<HipchatEntity> extractEntities(Message message) {
+    protected List<HipchatEntity> extractEntities(FatMessage fatMessage) {
+        Message message = fatMessage.getMessage();
         Map<String, HipchatEntity> entities = Maps.newHashMap();
         String messageWithXML = classifier.classifyWithInlineXML(message.getMessage());
         Reader r = new StringReader(messageWithXML);
@@ -111,13 +112,17 @@ public class EntityExtractionBolt extends BaseRichBolt {
                 String entity = XMLUtils.readUntilTag(r);
                 if (!tag.isEndTag) {
                     HipchatEntity existingEntity = entities.remove(entity);
+                    long occurrences;
                     if (existingEntity == null) {
-                        entities.put(entity, new HipchatEntity(entity, 1, message.getDate()));
+                        occurrences = 1;
                     }  else {
-                        entities.put(entity, new HipchatEntity(entity,
-                                                               existingEntity.getOccurrences() + 1,
-                                                               message.getDate()));
+                        occurrences = existingEntity.getOccurrences() + 1;
                     }
+                    entities.put(entity, new HipchatEntity(entity,
+                                                           occurrences,
+                                                           message.getDate(),
+                                                           fatMessage.getUser().getMentionName(),
+                                                           fatMessage.getRoom().getName()));
                 }
 
                 tag = XMLUtils.readAndParseTag(r);

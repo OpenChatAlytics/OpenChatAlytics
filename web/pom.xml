@@ -17,7 +17,12 @@
         <dependency>
             <groupId>com.hipchalytics.core</groupId>
             <artifactId>hipchalytics-core</artifactId>
-            <version>${parent.version}</version>
+            <version>${project.parent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.hipchalytics.compute</groupId>
+            <artifactId>hipchalytics-compute</artifactId>
+            <version>${project.parent.version}</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>

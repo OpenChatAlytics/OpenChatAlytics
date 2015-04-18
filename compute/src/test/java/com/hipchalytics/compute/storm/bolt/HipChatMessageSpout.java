@@ -1,8 +1,11 @@
 package com.hipchalytics.compute.storm.bolt;
 
 import com.hipchalytics.compute.config.ConfigurationConstants;
+import com.hipchalytics.core.model.FatMessage;
 import com.hipchalytics.core.model.HipchatEntity;
 import com.hipchalytics.core.model.Message;
+import com.hipchalytics.core.model.Room;
+import com.hipchalytics.core.model.User;
 
 import org.apache.storm.guava.collect.Maps;
 import org.joda.time.DateTime;
@@ -18,6 +21,7 @@ import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Tests {@link HipChatMessageSpout}.
@@ -49,8 +53,12 @@ public class HipChatMessageSpout {
         String ent2 = "Mount Everest";
         Message msg = new Message(date, mentionName, userId,
                                   String.format("Today, %s is going to climb %s", ent1, ent2));
-
-        List<HipchatEntity> entities = underTest.extractEntities(msg);
+        User mockUser = mock(User.class);
+        when(mockUser.getMentionName()).thenReturn("jane");
+        Room mockRoom = mock(Room.class);
+        when(mockRoom.getName()).thenReturn("theroom");
+        FatMessage fatMessage = new FatMessage(msg, mockUser, mockRoom);
+        List<HipchatEntity> entities = underTest.extractEntities(fatMessage);
         assertEquals(2, entities.size());
 
         HipchatEntity entity = entities.get(1);

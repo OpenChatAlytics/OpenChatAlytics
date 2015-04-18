@@ -1,5 +1,6 @@
 package com.hipchalytics.compute.db.dao;
 
+import com.google.common.base.Optional;
 import com.google.common.util.concurrent.Service;
 import com.hipchalytics.core.model.HipchatEntity;
 
@@ -55,10 +56,15 @@ public interface IHipChalyticsDao extends Service {
      * @param interval
      *            The interval of interest. Note that the query is inclusive of the start time and
      *            exclusive of the end time.
+     * @param roomName
+     *            Optionally supply a room name
+     * @param username
+     *            Optionally supply a user name
      * @return A list of {@link HipchatEntity} representing all the times this entity was mentioned
      *         in the given time period
      */
-    public List<HipchatEntity> getAllEntityMentions(String entity, Interval interval);
+    public List<HipchatEntity> getAllEntityMentions(String entity, Interval interval,
+            Optional<String> roomName, Optional<String> username);
 
     /**
      * Returns the total number of times an entity was mentioned in the given <code>interval</code>.
@@ -68,7 +74,12 @@ public interface IHipChalyticsDao extends Service {
      * @param interval
      *            The interval of interest. Note that the query is inclusive of the start time and
      *            exclusive of the end time.
+     * @param roomName
+     *            Optionally supply a room name
+     * @param username
+     *            Optionally supply a user name
      * @return The total number of times the entity was mentioned in the given time interval
      */
-    public long getTotalMentionsForEntity(String entity, Interval interval);
+    public long getTotalMentionsForEntity(String entity, Interval interval,
+            Optional<String> roomName, Optional<String> username);
 }
