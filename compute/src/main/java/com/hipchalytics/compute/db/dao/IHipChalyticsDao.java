@@ -63,7 +63,7 @@ public interface IHipChalyticsDao extends Service {
      * @return A list of {@link HipchatEntity} representing all the times this entity was mentioned
      *         in the given time period
      */
-    public List<HipchatEntity> getAllEntityMentions(String entity, Interval interval,
+    public List<HipchatEntity> getAllMentionsForEntity(String entity, Interval interval,
             Optional<String> roomName, Optional<String> username);
 
     /**

@@ -98,7 +98,7 @@ public class HipChalyticsDaoImpl extends AbstractIdleService implements IHipChal
      * {@inheritDoc}
      */
     @Override
-    public List<HipchatEntity> getAllEntityMentions(String entity, Interval interval,
+    public List<HipchatEntity> getAllMentionsForEntity(String entity, Interval interval,
             Optional<String> roomName, Optional<String> username) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<HipchatEntity> query = cb.createQuery(HipchatEntity.class);

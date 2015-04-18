@@ -85,18 +85,18 @@ public class HipChalyticsDaoImplTest {
      * Makes sure that the correct amount of entity mentions are returned
      */
     @Test
-    public void testGetAllEntityMentions() {
+    public void testGetAllMentionsForEntity() {
         Interval timeInterval = new Interval(mentionDate, mentionDate.plusHours(3));
-        List<HipchatEntity> result = underTest.getAllEntityMentions("entity1", timeInterval,
+        List<HipchatEntity> result = underTest.getAllMentionsForEntity("entity1", timeInterval,
                                                                     Optional.absent(),
                                                                     Optional.absent());
         assertEquals(3, result.size());
 
-        result = underTest.getAllEntityMentions("entity1", timeInterval, Optional.of("room1"),
+        result = underTest.getAllMentionsForEntity("entity1", timeInterval, Optional.of("room1"),
                                                 Optional.absent());
         assertEquals(2, result.size());
 
-        result = underTest.getAllEntityMentions("entity1", timeInterval, Optional.of("room1"),
+        result = underTest.getAllMentionsForEntity("entity1", timeInterval, Optional.of("room1"),
                                                 Optional.of("giannis"));
         assertEquals(1, result.size());
     }

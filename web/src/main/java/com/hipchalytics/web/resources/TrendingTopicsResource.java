@@ -51,7 +51,7 @@ public class TrendingTopicsResource {
             roomName = Optional.absent();
         }
 
-        dbDao.getAllEntityMentions("testEntity",
+        dbDao.getAllMentionsForEntity("testEntity",
                                    new Interval(DateTime.now(), DateTime.now()),
                                    roomName,
                                    username);
