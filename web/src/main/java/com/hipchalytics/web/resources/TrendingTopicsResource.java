@@ -7,15 +7,17 @@ import com.hipchalytics.compute.db.dao.IHipChalyticsDao;
 
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
-import org.mortbay.jetty.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Map;
 
 import javax.ws.rs.FormParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 @Path("/trending")
 public class TrendingTopicsResource {
@@ -51,11 +53,8 @@ public class TrendingTopicsResource {
             roomName = Optional.absent();
         }
 
-        dbDao.getAllMentionsForEntity("testEntity",
-                                   new Interval(DateTime.now(), DateTime.now()),
-                                   roomName,
-                                   username);
-
-        return null;
+        Interval interval = new Interval(DateTime.now(), DateTime.now());
+        Map<String, Long> topEntities = dbDao.getTopEntities(interval, roomName, username, 10);
+        return Response.ok(topEntities).build();
     }
 }
