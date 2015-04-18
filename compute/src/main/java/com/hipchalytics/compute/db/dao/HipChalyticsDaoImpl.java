@@ -7,22 +7,27 @@ import com.hipchalytics.core.model.HipchatEntity;
 import com.hipchalytics.core.model.LastPullTime;
 
 import org.apache.storm.guava.collect.Lists;
+import org.apache.storm.guava.collect.Maps;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Interval;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
+import javax.persistence.Tuple;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.ParameterExpression;
+import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
+import javax.persistence.criteria.Selection;
 
 /**
  * Implementation of the {@link IHipChalyticsDao} using SQL lite
@@ -109,8 +114,7 @@ public class HipChalyticsDaoImpl extends AbstractIdleService implements IHipChal
 
         List<Predicate> wherePredicates = Lists.newArrayListWithCapacity(4);
         wherePredicates.add(cb.equal(from.get("entityValue"), entityParam));
-        wherePredicates.add(cb.between(from.get("mentionTime"), startDateParam,
-                                       endDateParam));
+        wherePredicates.add(cb.between(from.get("mentionTime"), startDateParam, endDateParam));
 
         // Add the optional parameters
         ParameterExpression<String> roomNameParam = null;
@@ -158,8 +162,7 @@ public class HipChalyticsDaoImpl extends AbstractIdleService implements IHipChal
 
         List<Predicate> wherePredicates = Lists.newArrayListWithCapacity(4);
         wherePredicates.add(cb.equal(from.get("entityValue"), entityParam));
-        wherePredicates.add(cb.between(from.get("mentionTime"), startDateParam,
-                                       endDateParam));
+        wherePredicates.add(cb.between(from.get("mentionTime"), startDateParam, endDateParam));
 
         // Add the optional parameters
         ParameterExpression<String> roomNameParam = null;
@@ -194,6 +197,65 @@ public class HipChalyticsDaoImpl extends AbstractIdleService implements IHipChal
         } else {
             return result.get(0);
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Map<String, Long> getTopEntities(Interval interval, Optional<String> roomName,
+            Optional<String> username, int resultSize) {
+
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Tuple> query = cb.createTupleQuery();
+
+        Root<HipchatEntity> from = query.from(HipchatEntity.class);
+        ParameterExpression<DateTime> startDateParam = cb.parameter(DateTime.class);
+        ParameterExpression<DateTime> endDateParam = cb.parameter(DateTime.class);
+
+        Path<String> entityValuePath = from.get("entityValue");
+        Selection<String> entityValueAlias = entityValuePath.alias("entityValue_sel");
+
+        Expression<Long> occurrencesSum = cb.sum(from.get("occurrences"));
+        Selection<Long> occurrencesSumAlias = occurrencesSum.alias("occurrences_sum");
+
+        // do where clause
+        List<Predicate> wherePredicates = Lists.newArrayListWithCapacity(3);
+        wherePredicates.add(cb.between(from.get("mentionTime"), startDateParam, endDateParam));
+
+        // Add the optional parameters
+        ParameterExpression<String> roomNameParam = null;
+        if (roomName.isPresent()) {
+            roomNameParam = cb.parameter(String.class);
+            wherePredicates.add(cb.equal(from.get("roomName"), roomNameParam));
+        }
+        ParameterExpression<String> usernameParam = null;
+        if (username.isPresent()) {
+            usernameParam = cb.parameter(String.class);
+            wherePredicates.add(cb.equal(from.get("username"), usernameParam));
+        }
+        query.where(wherePredicates.toArray(new Predicate[wherePredicates.size()]));
+
+        query.multiselect(entityValueAlias, occurrencesSumAlias);
+        query.groupBy(entityValuePath);
+
+        TypedQuery<Tuple> finalQuery =
+                entityManager.createQuery(query)
+                             .setMaxResults(resultSize)
+                             .setParameter(startDateParam, interval.getStart())
+                             .setParameter(endDateParam, interval.getEnd());
+        if (roomName.isPresent()) {
+            finalQuery.setParameter(roomNameParam, roomName.get());
+        }
+        if (username.isPresent()) {
+            finalQuery.setParameter(usernameParam, username.get());
+        }
+        List<Tuple> resultList = finalQuery.getResultList();
+        Map<String, Long> result = Maps.newHashMapWithExpectedSize(resultList.size());
+        for (Tuple tuple : resultList) {
+            result.put(tuple.get(entityValueAlias), tuple.get(occurrencesSumAlias));
+        }
+        return result;
     }
 
     @Override

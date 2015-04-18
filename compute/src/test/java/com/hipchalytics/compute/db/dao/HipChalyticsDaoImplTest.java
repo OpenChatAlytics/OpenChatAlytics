@@ -12,6 +12,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 
@@ -23,7 +24,7 @@ import static org.junit.Assert.assertEquals;
  */
 public class HipChalyticsDaoImplTest {
 
-    private HipChalyticsDaoImpl underTest;
+    private IHipChalyticsDao underTest;
     private DateTime mentionDate;
 
     @Before
@@ -99,6 +100,27 @@ public class HipChalyticsDaoImplTest {
         result = underTest.getAllMentionsForEntity("entity1", timeInterval, Optional.of("room1"),
                                                 Optional.of("giannis"));
         assertEquals(1, result.size());
+    }
+
+    @Test
+    public void testGetTopEntities() {
+        Interval timeInterval = new Interval(mentionDate, mentionDate.plusHours(3));
+        Map<String, Long> result =
+            underTest.getTopEntities(timeInterval, Optional.absent(), Optional.absent(), 10);
+        assertEquals(2, result.size());
+        assertEquals(3L, result.get("entity1").longValue());
+        assertEquals(1L, result.get("entity2").longValue());
+
+        result = underTest.getTopEntities(timeInterval, Optional.of("room1"), Optional.absent(), 10);
+        assertEquals(2, result.size());
+        assertEquals(2L, result.get("entity1").longValue());
+        assertEquals(1L, result.get("entity2").longValue());
+
+        result = underTest.getTopEntities(timeInterval, Optional.of("room1"),
+                                          Optional.of("giannis"), 10);
+        assertEquals(2, result.size());
+        assertEquals(1L, result.get("entity1").longValue());
+        assertEquals(1L, result.get("entity2").longValue());
     }
 
     @After

@@ -55,7 +55,6 @@ public class HipchatEntity implements Serializable {
         return entityValue;
     }
 
-    @Id
     @Column(name = OCCURENCES_COLUMN)
     public long getOccurrences() {
         return occurrences;

@@ -8,6 +8,7 @@ import org.joda.time.DateTime;
 import org.joda.time.Interval;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Contains methods for persisting and retrieving objects from the hipchalytics store.
@@ -64,7 +65,8 @@ public interface IHipChalyticsDao extends Service {
      *         in the given time period
      */
     public List<HipchatEntity> getAllMentionsForEntity(String entity, Interval interval,
-            Optional<String> roomName, Optional<String> username);
+                                                       Optional<String> roomName,
+                                                       Optional<String> username);
 
     /**
      * Returns the total number of times an entity was mentioned in the given <code>interval</code>.
@@ -81,5 +83,23 @@ public interface IHipChalyticsDao extends Service {
      * @return The total number of times the entity was mentioned in the given time interval
      */
     public long getTotalMentionsForEntity(String entity, Interval interval,
-            Optional<String> roomName, Optional<String> username);
+                                          Optional<String> roomName, Optional<String> username);
+
+
+    /**
+     * Returns back the top mentioned entities in the given time interval, and optionally by user
+     * name and/or room name
+     *
+     * @param interval
+     *            The time interval to search in
+     * @param roomName
+     *            Optional room name to filter by
+     * @param username
+     *            Optional user name to filter by
+     * @param resultSize
+     *            The number of top entities to return back
+     * @return Returns back a map of entity value to number of occurrences.
+     */
+    public Map<String, Long> getTopEntities(Interval interval, Optional<String> roomName,
+                                            Optional<String> username, int resultSize);
 }
