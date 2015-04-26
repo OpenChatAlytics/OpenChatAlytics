@@ -21,7 +21,7 @@ public class HipChalyticsConfig implements Serializable {
 
     public String apiDateFormat;
 
-    public String timeZone;
+    public String timeZone = "America/New_York";
 
     public int apiRetries = 3;
 
