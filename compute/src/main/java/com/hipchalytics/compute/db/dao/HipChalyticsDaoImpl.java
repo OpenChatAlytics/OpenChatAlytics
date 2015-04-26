@@ -238,7 +238,7 @@ public class HipChalyticsDaoImpl extends AbstractIdleService implements IHipChal
 
         query.multiselect(entityValueAlias, occurrencesSumAlias);
         query.groupBy(entityValuePath);
-
+        query.orderBy(cb.desc(occurrencesSum));
         TypedQuery<Tuple> finalQuery =
                 entityManager.createQuery(query)
                              .setMaxResults(resultSize)
@@ -251,7 +251,8 @@ public class HipChalyticsDaoImpl extends AbstractIdleService implements IHipChal
             finalQuery.setParameter(usernameParam, username.get());
         }
         List<Tuple> resultList = finalQuery.getResultList();
-        Map<String, Long> result = Maps.newHashMapWithExpectedSize(resultList.size());
+        // linked hashmap to preserve order
+        Map<String, Long> result = Maps.newLinkedHashMap();
         for (Tuple tuple : resultList) {
             result.put(tuple.get(entityValueAlias), tuple.get(occurrencesSumAlias));
         }

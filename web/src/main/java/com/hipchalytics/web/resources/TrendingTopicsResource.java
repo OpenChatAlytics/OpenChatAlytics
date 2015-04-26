@@ -7,6 +7,9 @@ import com.hipchalytics.compute.config.HipChalyticsConfig;
 import com.hipchalytics.compute.db.dao.HipChalyticsDaoFactory;
 import com.hipchalytics.compute.db.dao.IHipChalyticsDao;
 
+import org.codehaus.jackson.JsonGenerationException;
+import org.codehaus.jackson.map.JsonMappingException;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Interval;
@@ -15,6 +18,7 @@ import org.joda.time.format.DateTimeFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.util.Map;
 
 import javax.ws.rs.FormParam;
@@ -51,10 +55,12 @@ public class TrendingTopicsResource {
 
     private final IHipChalyticsDao dbDao;
     private final DateTimeZone dateTimeZone;
+    private final ObjectMapper objectMapper;
 
     public TrendingTopicsResource(HipChalyticsConfig hconfig) {
         dbDao = HipChalyticsDaoFactory.getHipchalyticsDao(hconfig);
         dateTimeZone = DateTimeZone.forID(hconfig.timeZone);
+        objectMapper = new ObjectMapper();
     }
 
     @POST
@@ -62,7 +68,8 @@ public class TrendingTopicsResource {
     public Response getTrendingTopics(@FormParam(START_TIME_PARAM) String startTimeStr,
                                       @FormParam(END_TIME_PARAM) String endTimeStr,
                                       @FormParam(USER_PARAM) String user,
-                                      @FormParam(ROOM_PARAM) String room) {
+                                      @FormParam(ROOM_PARAM) String room)
+            throws JsonGenerationException, JsonMappingException, IOException {
         LOG.debug("Got query for starttime={}, endtime={}, user={}, room={}",
                   startTimeStr, endTimeStr, user, room);
 
@@ -75,7 +82,8 @@ public class TrendingTopicsResource {
 
         Map<String, Long> topEntities = dbDao.getTopEntities(interval, roomName,
                                                              username, MAX_RESULTS);
-        return Response.ok(topEntities).build();
+        String jsonResult = objectMapper.writeValueAsString(topEntities);
+        return Response.ok(jsonResult).build();
     }
 
     /**
