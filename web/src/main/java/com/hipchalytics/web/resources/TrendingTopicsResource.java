@@ -37,7 +37,7 @@ import javax.ws.rs.core.Response;
 @Path(TrendingTopicsResource.TRENDING_ENDPOINT)
 public class TrendingTopicsResource {
 
-    public static final String TRENDING_ENDPOINT = "/trending";
+    public static final String TRENDING_ENDPOINT = "trending";
     public static final String START_TIME_PARAM = "starttime";
     public static final String END_TIME_PARAM = "endtime";
     public static final String USER_PARAM = "user";
