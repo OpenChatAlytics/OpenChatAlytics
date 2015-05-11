@@ -5,3 +5,6 @@ classifier: "classifiers/english.all.3class.distsim.crf.ser.gz"
 hipchatConfig:
     baseHipChatURL: 'https://api.hipchat.com/v1/'
     authTokens: [0]
+slackConfig:
+    baseSlackURL: "https://slack.com/api/"
+    authTokens: [0]

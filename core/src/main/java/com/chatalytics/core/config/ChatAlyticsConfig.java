@@ -26,4 +26,6 @@ public class ChatAlyticsConfig implements Serializable {
 
     public HipChatConfig hipchatConfig;
 
+    public SlackConfig slackConfig;
+
 }
