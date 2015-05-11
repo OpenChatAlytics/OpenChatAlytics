@@ -57,22 +57,22 @@ public class EntityExtractionBolt extends BaseRichBolt {
     public void prepare(@SuppressWarnings("rawtypes") Map conf, TopologyContext context,
             OutputCollector collector) {
         String configYaml = (String) conf.get(ConfigurationConstants.CHATALYTICS_CONFIG.txt);
-        ChatAlyticsConfig hconfig = YamlUtils.readYamlFromString(configYaml,
+        ChatAlyticsConfig config = YamlUtils.readYamlFromString(configYaml,
                                                                  ChatAlyticsConfig.class);
-        classifier = getClassifier(hconfig);
-        dbDao = ChatAlyticsDAOFactory.getChatAlyticsDao(hconfig);
+        classifier = getClassifier(config);
+        dbDao = ChatAlyticsDAOFactory.getChatAlyticsDao(config);
         dbDao.startAsync().awaitRunning();
     }
 
     /**
      * Gets the classifier to use for parsing text
      *
-     * @param hconfig
+     * @param config
      *            The configuration object containing information about which classifier to use.
      * @return The classifier to use for extracting entities.
      */
-    private AbstractSequenceClassifier<CoreLabel> getClassifier(ChatAlyticsConfig hconfig) {
-        URL classifierURL = Resources.getResource(hconfig.classifier);
+    private AbstractSequenceClassifier<CoreLabel> getClassifier(ChatAlyticsConfig config) {
+        URL classifierURL = Resources.getResource(config.classifier);
         AbstractSequenceClassifier<CoreLabel> classifier =
             CRFClassifier.getClassifierNoExceptions(classifierURL.getPath());
         return classifier;

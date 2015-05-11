@@ -17,9 +17,9 @@ public class HipChatApiDAOFactory {
         // hide constructor
     }
 
-    public static IChatApiDAO getHipChatApiDao(ChatAlyticsConfig hconfig) {
+    public static IChatApiDAO getHipChatApiDao(ChatAlyticsConfig config) {
         if (hipchatDaoImpl == null) {
-            hipchatDaoImpl = new JsonHipChatDAO(hconfig);
+            hipchatDaoImpl = new JsonHipChatDAO(config);
         }
         return hipchatDaoImpl;
     }

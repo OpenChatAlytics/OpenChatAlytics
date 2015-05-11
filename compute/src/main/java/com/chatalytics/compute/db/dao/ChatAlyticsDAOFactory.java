@@ -16,9 +16,9 @@ public class ChatAlyticsDAOFactory {
         // hide constructor
     }
 
-    public static ChatAlyticsDAO getChatAlyticsDao(ChatAlyticsConfig hconfig) {
+    public static ChatAlyticsDAO getChatAlyticsDao(ChatAlyticsConfig config) {
         if (chatalyticsDaoImpl == null) {
-            chatalyticsDaoImpl = new ChatAlyticsDAOImpl(hconfig);
+            chatalyticsDaoImpl = new ChatAlyticsDAOImpl(config);
         }
         return chatalyticsDaoImpl;
     }

@@ -44,6 +44,9 @@ import javax.ws.rs.core.MediaType;
  */
 public class JsonHipChatDAO implements IChatApiDAO {
 
+    private static final String AUTH_TOKEN_PARAM = "auth_token";
+    private static final Logger LOG = LoggerFactory.getLogger(JsonHipChatDAO.class);
+
     private final WebResource resource;
     private final ChatAlyticsConfig config;
     private final Random rand;
@@ -51,9 +54,6 @@ public class JsonHipChatDAO implements IChatApiDAO {
 
     public final DateTimeZone dtz;
     public final DateTimeFormatter apiDateFormat;
-
-    private static final String AUTH_TOKEN_PARAM = "auth_token";
-    private static final Logger LOG = LoggerFactory.getLogger(JsonHipChatDAO.class);
 
     public JsonHipChatDAO(ChatAlyticsConfig config) {
         DefaultClientConfig clientConfig = new DefaultClientConfig();

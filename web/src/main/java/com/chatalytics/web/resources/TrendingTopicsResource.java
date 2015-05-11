@@ -57,9 +57,9 @@ public class TrendingTopicsResource {
     private final DateTimeZone dateTimeZone;
     private final ObjectMapper objectMapper;
 
-    public TrendingTopicsResource(ChatAlyticsConfig hconfig) {
-        dbDao = ChatAlyticsDAOFactory.getChatAlyticsDao(hconfig);
-        dateTimeZone = DateTimeZone.forID(hconfig.timeZone);
+    public TrendingTopicsResource(ChatAlyticsConfig config) {
+        dbDao = ChatAlyticsDAOFactory.getChatAlyticsDao(config);
+        dateTimeZone = DateTimeZone.forID(config.timeZone);
         objectMapper = new ObjectMapper();
     }
 

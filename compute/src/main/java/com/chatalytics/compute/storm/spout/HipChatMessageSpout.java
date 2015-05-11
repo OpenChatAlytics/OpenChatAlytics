@@ -79,13 +79,13 @@ public class HipChatMessageSpout extends BaseRichSpout {
     public void open(@SuppressWarnings("rawtypes") Map conf, TopologyContext context,
             SpoutOutputCollector collector) {
         String configYaml = (String) conf.get(ConfigurationConstants.CHATALYTICS_CONFIG.txt);
-        ChatAlyticsConfig hconfig = YamlUtils.readYamlFromString(configYaml,
+        ChatAlyticsConfig config = YamlUtils.readYamlFromString(configYaml,
                                                                  ChatAlyticsConfig.class);
         LOG.info("Loaded config...");
-        hipchatDao = HipChatApiDAOFactory.getHipChatApiDao(hconfig);
-        dbDao = ChatAlyticsDAOFactory.getChatAlyticsDao(hconfig);
+        hipchatDao = HipChatApiDAOFactory.getHipChatApiDao(config);
+        dbDao = ChatAlyticsDAOFactory.getChatAlyticsDao(config);
         LOG.info("Got HipChat API DAO...");
-        dtz = DateTimeZone.forID(hconfig.timeZone);
+        dtz = DateTimeZone.forID(config.timeZone);
         this.collector = collector;
     }
 
