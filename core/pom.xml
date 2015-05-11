@@ -3,16 +3,16 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     
     <modelVersion>4.0.0</modelVersion>
-    <groupId>com.hipchalytics.core</groupId>
-    <artifactId>hipchalytics-core</artifactId>
+    <groupId>com.chatalytics.core</groupId>
+    <artifactId>chatalytics-core</artifactId>
 
     <parent>
-        <groupId>com.hipchalytics</groupId>
-        <artifactId>hipchalytics</artifactId>
-        <version>0.2</version>
+        <groupId>com.chatalytics</groupId>
+        <artifactId>chatalytics</artifactId>
+        <version>0.3</version>
     </parent>
 
-    <name>HipChalytics Core</name>
+    <name>ChatAlytics Core</name>
 
     <dependencies>
         <dependency>

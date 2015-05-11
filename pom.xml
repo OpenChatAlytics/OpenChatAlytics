@@ -3,12 +3,12 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
-    <groupId>com.hipchalytics</groupId>
-    <artifactId>hipchalytics</artifactId>
-    <version>0.2</version>
+    <groupId>com.chatalytics</groupId>
+    <artifactId>chatalytics</artifactId>
+    <version>0.3</version>
     <packaging>pom</packaging>
 
-    <name>HipChalytics</name>
+    <name>ChatAlytics</name>
     <description>Realtime processing platform for doing HipChat analytics</description>
 
     <modules>

@@ -1,0 +1,7 @@
+timeZone: 'America/New_York'
+apiDateFormat: 'YYYY-MM-dd'
+baseHipChatURL: 'https://api.hipchat.com/v1/'
+classifier: "classifiers/english.all.3class.distsim.crf.ser.gz"
+hipchatConfig:
+    baseHipChatURL: 'https://api.hipchat.com/v1/'
+    authTokens: [0]
