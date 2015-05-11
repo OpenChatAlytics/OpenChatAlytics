@@ -13,7 +13,7 @@ import org.joda.time.DateTime;
 import java.io.IOException;
 
 /**
- * Deserializes {@link User}s
+ * Deserializes hipchat {@link User}s
  *
  * @author giannis
  *
@@ -40,8 +40,9 @@ public class UserDeserializer extends JsonDeserializer<User> {
         String timezone = node.get("timezone").asText();
         String title = node.get("title").asText();
 
-        return new User(userId, email, deleted, groupAdmin, name, mentionName, photoUrl,
-                        lastActiveDate, creationDate, status, statusMessage, timezone, title);
+        return new User(String.valueOf(userId), email, deleted, groupAdmin, name, mentionName,
+                        photoUrl, lastActiveDate, creationDate, status, statusMessage, timezone,
+                        title);
     }
 
 }

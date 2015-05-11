@@ -55,11 +55,11 @@ public class HipChatMessageSpout extends BaseRichSpout {
                      lastPullTime, newPullEndDate);
             return;
         }
-        Map<Integer, Room> rooms = hipchatDao.getRooms();
+        Map<String, Room> rooms = hipchatDao.getRooms();
         List<FatMessage> messagesToEmit = Lists.newArrayList();
         for (Room room : rooms.values()) {
             List<Message> messages = hipchatDao.getMessages(lastPullTime, newPullEndDate, room);
-            Map<Integer, User> users = hipchatDao.getUsers();
+            Map<String, User> users = hipchatDao.getUsers();
             for (Message message : messages) {
                 User user = users.get(message.getFromUserId());
                 messagesToEmit.add(new FatMessage(message, user, room));

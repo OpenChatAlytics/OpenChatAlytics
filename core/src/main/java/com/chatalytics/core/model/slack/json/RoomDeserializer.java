@@ -1,4 +1,4 @@
-package com.chatalytics.core.model.hipchat.json;
+package com.chatalytics.core.model.slack.json;
 
 import com.chatalytics.core.model.Room;
 
@@ -13,7 +13,7 @@ import org.joda.time.DateTime;
 import java.io.IOException;
 
 /**
- * Deserializes hipchat {@link Room}s
+ * Deserializes slack {@link Room}s
  *
  * @author giannis
  *
@@ -27,24 +27,16 @@ public class RoomDeserializer extends JsonDeserializer<Room> {
         ObjectCodec oc = jp.getCodec();
         JsonNode node = oc.readTree(jp);
 
-        int roomId = node.get("room_id").asInt();
+        String roomId = node.get("id").asText();
         String name = node.get("name").asText();
-        String topic = node.get("topic").asText();
+        String topic = node.get("topic").get("value").asText();
 
-        DateTime lastActiveDate = new DateTime(node.get("last_active").asLong() * 1000L);
         DateTime creationDate = new DateTime(node.get("created").asLong() * 1000L);
-        int ownerUserId = node.get("owner_user_id").asInt();
+        String ownerUserId = node.get("purpose").get("creator").asText();
         boolean archived = node.get("is_archived").asBoolean();
-        boolean privateRoom = node.get("is_private").asBoolean();
-        String guestAccessURL = null;
-        JsonNode guestAccessJonEl = node.get("guest_access_url");
-        if (guestAccessJonEl != null) {
-            guestAccessURL = guestAccessJonEl.asText();
-        }
-        String xmppJid = node.get("xmpp_jid").asText();
-        return new Room(String.valueOf(roomId), name, topic, lastActiveDate, creationDate,
-                        String.valueOf(ownerUserId), archived, privateRoom, guestAccessURL,
-                        xmppJid);
+        boolean privateRoom = false;
+        return new Room(roomId, name, topic, null, creationDate, ownerUserId, archived,
+                        privateRoom, null, null);
     }
 
 }

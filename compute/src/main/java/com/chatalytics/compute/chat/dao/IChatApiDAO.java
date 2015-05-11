@@ -22,14 +22,14 @@ public interface IChatApiDAO {
      *
      * @return A map of room IDs to {@link Room}s.
      */
-    public Map<Integer, Room> getRooms();
+    public Map<String, Room> getRooms();
 
     /**
      * Gets all the users.
      *
      * @return A map of user IDs to {@link User}s
      */
-    public Map<Integer, User> getUsers();
+    public Map<String, User> getUsers();
 
     /**
      * Gets the list of participating users in a room.
@@ -38,7 +38,7 @@ public interface IChatApiDAO {
      *            The room for which to get the users.
      * @return A map of user IDs to {@link User}s that are participating in the <code>room</code>
      */
-    public Map<Integer, User> getUsersForRoom(Room room);
+    public Map<String, User> getUsersForRoom(Room room);
 
     /**
      * Gets the list of messages in a room for a particular date range

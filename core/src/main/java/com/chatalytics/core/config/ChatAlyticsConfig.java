@@ -24,8 +24,8 @@ public class ChatAlyticsConfig implements Serializable {
 
     public String persistenceUnitName = "chatalytics-db";
 
-    public HipChatConfig hipchatConfig;
+    public HipChatConfig hipchatConfig = new HipChatConfig();
 
-    public SlackConfig slackConfig;
+    public SlackConfig slackConfig = new SlackConfig();
 
 }

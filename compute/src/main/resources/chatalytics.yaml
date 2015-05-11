@@ -1,10 +1,9 @@
-timeZone: 'America/New_York'
-apiDateFormat: 'YYYY-MM-dd'
-baseHipChatURL: 'https://api.hipchat.com/v1/'
-classifier: "classifiers/english.all.3class.distsim.crf.ser.gz"
+timeZone: America/New_York
+apiDateFormat: YYYY-MM-dd
+classifier: classifiers/english.all.3class.distsim.crf.ser.gz
 hipchatConfig:
-    baseHipChatURL: 'https://api.hipchat.com/v1/'
+    baseHipChatURL: https://api.hipchat.com/v1/
     authTokens: [0]
 slackConfig:
-    baseSlackURL: "https://slack.com/api/"
+    baseSlackURL: https://slack.com/api/
     authTokens: [0]

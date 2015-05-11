@@ -15,7 +15,7 @@ import org.joda.time.format.DateTimeFormatter;
 import java.io.IOException;
 
 /**
- * Deserializes {@link Message}s
+ * Deserializes hipchat {@link Message}s
  *
  * @author giannis
  *

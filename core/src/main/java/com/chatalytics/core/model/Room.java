@@ -14,12 +14,12 @@ import java.io.Serializable;
  */
 public class Room implements Serializable {
 
-    private final int roomId;
+    private final String roomId;
     private final String name;
     private final String topic;
     private final DateTime lastActiveDate;
     private final DateTime creationDate;
-    private final int ownerUserId;
+    private final String ownerUserId;
     private final boolean archived;
     private final boolean privateRoom;
     private final String guestAccessURL;
@@ -27,8 +27,8 @@ public class Room implements Serializable {
 
     private static final long serialVersionUID = -31871889682914674L;
 
-    public Room(int roomId, String name, String topic, DateTime lastActiveDate,
-            DateTime created, int ownerUserId, boolean archived, boolean privateRoom,
+    public Room(String roomId, String name, String topic, DateTime lastActiveDate,
+            DateTime created, String ownerUserId, boolean archived, boolean privateRoom,
             String guestAccessURL, String xmppJid) {
         this.roomId = roomId;
         this.name = name;
@@ -42,7 +42,7 @@ public class Room implements Serializable {
         this.xmppJid = xmppJid;
     }
 
-    public int getRoomId() {
+    public String getRoomId() {
         return roomId;
     }
 
@@ -62,7 +62,7 @@ public class Room implements Serializable {
         return creationDate;
     }
 
-    public int getOwnerUserId() {
+    public String getOwnerUserId() {
         return ownerUserId;
     }
 

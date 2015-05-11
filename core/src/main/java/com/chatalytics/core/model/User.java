@@ -12,7 +12,7 @@ import org.joda.time.DateTime;
  */
 public class User {
 
-    private final int userId;
+    private final String userId;
     private final String email;
     private final boolean deleted;
     private final boolean groupAdmin;
@@ -26,7 +26,7 @@ public class User {
     private final String timezone;
     private final String title;
 
-    public User(int userId, String email, boolean deleted, boolean groupAdmin, String name,
+    public User(String userId, String email, boolean deleted, boolean groupAdmin, String name,
             String mentionName, String photoUrl, DateTime lastActiveDate, DateTime creationDate,
             String status, String statusMessage, String timezone, String title) {
         this.userId = userId;
@@ -44,7 +44,7 @@ public class User {
         this.title = title;
     }
 
-    public int getUserId() {
+    public String getUserId() {
         return userId;
     }
 
