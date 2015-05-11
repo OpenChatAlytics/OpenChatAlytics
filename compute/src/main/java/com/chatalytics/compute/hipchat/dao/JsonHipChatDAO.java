@@ -58,7 +58,7 @@ public class JsonHipChatDAO implements IChatApiDAO {
     public JsonHipChatDAO(ChatAlyticsConfig config) {
         DefaultClientConfig clientConfig = new DefaultClientConfig();
         Client client = Client.create(clientConfig);
-        this.resource = client.resource(config.hipChatConfig.baseHipChatURL);
+        this.resource = client.resource(config.hipchatConfig.baseHipChatURL);
         this.config = config;
         this.rand = new Random(System.currentTimeMillis());
         this.dtz = DateTimeZone.forID(config.timeZone);
@@ -164,8 +164,8 @@ public class JsonHipChatDAO implements IChatApiDAO {
      * @return Returns a new resource with the token query parameter added.
      */
     private WebResource addTokenQueryParam(WebResource resource) {
-        int tokenSize = config.hipChatConfig.authTokens.size();
-        String randomAuthToken = config.hipChatConfig.authTokens.get(rand.nextInt(tokenSize));
+        int tokenSize = config.hipchatConfig.authTokens.size();
+        String randomAuthToken = config.hipchatConfig.authTokens.get(rand.nextInt(tokenSize));
         return resource.queryParam(AUTH_TOKEN_PARAM, randomAuthToken);
     }
 
