@@ -2,6 +2,8 @@ package com.chatalytics.compute.hipchat.dao;
 
 import com.chatalytics.compute.chat.dao.IChatApiDAO;
 import com.chatalytics.core.config.ChatAlyticsConfig;
+import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.config.DefaultClientConfig;
 
 /**
  * Factory for getting an instance of the hipchat DAO.
@@ -19,7 +21,9 @@ public class HipChatApiDAOFactory {
 
     public static IChatApiDAO getHipChatApiDao(ChatAlyticsConfig config) {
         if (hipchatDaoImpl == null) {
-            hipchatDaoImpl = new JsonHipChatDAO(config);
+            DefaultClientConfig clientConfig = new DefaultClientConfig();
+            Client client = Client.create(clientConfig);
+            hipchatDaoImpl = new JsonHipChatDAO(config, client);
         }
         return hipchatDaoImpl;
     }

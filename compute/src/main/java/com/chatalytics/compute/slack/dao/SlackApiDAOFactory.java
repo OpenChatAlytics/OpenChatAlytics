@@ -2,6 +2,8 @@ package com.chatalytics.compute.slack.dao;
 
 import com.chatalytics.compute.chat.dao.IChatApiDAO;
 import com.chatalytics.core.config.ChatAlyticsConfig;
+import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.config.DefaultClientConfig;
 
 /**
  * Factory for getting an instance of the slack DAO.
@@ -19,7 +21,9 @@ public class SlackApiDAOFactory {
 
     public static IChatApiDAO getSlackApiDao(ChatAlyticsConfig config) {
         if (slackDaoImpl == null) {
-            slackDaoImpl = new JsonSlackDAO(config);
+            DefaultClientConfig clientConfig = new DefaultClientConfig();
+            Client client = Client.create(clientConfig);
+            slackDaoImpl = new JsonSlackDAO(config, client);
         }
         return slackDaoImpl;
     }

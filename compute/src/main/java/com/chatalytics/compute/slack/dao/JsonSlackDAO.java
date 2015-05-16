@@ -11,16 +11,12 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.WebResource;
-import com.sun.jersey.api.client.config.DefaultClientConfig;
 
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.type.CollectionType;
 import org.codehaus.jackson.map.type.TypeFactory;
 import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,17 +40,10 @@ public class JsonSlackDAO extends AbstractJSONChatApiDAO {
     private final ChatAlyticsConfig config;
     private final ObjectMapper objMapper;
 
-    private final DateTimeZone dtz;
-    private final DateTimeFormatter apiDateFormat;
-
-    public JsonSlackDAO(ChatAlyticsConfig config) {
+    public JsonSlackDAO(ChatAlyticsConfig config, Client client) {
         super(config.slackConfig.authTokens, AUTH_TOKEN_PARAM);
-        DefaultClientConfig clientConfig = new DefaultClientConfig();
-        Client client = Client.create(clientConfig);
         this.resource = client.resource(config.slackConfig.baseSlackURL);
         this.config = config;
-        this.dtz = DateTimeZone.forID(config.timeZone);
-        this.apiDateFormat = DateTimeFormat.forPattern(config.apiDateFormat).withZone(dtz);
         this.objMapper = new ObjectMapper();
         this.objMapper.registerModule(new SlackJsonModule());
     }
@@ -73,8 +62,14 @@ public class JsonSlackDAO extends AbstractJSONChatApiDAO {
 
     @Override
     public Map<String, User> getUsers() {
-        // TODO Auto-generated method stub
-        return null;
+        WebResource roomResource = resource.path("users.list");
+        String jsonStr = getJsonResultWithRetries(roomResource, config.apiRetries);
+        Collection<User> userCol = deserializeJsonStr(jsonStr, "members", User.class, objMapper);
+        Map<String, User> result = Maps.newHashMapWithExpectedSize(userCol.size());
+        for (User user : userCol) {
+            result.put(user.getUserId(), user);
+        }
+        return result;
     }
 
     @Override

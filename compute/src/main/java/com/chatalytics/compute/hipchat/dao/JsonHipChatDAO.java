@@ -11,7 +11,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.WebResource;
-import com.sun.jersey.api.client.config.DefaultClientConfig;
 
 import org.apache.commons.lang.NotImplementedException;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -50,10 +49,8 @@ public class JsonHipChatDAO extends AbstractJSONChatApiDAO {
     public final DateTimeZone dtz;
     public final DateTimeFormatter apiDateFormat;
 
-    public JsonHipChatDAO(ChatAlyticsConfig config) {
+    public JsonHipChatDAO(ChatAlyticsConfig config, Client client) {
         super(config.hipchatConfig.authTokens, AUTH_TOKEN_PARAM);
-        DefaultClientConfig clientConfig = new DefaultClientConfig();
-        Client client = Client.create(clientConfig);
         this.resource = client.resource(config.hipchatConfig.baseHipChatURL);
         this.config = config;
         this.dtz = DateTimeZone.forID(config.timeZone);

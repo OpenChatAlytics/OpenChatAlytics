@@ -1,0 +1,43 @@
+{
+    "ok": true,
+    "channels": [
+        {
+            "id": "C024BE91L",
+            "name": "fun",
+            "created": 1360782804,
+            "creator": "U024BE7LH",
+            "is_archived": false,
+            "is_member": false,
+            "num_members": 6,
+            "topic": {
+                "value": "Fun times",
+                "creator": "U024BE7LV",
+                "last_set": 1369677212
+            },
+            "purpose": {
+                "value": "This channel is for fun",
+                "creator": "U024BE7LH",
+                "last_set": 1360782804
+            }
+        },
+        {
+            "id": "C034AS65L",
+            "name": "test",
+            "created": 1360782454,
+            "creator": "U024BE7LV",
+            "is_archived": true,
+            "is_member": false,
+            "num_members": 3,
+            "topic": {
+                "value": "Testing",
+                "creator": "U024BE7KO",
+                "last_set": 1369677244
+            },
+            "purpose": {
+                "value": "This channel is for testing",
+                "creator": "U024BE7LV",
+                "last_set": 1360782894
+            }
+        }
+    ]
+}

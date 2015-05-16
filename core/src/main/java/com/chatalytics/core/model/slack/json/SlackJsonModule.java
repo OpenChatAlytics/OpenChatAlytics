@@ -1,6 +1,7 @@
 package com.chatalytics.core.model.slack.json;
 
 import com.chatalytics.core.model.Room;
+import com.chatalytics.core.model.User;
 
 import org.codehaus.jackson.Version;
 import org.codehaus.jackson.map.module.SimpleModule;
@@ -17,6 +18,7 @@ public class SlackJsonModule extends SimpleModule {
     public SlackJsonModule() {
         super("SlackJsonModule", new Version(1, 0, 0, "SNAP"));
         addDeserializer(Room.class, new RoomDeserializer());
+        addDeserializer(User.class, new UserDeserializer());
     }
 
 }

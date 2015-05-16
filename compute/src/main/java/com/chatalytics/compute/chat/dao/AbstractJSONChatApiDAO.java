@@ -1,5 +1,6 @@
 package com.chatalytics.compute.chat.dao;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.sun.jersey.api.client.ClientResponse.Status;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
@@ -37,7 +38,8 @@ public abstract class AbstractJSONChatApiDAO implements IChatApiDAO {
      *            The number of retries if a 403 is encountered.
      * @return The JSON result string.
      */
-    protected String getJsonResultWithRetries(WebResource resource, int retries) {
+    @VisibleForTesting
+    public String getJsonResultWithRetries(WebResource resource, int retries) {
         resource = addTokenQueryParam(resource);
         while (retries >= 0) {
             try {

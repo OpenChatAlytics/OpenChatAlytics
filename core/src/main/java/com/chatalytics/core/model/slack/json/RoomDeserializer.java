@@ -32,7 +32,7 @@ public class RoomDeserializer extends JsonDeserializer<Room> {
         String topic = node.get("topic").get("value").asText();
 
         DateTime creationDate = new DateTime(node.get("created").asLong() * 1000L);
-        String ownerUserId = node.get("purpose").get("creator").asText();
+        String ownerUserId = node.get("creator").asText();
         boolean archived = node.get("is_archived").asBoolean();
         boolean privateRoom = false;
         return new Room(roomId, name, topic, null, creationDate, ownerUserId, archived,
