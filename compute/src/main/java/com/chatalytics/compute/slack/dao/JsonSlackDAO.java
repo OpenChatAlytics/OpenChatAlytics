@@ -62,8 +62,8 @@ public class JsonSlackDAO extends AbstractJSONChatApiDAO {
 
     @Override
     public Map<String, User> getUsers() {
-        WebResource roomResource = resource.path("users.list");
-        String jsonStr = getJsonResultWithRetries(roomResource, config.apiRetries);
+        WebResource userResource = resource.path("users.list");
+        String jsonStr = getJsonResultWithRetries(userResource, config.apiRetries);
         Collection<User> userCol = deserializeJsonStr(jsonStr, "members", User.class, objMapper);
         Map<String, User> result = Maps.newHashMapWithExpectedSize(userCol.size());
         for (User user : userCol) {
@@ -74,8 +74,29 @@ public class JsonSlackDAO extends AbstractJSONChatApiDAO {
 
     @Override
     public Map<String, User> getUsersForRoom(Room room) {
-        // TODO Auto-generated method stub
-        return null;
+        WebResource roomResource = resource.path("channels.info");
+        roomResource = roomResource.queryParam("channel", room.getRoomId());
+        String jsonStr = getJsonResultWithRetries(roomResource, config.apiRetries);
+        Collection<String> userIdCol = deserializeJsonStr(jsonStr,
+                                                          Lists.newArrayList("channel", "members"),
+                                                          String.class,
+                                                          objMapper);
+        // get info for user IDs
+        Map<String, User> result = Maps.newHashMapWithExpectedSize(userIdCol.size());
+        for (String userId : userIdCol) {
+            WebResource userResource = resource.path("users.info");
+            userResource = userResource.queryParam("user", userId);
+            jsonStr = getJsonResultWithRetries(userResource, config.apiRetries);
+            try {
+                JsonNode jsonNode = objMapper.readTree(jsonStr);
+                jsonNode = jsonNode.get("user");
+                User user = objMapper.readValue(jsonNode, User.class);
+                result.put(user.getUserId(), user);
+            } catch (IOException e) {
+                throw new RuntimeException("Can't deserialize user with ID:" + userId, e);
+            }
+        }
+        return result;
     }
 
     @Override
@@ -84,14 +105,75 @@ public class JsonSlackDAO extends AbstractJSONChatApiDAO {
         return null;
     }
 
+    /**
+     * Helper method for deserializing lists of elements of type <code>T</code> from a response JSON
+     * string
+     *
+     * @param jsonStr
+     *            The API returned JSON string
+     * @param listElement
+     *            The element in the original response JSON string that contains the list of items
+     *            of type <code>T</code> to deserialize
+     * @param clazz
+     *            The class to deserialize
+     * @param objMapper
+     *            The JSON object mapper used to deserialize the JSON string.
+     * @return A collection of elements of type <code>clazz</code>.
+     */
     private <T> Collection<T> deserializeJsonStr(String jsonStr, String listElement,
+                                                 Class<T> clazz,
+                                                 ObjectMapper objMapper) {
+        return deserializeJsonStr(jsonStr, Lists.newArrayList(listElement), clazz, objMapper);
+    }
+
+    /**
+     * Helper method for deserializing lists of elements of type <code>T</code> from a response JSON
+     * string
+     *
+     * @param jsonStr
+     *            The API returned JSON string
+     * @param listElements
+     *            A list of ordered elements in the original response JSON to traverse down to to
+     *            get to the element that contains the list of items of type <code>T</code> to
+     *            deserialize
+     *            <p/>
+     *            For example given the following JSON string
+     *
+     * <pre>
+     *            {
+     *                "someElement": {
+     *                    "someInnerElement": [
+     *                        {...},
+     *                        {...}
+     *                    ],
+     *                    "otherElement": "value"
+     *                }
+     *            }
+     * </pre>
+     *
+     *            If the collection of <code>T</code>s we were interested in were inside
+     *            <code>someInnerEllement</code> then the list would equal:
+     *            <code>[someElement, someInnterElement]</code>
+     * @param clazz
+     *            The class to deserialize The JSON object mapper used to deserialize the JSON
+     *            string.
+     * @return A collection of elements of type <code>clazz</code>.
+     */
+    private <T> Collection<T> deserializeJsonStr(String jsonStr, List<String> listElements,
                                                  Class<T> clazz,
                                                  ObjectMapper objMapper) {
         TypeFactory typeFactory = objMapper.getTypeFactory();
         CollectionType type = typeFactory.constructCollectionType(List.class, clazz);
         try {
-            JsonNode channelsNode = objMapper.readTree(jsonStr).get(listElement);
-            return objMapper.readValue(channelsNode, type);
+            JsonNode jsonNode = objMapper.readTree(jsonStr);
+            // traverse down the order of elements until the desired one is reached
+            for (String jsonEl : listElements) {
+                jsonNode = jsonNode.get(jsonEl);
+                if (jsonNode == null) {
+                    return Lists.newArrayListWithCapacity(0);
+                }
+            }
+            return objMapper.readValue(jsonNode, type);
         } catch (IOException e) {
             LOG.error("Got exception when trying to deserialize list of {}", clazz, e);
             return Lists.newArrayListWithExpectedSize(0);

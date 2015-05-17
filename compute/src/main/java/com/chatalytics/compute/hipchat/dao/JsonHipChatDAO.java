@@ -105,7 +105,7 @@ public class JsonHipChatDAO extends AbstractJSONChatApiDAO {
         DateTime curDate = start;
         List<Message> messages = Lists.newArrayList();
         WebResource roomsResource = resource.path("rooms/history");
-        roomsResource = roomsResource.queryParam("room_id", String.valueOf(room.getRoomId()))
+        roomsResource = roomsResource.queryParam("room_id", room.getRoomId())
                                      .queryParam("timezone", config.timeZone);
         Interval messageInterval = new Interval(start, end);
         while (curDate.isBefore(end) || curDate.equals(end)) {

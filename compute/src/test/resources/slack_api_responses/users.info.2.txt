@@ -1,0 +1,29 @@
+{
+  "ok": true,
+  "user": {
+    "id": "U023TY454",
+    "name": "jane",
+    "deleted": true,
+    "color": "9f69f7",
+    "tz": "America\/New York\/New York",
+    "status": "some status",
+    "profile": {
+      "first_name": "Jane",
+      "last_name": "Doe",
+      "real_name": "Jane Doe",
+      "email": "jane@slack.com",
+      "skype": "my-skype-name-jane",
+      "title": "some title",
+      "phone": "+1 (123) 654 0987",
+      "image_24": "https:\/\/...",
+      "image_32": "https:\/\/...",
+      "image_48": "https:\/\/...",
+      "image_72": "https:\/\/...",
+      "image_192": "https:\/\/..."
+    },
+    "is_admin": false,
+    "is_owner": false,
+    "has_2fa": false,
+    "has_files": true
+  }
+}

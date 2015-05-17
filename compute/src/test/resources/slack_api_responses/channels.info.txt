@@ -1,0 +1,27 @@
+{
+  "ok": true,
+  "channel": {
+    "id": "C0SDFG423",
+    "name": "random test channel",
+    "is_channel": true,
+    "created": 1424979678,
+    "creator": "U03R5C4Q5",
+    "is_archived": false,
+    "is_general": false,
+    "is_member": false,
+    "members": [
+      "U023BECGF",
+      "U023TY454"
+    ],
+    "topic": {
+      "value": "",
+      "creator": "",
+      "last_set": 0
+    },
+    "purpose": {
+      "value": "A random test channel",
+      "creator": "U06Y5TY59",
+      "last_set": 1424991497
+    }
+  }
+}

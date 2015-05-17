@@ -13,12 +13,14 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
@@ -33,7 +35,6 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class JsonSlackDAOTest {
 
-
     private JsonSlackDAO underTest;
 
     @Before
@@ -42,25 +43,57 @@ public class JsonSlackDAOTest {
                                                                   ChatAlyticsConfig.class);
         Client mockClient = mock(Client.class);
         WebResource mockResource = mock(WebResource.class);
-        WebResource mockChanResource = mock(WebResource.class);
-        WebResource mockUserResource = mock(WebResource.class);
-
         when(mockClient.resource(config.slackConfig.baseSlackURL)).thenReturn(mockResource);
-        when(mockResource.path("channels.list")).thenReturn(mockChanResource);
-        when(mockResource.path("users.list")).thenReturn(mockUserResource);
-
-        Path channelsPath =
-            Paths.get(Resources.getResource("slack_api_responses/channels.list.txt").toURI());
-        String channelsResponseStr = new String(Files.readAllBytes(channelsPath));
-        Path usersPath =
-            Paths.get(Resources.getResource("slack_api_responses/users.list.txt").toURI());
-        String usersResponseStr = new String(Files.readAllBytes(usersPath));
-
         underTest = spy(new JsonSlackDAO(config, mockClient));
+
+        // channels.list
+        WebResource mockChanResource = mock(WebResource.class);
+        when(mockResource.path("channels.list")).thenReturn(mockChanResource);
+        URI channelListURI = Resources.getResource("slack_api_responses/channels.list.txt").toURI();
+        Path channelsPath = Paths.get(channelListURI);
+        String channelsResponseStr = new String(Files.readAllBytes(channelsPath));
         doReturn(channelsResponseStr).when(underTest).getJsonResultWithRetries(mockChanResource,
                                                                                config.apiRetries);
+
+        // users.list
+        WebResource mockUserResource = mock(WebResource.class);
+        when(mockResource.path("users.list")).thenReturn(mockUserResource);
+        URI userListURI = Resources.getResource("slack_api_responses/users.list.txt").toURI();
+        Path usersPath = Paths.get(userListURI);
+        String usersResponseStr = new String(Files.readAllBytes(usersPath));
         doReturn(usersResponseStr).when(underTest).getJsonResultWithRetries(mockUserResource,
                                                                             config.apiRetries);
+
+        // channels.info
+        WebResource mockChanInfoResrc = mock(WebResource.class);
+        when(mockResource.path("channels.info")).thenReturn(mockChanInfoResrc);
+        when(mockChanInfoResrc.queryParam(anyString(), anyString())).thenReturn(mockChanInfoResrc);
+        URI chanInfoURI = Resources.getResource("slack_api_responses/channels.info.txt").toURI();
+        Path channelsInfoPath = Paths.get(chanInfoURI);
+        String chanInfoResponseStr = new String(Files.readAllBytes(channelsInfoPath));
+        doReturn(chanInfoResponseStr).when(underTest).getJsonResultWithRetries(mockChanInfoResrc,
+                                                                               config.apiRetries);
+
+        // users.info
+        WebResource mockUserInfoResource = mock(WebResource.class);
+        when(mockResource.path("users.info")).thenReturn(mockUserInfoResource);
+        // user 1
+        WebResource user1InfoResource = mock(WebResource.class);
+        when(mockUserInfoResource.queryParam("user", "U023BECGF")).thenReturn(user1InfoResource);
+        URI userInfoURI = Resources.getResource("slack_api_responses/users.info.1.txt").toURI();
+        Path usersInfoPath = Paths.get(userInfoURI);
+        String userInfoResponseStr = new String(Files.readAllBytes(usersInfoPath));
+        doReturn(userInfoResponseStr).when(underTest).getJsonResultWithRetries(user1InfoResource,
+                                                                               config.apiRetries);
+
+        // user 2
+        WebResource user2InfoResource = mock(WebResource.class);
+        when(mockUserInfoResource.queryParam("user", "U023TY454")).thenReturn(user2InfoResource);
+        userInfoURI = Resources.getResource("slack_api_responses/users.info.2.txt").toURI();
+        usersInfoPath = Paths.get(userInfoURI);
+        userInfoResponseStr = new String(Files.readAllBytes(usersInfoPath));
+        doReturn(userInfoResponseStr).when(underTest).getJsonResultWithRetries(user2InfoResource,
+                                                                               config.apiRetries);
     }
 
     /**
@@ -79,6 +112,17 @@ public class JsonSlackDAOTest {
     public void testGetUsers() {
         Map<String, User> users = underTest.getUsers();
         assertEquals(2, users.size());
+    }
+
+    /**
+     * Makes sure users for a given room are properly returned
+     */
+    @Test
+    public void testGetUsersForRoom() {
+        Room mockRoom = mock(Room.class);
+        when(mockRoom.getRoomId()).thenReturn("C0SDFG423");
+        Map<String, User> usersForRoom = underTest.getUsersForRoom(mockRoom);
+        assertEquals(2, usersForRoom.size());
     }
 
 }
