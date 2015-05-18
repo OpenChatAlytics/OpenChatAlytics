@@ -45,7 +45,7 @@ public class SlackMessageSpout extends BaseRichSpout {
         LOG.info("Loaded config...");
 
         slackDao = SlackApiDAOFactory.getSlackApiDao(config);
-        LOG.info("Got HipChat API DAO...");
+        LOG.info("Got Slack API DAO...");
 
         dbDao = ChatAlyticsDAOFactory.getChatAlyticsDao(config);
         LOG.info("Got database DAO...");
