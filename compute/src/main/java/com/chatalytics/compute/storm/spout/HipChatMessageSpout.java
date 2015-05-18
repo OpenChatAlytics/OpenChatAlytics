@@ -32,19 +32,36 @@ import java.util.Map;
  * Spout that pulls messages from the hipchat API and emits {@link FatMessage}s to subscribed bolts.
  *
  * @author giannis
- *
  */
 public class HipChatMessageSpout extends BaseRichSpout {
+
+    private static final long serialVersionUID = -1059483249301395751L;
+    public static final String SPOUT_ID = "HIP_CHAT_MESSAGE_SPOUT_ID";
+    public static final String HIPCHAT_MESSAGE_FIELD_STR = "hipchat-message";
+    private static final Logger LOG = LoggerFactory.getLogger(HipChatMessageSpout.class);
 
     private IChatApiDAO hipchatDao;
     private DateTimeZone dtz;
     private SpoutOutputCollector collector;
     private ChatAlyticsDAO dbDao;
 
-    public static final String SPOUT_ID = "HIP_CHAT_MESSAGE_SPOUT_ID";
-    public static final String HIPCHAT_MESSAGE_FIELD_STR = "hipchat-message";
-    private static final Logger LOG = LoggerFactory.getLogger(HipChatMessageSpout.class);
-    private static final long serialVersionUID = -1059483249301395751L;
+    @Override
+    public void open(@SuppressWarnings("rawtypes") Map conf, TopologyContext context,
+                     SpoutOutputCollector collector) {
+        String configYaml = (String) conf.get(ConfigurationConstants.CHATALYTICS_CONFIG.txt);
+        ChatAlyticsConfig config = YamlUtils.readYamlFromString(configYaml,
+                                                                 ChatAlyticsConfig.class);
+        LOG.info("Loaded config...");
+
+        hipchatDao = HipChatApiDAOFactory.getHipChatApiDao(config);
+        LOG.info("Got HipChat API DAO...");
+
+        dbDao = ChatAlyticsDAOFactory.getChatAlyticsDao(config);
+        LOG.info("Got database DAO...");
+
+        dtz = DateTimeZone.forID(config.timeZone);
+        this.collector = collector;
+    }
 
     @Override
     public void nextTuple() {
@@ -73,20 +90,6 @@ public class HipChatMessageSpout extends BaseRichSpout {
         } catch (InterruptedException e) {
             LOG.error("Got interrupted while sleeping.", e);
         }
-    }
-
-    @Override
-    public void open(@SuppressWarnings("rawtypes") Map conf, TopologyContext context,
-            SpoutOutputCollector collector) {
-        String configYaml = (String) conf.get(ConfigurationConstants.CHATALYTICS_CONFIG.txt);
-        ChatAlyticsConfig config = YamlUtils.readYamlFromString(configYaml,
-                                                                 ChatAlyticsConfig.class);
-        LOG.info("Loaded config...");
-        hipchatDao = HipChatApiDAOFactory.getHipChatApiDao(config);
-        dbDao = ChatAlyticsDAOFactory.getChatAlyticsDao(config);
-        LOG.info("Got HipChat API DAO...");
-        dtz = DateTimeZone.forID(config.timeZone);
-        this.collector = collector;
     }
 
     @Override
