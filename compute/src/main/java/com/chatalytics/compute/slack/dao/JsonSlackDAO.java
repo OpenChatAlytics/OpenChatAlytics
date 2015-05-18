@@ -101,8 +101,31 @@ public class JsonSlackDAO extends AbstractJSONChatApiDAO {
 
     @Override
     public List<Message> getMessages(DateTime start, DateTime end, Room room) {
-        // TODO Auto-generated method stub
-        return null;
+        long startMillis = start.getMillis();
+        String startMillisStr = String.format("%s.%s",
+                                              String.valueOf(startMillis / 1000),
+                                              startMillis % 1000);
+
+        // get smallest time unit for slack API and subtract one because latest is inclusive in the
+        // Slack API
+        long endNanos = end.getMillis() * 1000 - 1;
+        String endMillisStr = String.format("%s.%s",
+                                            String.valueOf(endNanos / 1000 / 1000),
+                                            endNanos % (1000 * 1000));
+
+        WebResource roomResource = resource.path("channels.history");
+        roomResource = roomResource.queryParam("channel", room.getRoomId())
+                                   .queryParam("latest", endMillisStr)
+                                   .queryParam("oldest", startMillisStr)
+                                   .queryParam("inclusive", "1")
+                                   .queryParam("count", "1000");
+
+        String jsonStr = getJsonResultWithRetries(roomResource, config.apiRetries);
+        Collection<Message> messagesCol = deserializeJsonStr(jsonStr,
+                                                             "messages",
+                                                             Message.class,
+                                                             objMapper);
+        return Lists.newArrayList(messagesCol);
     }
 
     /**

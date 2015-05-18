@@ -2,12 +2,14 @@ package com.chatalytics.compute.slack.dao;
 
 import com.chatalytics.compute.util.YamlUtils;
 import com.chatalytics.core.config.ChatAlyticsConfig;
+import com.chatalytics.core.model.Message;
 import com.chatalytics.core.model.Room;
 import com.chatalytics.core.model.User;
 import com.google.common.io.Resources;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.WebResource;
 
+import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -17,9 +19,11 @@ import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
@@ -94,6 +98,17 @@ public class JsonSlackDAOTest {
         userInfoResponseStr = new String(Files.readAllBytes(usersInfoPath));
         doReturn(userInfoResponseStr).when(underTest).getJsonResultWithRetries(user2InfoResource,
                                                                                config.apiRetries);
+
+        // channels.history
+        WebResource mockHistoryResrc = mock(WebResource.class);
+        when(mockResource.path("channels.history")).thenReturn(mockHistoryResrc);
+        when(mockHistoryResrc.queryParam(anyString(), anyString())).thenReturn(mockHistoryResrc);
+        URI historyURI = Resources.getResource("slack_api_responses/channels.history.txt").toURI();
+        Path historyPath = Paths.get(historyURI);
+        String historyResponseStr = new String(Files.readAllBytes(historyPath));
+        doReturn(historyResponseStr).when(underTest).getJsonResultWithRetries(mockHistoryResrc,
+                                                                              config.apiRetries);
+
     }
 
     /**
@@ -103,6 +118,9 @@ public class JsonSlackDAOTest {
     public void testGetRooms() {
         Map<String, Room> rooms = underTest.getRooms();
         assertEquals(2, rooms.size());
+        for (Room room : rooms.values()) {
+            assertNotNull(room);
+        }
     }
 
     /**
@@ -112,6 +130,9 @@ public class JsonSlackDAOTest {
     public void testGetUsers() {
         Map<String, User> users = underTest.getUsers();
         assertEquals(2, users.size());
+        for (User user : users.values()) {
+            assertNotNull(user);
+        }
     }
 
     /**
@@ -123,6 +144,25 @@ public class JsonSlackDAOTest {
         when(mockRoom.getRoomId()).thenReturn("C0SDFG423");
         Map<String, User> usersForRoom = underTest.getUsersForRoom(mockRoom);
         assertEquals(2, usersForRoom.size());
+        for (User user : usersForRoom.values()) {
+            assertNotNull(user);
+        }
+    }
+
+    /**
+     * Makes sure messages for a given room and time interval are properly returned
+     */
+    @Test
+    public void testGetMessages() {
+        Room mockRoom = mock(Room.class);
+        when(mockRoom.getRoomId()).thenReturn("C0SDFG423");
+        DateTime now = DateTime.now();
+
+        List<Message> messages = underTest.getMessages(now.minusDays(1), now, mockRoom);
+        assertEquals(7, messages.size());
+        for (Message message : messages) {
+            assertNotNull(message);
+        }
     }
 
 }
