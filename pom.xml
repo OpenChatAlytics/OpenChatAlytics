@@ -9,7 +9,25 @@
     <packaging>pom</packaging>
 
     <name>ChatAlytics</name>
-    <description>Realtime processing platform for doing HipChat analytics</description>
+    <description>Realtime processing platform for HipChat and/or Slack analytics</description>
+
+    <scm>
+        <connection>scm:git:git@github.com:gneokleo/ChatAlytics.git</connection>
+        <developerConnection>scm:git:git@github.com:gneokleo/ChatAlytics.git</developerConnection>
+        <url>git@github.com:gneokleo/ChatAlytics.git</url>
+    </scm>
+    <developers>
+        <developer>
+            <id>giannis</id>
+            <name>Giannis Neokleous</name>
+            <url>http://www.giann.is</url>
+            <roles>
+                <role>architect</role>
+                <role>developer</role>
+            </roles>
+            <timezone>-5</timezone>
+        </developer>
+    </developers>
 
     <modules>
         <module>core</module>
@@ -19,6 +37,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <javadoc.opts>-Xdoclint:none</javadoc.opts>
     </properties>
 
     <dependencyManagement>
