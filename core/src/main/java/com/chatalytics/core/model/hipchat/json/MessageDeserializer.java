@@ -36,15 +36,9 @@ public class MessageDeserializer extends JsonDeserializer<Message> {
         JsonNode fromStruct = node.get("from");
         String fromName = fromStruct.get("name").asText();
         String userIdStr = fromStruct.get("user_id").asText();
-        int fromUserId = 0;
-        try {
-            fromUserId = Integer.valueOf(userIdStr);
-        } catch (NumberFormatException e) {
-
-        }
         String message = node.get("message").asText();
 
-        return new Message(date, fromName, fromUserId, message);
+        return new Message(date, fromName, userIdStr, message);
     }
 
 }

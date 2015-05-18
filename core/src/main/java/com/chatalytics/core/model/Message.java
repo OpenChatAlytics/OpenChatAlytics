@@ -16,12 +16,12 @@ public class Message implements Serializable {
 
     private final DateTime date;
     private final String fromName;
-    private final int fromUserId;
+    private final String fromUserId;
     private final String message;
 
     private static final long serialVersionUID = -4370348419961560257L;
 
-    public Message(DateTime date, String fromName, int fromUserId, String message) {
+    public Message(DateTime date, String fromName, String fromUserId, String message) {
         this.date = date;
         this.fromName = fromName;
         this.fromUserId = fromUserId;
@@ -36,7 +36,7 @@ public class Message implements Serializable {
         return fromName;
     }
 
-    public int getFromUserId() {
+    public String getFromUserId() {
         return fromUserId;
     }
 

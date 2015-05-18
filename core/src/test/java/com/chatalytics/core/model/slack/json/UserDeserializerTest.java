@@ -29,6 +29,9 @@ public class UserDeserializerTest {
         objMapper.registerModule(new SlackJsonModule());
     }
 
+    /**
+     * Tests to see if a user can be properly deserialized
+     */
     @Test
     public void testDeserialize() throws Exception {
         User u = objMapper.readValue(userJsonStr, User.class);

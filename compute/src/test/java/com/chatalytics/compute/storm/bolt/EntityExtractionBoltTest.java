@@ -1,9 +1,8 @@
 package com.chatalytics.compute.storm.bolt;
 
 import com.chatalytics.compute.config.ConfigurationConstants;
-import com.chatalytics.compute.storm.bolt.EntityExtractionBolt;
-import com.chatalytics.core.model.FatMessage;
 import com.chatalytics.core.model.ChatEntity;
+import com.chatalytics.core.model.FatMessage;
 import com.chatalytics.core.model.Message;
 import com.chatalytics.core.model.Room;
 import com.chatalytics.core.model.User;
@@ -50,7 +49,7 @@ public class EntityExtractionBoltTest {
     public void testExtractEntities() {
         DateTime date = DateTime.now().withZone(DateTimeZone.UTC);
         String mentionName = "jane";
-        int userId = 1;
+        String userId = "1";
         String ent1 = "Jane Doe";
         String ent2 = "Mount Everest";
         Message msg = new Message(date, mentionName, userId,
