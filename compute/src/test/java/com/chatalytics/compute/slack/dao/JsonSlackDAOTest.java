@@ -15,6 +15,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -40,15 +41,23 @@ import static org.mockito.Mockito.when;
 public class JsonSlackDAOTest {
 
     private JsonSlackDAO underTest;
+    private WebResource mockResource;
+    private ChatAlyticsConfig config;
 
     @Before
     public void setUp() throws Exception {
-        ChatAlyticsConfig config = YamlUtils.readYamlFromResource("chatalytics.yaml",
-                                                                  ChatAlyticsConfig.class);
+        this.config = YamlUtils.readYamlFromResource("chatalytics.yaml", ChatAlyticsConfig.class);
         Client mockClient = mock(Client.class);
-        WebResource mockResource = mock(WebResource.class);
+        mockResource = mock(WebResource.class);
         when(mockClient.resource(config.slackConfig.baseSlackURL)).thenReturn(mockResource);
         underTest = spy(new JsonSlackDAO(config, mockClient));
+    }
+
+    /**
+     * Makes sure rooms can be returned
+     */
+    @Test
+    public void testGetRooms() throws Exception {
 
         // channels.list
         WebResource mockChanResource = mock(WebResource.class);
@@ -59,6 +68,19 @@ public class JsonSlackDAOTest {
         doReturn(channelsResponseStr).when(underTest).getJsonResultWithRetries(mockChanResource,
                                                                                config.apiRetries);
 
+        Map<String, Room> rooms = underTest.getRooms();
+        assertEquals(2, rooms.size());
+        for (Room room : rooms.values()) {
+            assertNotNull(room);
+        }
+    }
+
+    /**
+     * Makes sure users can be returned
+     */
+    @Test
+    public void testGetUsers() throws Exception {
+
         // users.list
         WebResource mockUserResource = mock(WebResource.class);
         when(mockResource.path("users.list")).thenReturn(mockUserResource);
@@ -67,6 +89,19 @@ public class JsonSlackDAOTest {
         String usersResponseStr = new String(Files.readAllBytes(usersPath));
         doReturn(usersResponseStr).when(underTest).getJsonResultWithRetries(mockUserResource,
                                                                             config.apiRetries);
+
+        Map<String, User> users = underTest.getUsers();
+        assertEquals(2, users.size());
+        for (User user : users.values()) {
+            assertNotNull(user);
+        }
+    }
+
+    /**
+     * Makes sure users for a given room are properly returned
+     */
+    @Test
+    public void testGetUsersForRoom() throws Exception {
 
         // channels.info
         WebResource mockChanInfoResrc = mock(WebResource.class);
@@ -99,47 +134,6 @@ public class JsonSlackDAOTest {
         doReturn(userInfoResponseStr).when(underTest).getJsonResultWithRetries(user2InfoResource,
                                                                                config.apiRetries);
 
-        // channels.history
-        WebResource mockHistoryResrc = mock(WebResource.class);
-        when(mockResource.path("channels.history")).thenReturn(mockHistoryResrc);
-        when(mockHistoryResrc.queryParam(anyString(), anyString())).thenReturn(mockHistoryResrc);
-        URI historyURI = Resources.getResource("slack_api_responses/channels.history.txt").toURI();
-        Path historyPath = Paths.get(historyURI);
-        String historyResponseStr = new String(Files.readAllBytes(historyPath));
-        doReturn(historyResponseStr).when(underTest).getJsonResultWithRetries(mockHistoryResrc,
-                                                                              config.apiRetries);
-
-    }
-
-    /**
-     * Makes sure rooms can be returned
-     */
-    @Test
-    public void testGetRooms() {
-        Map<String, Room> rooms = underTest.getRooms();
-        assertEquals(2, rooms.size());
-        for (Room room : rooms.values()) {
-            assertNotNull(room);
-        }
-    }
-
-    /**
-     * Makes sure users can be returned
-     */
-    @Test
-    public void testGetUsers() {
-        Map<String, User> users = underTest.getUsers();
-        assertEquals(2, users.size());
-        for (User user : users.values()) {
-            assertNotNull(user);
-        }
-    }
-
-    /**
-     * Makes sure users for a given room are properly returned
-     */
-    @Test
-    public void testGetUsersForRoom() {
         Room mockRoom = mock(Room.class);
         when(mockRoom.getRoomId()).thenReturn("C0SDFG423");
         Map<String, User> usersForRoom = underTest.getUsersForRoom(mockRoom);
@@ -153,7 +147,18 @@ public class JsonSlackDAOTest {
      * Makes sure messages for a given room and time interval are properly returned
      */
     @Test
-    public void testGetMessages() {
+    public void testGetMessages() throws Exception {
+
+        // channels.history
+        WebResource mockHistoryResrc = mock(WebResource.class);
+        when(mockResource.path("channels.history")).thenReturn(mockHistoryResrc);
+        when(mockHistoryResrc.queryParam(anyString(), anyString())).thenReturn(mockHistoryResrc);
+        URI historyURI = Resources.getResource("slack_api_responses/channels.history.txt").toURI();
+        Path historyPath = Paths.get(historyURI);
+        String historyResponseStr = new String(Files.readAllBytes(historyPath));
+        doReturn(historyResponseStr).when(underTest).getJsonResultWithRetries(mockHistoryResrc,
+                                                                              config.apiRetries);
+
         Room mockRoom = mock(Room.class);
         when(mockRoom.getRoomId()).thenReturn("C0SDFG423");
         DateTime now = DateTime.now();
@@ -163,6 +168,43 @@ public class JsonSlackDAOTest {
         for (Message message : messages) {
             assertNotNull(message);
         }
+    }
+
+    /**
+     * Makes sure that the web socket URL can be properly read
+     */
+    @Test
+    public void testGetRealtimeWebSocketURI() throws Exception {
+
+        // RTM start
+        WebResource mockRtmResrc = mock(WebResource.class);
+        when(mockResource.path("rtm.start")).thenReturn(mockRtmResrc);
+        String rtmResponseStr =
+            "{\"ok\": true, \"url\":\"wss:\\/\\/ms9.slack-msgs.com\\/websocket\\/7I5yBpcvk\"}";
+        doReturn(rtmResponseStr).when(underTest).getJsonResultWithRetries(mockRtmResrc,
+                                                                          config.apiRetries);
+
+        assertEquals(URI.create("wss://ms9.slack-msgs.com/websocket/7I5yBpcvk"),
+                     underTest.getRealtimeWebSocketURI());
+    }
+
+    /**
+     * Makes sure that an exception is propagated when a malformed JSON is returned from the API
+     */
+    @Test(expected = IOException.class)
+    public void testGetRealtimeWebSocketURI_withoutURLInResponse() throws Exception {
+        // RTM start
+        WebResource mockRtmResrc = mock(WebResource.class);
+        when(mockResource.path("rtm.start")).thenReturn(mockRtmResrc);
+        String rtmResponseStr = "{malformedJSON";
+        doReturn(rtmResponseStr).when(underTest).getJsonResultWithRetries(mockRtmResrc,
+                                                                          config.apiRetries);
+        try {
+            underTest.getRealtimeWebSocketURI();
+        } catch (Exception e) {
+            throw (Exception) e.getCause();
+        }
+
     }
 
 }

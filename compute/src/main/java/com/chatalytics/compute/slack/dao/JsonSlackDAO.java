@@ -21,6 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -97,6 +98,21 @@ public class JsonSlackDAO extends AbstractJSONChatApiDAO {
             }
         }
         return result;
+    }
+
+    /**
+     * @return A URI for initiating the realtime web socket connection
+     */
+    public URI getRealtimeWebSocketURI() {
+        WebResource rtmResource = resource.path("rtm.start");
+        String jsonStr = getJsonResultWithRetries(rtmResource, config.apiRetries);
+        try {
+            String webSocketUrl = objMapper.readTree(jsonStr).get("url").asText();
+            return URI.create(webSocketUrl);
+        } catch (IOException e) {
+            throw new RuntimeException("Unable to parse realtime resource response", e);
+
+        }
     }
 
     @Override
