@@ -1,14 +1,13 @@
 package com.chatalytics.core.model.slack.json;
 
 import com.chatalytics.core.model.User;
-import com.google.common.annotations.VisibleForTesting;
+import com.chatalytics.core.model.json.JsonChatDeserializer;
 
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.JsonParser;
 import org.codehaus.jackson.JsonProcessingException;
 import org.codehaus.jackson.ObjectCodec;
 import org.codehaus.jackson.map.DeserializationContext;
-import org.codehaus.jackson.map.JsonDeserializer;
 
 import java.io.IOException;
 
@@ -18,7 +17,7 @@ import java.io.IOException;
  * @author giannis
  *
  */
-public class UserDeserializer extends JsonDeserializer<User> {
+public class UserDeserializer extends JsonChatDeserializer<User> {
 
     @Override
     public User deserialize(JsonParser jp, DeserializationContext context) throws IOException,
@@ -42,24 +41,6 @@ public class UserDeserializer extends JsonDeserializer<User> {
 
         return new User(userId, email, deleted, groupAdmin, name, mentionName, photoUrl, null,
                         null, null, statusMessage, timezone, title);
-    }
-
-    @VisibleForTesting
-    protected String getAsTextOrNull(JsonNode node) {
-        if (node == null) {
-            return null;
-        } else {
-            return node.asText();
-        }
-    }
-
-    @VisibleForTesting
-    protected boolean getAsBooleanOrFalse(JsonNode node) {
-        if (node == null) {
-            return false;
-        } else {
-            return node.asBoolean();
-        }
     }
 
 }

@@ -50,10 +50,12 @@ public class EntityExtractionBoltTest {
         DateTime date = DateTime.now().withZone(DateTimeZone.UTC);
         String mentionName = "jane";
         String userId = "1";
+        String roomId = "100";
         String ent1 = "Jane Doe";
         String ent2 = "Mount Everest";
         Message msg = new Message(date, mentionName, userId,
-                                  String.format("Today, %s is going to climb %s", ent1, ent2));
+                                  String.format("Today, %s is going to climb %s", ent1, ent2),
+                                  roomId);
         User mockUser = mock(User.class);
         when(mockUser.getMentionName()).thenReturn("jane");
         Room mockRoom = mock(Room.class);

@@ -2,17 +2,13 @@ package com.chatalytics.core.model.slack.json;
 
 import com.chatalytics.core.model.User;
 
-import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 /**
  * Tests the {@link UserDeserializer} for slack.
@@ -48,31 +44,6 @@ public class UserDeserializerTest {
         assertNull(u.getCreationDate());
         assertNull(u.getLastActiveDate());
         assertNull(u.getStatus());
-    }
-
-    /**
-     * Tests to see if a boolean node that could potentially be null can be parsed correctly
-     */
-    @Test
-    public void testGetAsBooleanOrNull() {
-        UserDeserializer deserializer = new UserDeserializer();
-        assertFalse(deserializer.getAsBooleanOrFalse(null));
-        JsonNode mockNode = mock(JsonNode.class);
-        when(mockNode.asBoolean()).thenReturn(true);
-        assertTrue(deserializer.getAsBooleanOrFalse(mockNode));
-    }
-
-    /**
-     * Tests to see if a text node that could potentially be null can be parsed correctly
-     */
-    @Test
-    public void testGetAsTextOrNull() {
-        UserDeserializer deserializer = new UserDeserializer();
-        assertNull(deserializer.getAsTextOrNull(null));
-        JsonNode mockNode = mock(JsonNode.class);
-        String returnValue = "test";
-        when(mockNode.asText()).thenReturn(returnValue);
-        assertEquals(returnValue, deserializer.getAsTextOrNull(mockNode));
     }
 
     private final String userJsonStr = "{" +

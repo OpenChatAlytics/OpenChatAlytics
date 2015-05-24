@@ -1,13 +1,13 @@
 package com.chatalytics.core.model.hipchat.json;
 
 import com.chatalytics.core.model.User;
+import com.chatalytics.core.model.json.JsonChatDeserializer;
 
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.JsonParser;
 import org.codehaus.jackson.JsonProcessingException;
 import org.codehaus.jackson.ObjectCodec;
 import org.codehaus.jackson.map.DeserializationContext;
-import org.codehaus.jackson.map.JsonDeserializer;
 import org.joda.time.DateTime;
 
 import java.io.IOException;
@@ -18,7 +18,7 @@ import java.io.IOException;
  * @author giannis
  *
  */
-public class UserDeserializer extends JsonDeserializer<User> {
+public class UserDeserializer extends JsonChatDeserializer<User> {
 
     @Override
     public User deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException,

@@ -18,14 +18,17 @@ public class Message implements Serializable {
     private final String fromName;
     private final String fromUserId;
     private final String message;
+    private final String roomId;
 
     private static final long serialVersionUID = -4370348419961560257L;
 
-    public Message(DateTime date, String fromName, String fromUserId, String message) {
+    public Message(DateTime date, String fromName, String fromUserId, String message,
+                   String roomId) {
         this.date = date;
         this.fromName = fromName;
         this.fromUserId = fromUserId;
         this.message = message;
+        this.roomId = roomId;
     }
 
     public DateTime getDate() {
@@ -44,14 +47,19 @@ public class Message implements Serializable {
         return message;
     }
 
+    public String getRoomId() {
+        return roomId;
+    }
+
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this.getClass())
-                          .add("date", date)
-                          .add("fromName", fromName)
-                          .add("fromUserId", fromUserId)
-                          .add("message", message)
-                          .toString();
+            .add("date", date)
+            .add("fromName", fromName)
+            .add("fromUserId", fromUserId)
+            .add("message", message)
+            .add("roomId", roomId)
+            .toString();
     }
 
 }
