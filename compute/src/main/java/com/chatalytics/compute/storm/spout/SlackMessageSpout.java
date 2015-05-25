@@ -41,7 +41,7 @@ import javax.websocket.WebSocketContainer;
  *
  * @author giannis
  */
-@ClientEndpoint(decoders = { RealtimeMessageDecoder.class })
+@ClientEndpoint(decoders = { WebSocketMessageDecoder.class })
 public class SlackMessageSpout extends BaseRichSpout {
 
     private static final long serialVersionUID = -6294446748544704853L;

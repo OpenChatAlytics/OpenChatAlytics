@@ -18,9 +18,9 @@ import javax.websocket.EndpointConfig;
  *
  * @author giannis
  */
-public class RealtimeMessageDecoder implements Decoder.Text<Message> {
+public class WebSocketMessageDecoder implements Decoder.Text<Message> {
 
-    private static final Logger LOG = LoggerFactory.getLogger(RealtimeMessageDecoder.class);
+    private static final Logger LOG = LoggerFactory.getLogger(WebSocketMessageDecoder.class);
     private static final String MESSAGE_TYPE_SLACK = "message";
 
     private ObjectMapper objMapper;
