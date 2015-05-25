@@ -2,14 +2,18 @@ package com.chatalytics.compute.storm.spout;
 
 import com.chatalytics.compute.chat.dao.IChatApiDAO;
 import com.chatalytics.compute.config.ConfigurationConstants;
-import com.chatalytics.compute.db.dao.ChatAlyticsDAO;
-import com.chatalytics.compute.db.dao.ChatAlyticsDAOFactory;
 import com.chatalytics.compute.slack.dao.JsonSlackDAO;
 import com.chatalytics.compute.slack.dao.SlackApiDAOFactory;
 import com.chatalytics.compute.util.YamlUtils;
 import com.chatalytics.core.config.ChatAlyticsConfig;
 import com.chatalytics.core.model.FatMessage;
+import com.chatalytics.core.model.Message;
+import com.chatalytics.core.model.Room;
+import com.chatalytics.core.model.User;
+import com.google.common.annotations.VisibleForTesting;
 
+import org.apache.storm.guava.base.Throwables;
+import org.glassfish.tyrus.container.jdk.client.JdkContainerProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,15 +22,18 @@ import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichSpout;
 import backtype.storm.tuple.Fields;
+import backtype.storm.tuple.Values;
 
 import java.io.IOException;
 import java.net.URI;
 import java.util.Map;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import javax.websocket.ClientEndpoint;
-import javax.websocket.ContainerProvider;
 import javax.websocket.DeploymentException;
+import javax.websocket.OnError;
 import javax.websocket.OnMessage;
+import javax.websocket.Session;
 import javax.websocket.WebSocketContainer;
 
 /**
@@ -34,7 +41,7 @@ import javax.websocket.WebSocketContainer;
  *
  * @author giannis
  */
-@ClientEndpoint
+@ClientEndpoint(decoders = { RealtimeMessageDecoder.class })
 public class SlackMessageSpout extends BaseRichSpout {
 
     private static final long serialVersionUID = -6294446748544704853L;
@@ -43,34 +50,61 @@ public class SlackMessageSpout extends BaseRichSpout {
     public static final String SLACK_MESSAGE_FIELD_STR = "slack-message";
 
     private IChatApiDAO slackDao;
-    private ChatAlyticsDAO dbDao;
     private SpoutOutputCollector collector;
+
+    private final ConcurrentLinkedQueue<FatMessage> unemittedMessages;
+    private Session session;
+
+    public SlackMessageSpout() {
+        unemittedMessages = new ConcurrentLinkedQueue<>();
+    }
 
     @Override
     public void open(@SuppressWarnings("rawtypes") Map conf, TopologyContext context,
-                    SpoutOutputCollector collector) {
+                     SpoutOutputCollector collector) {
         String configYaml = (String) conf.get(ConfigurationConstants.CHATALYTICS_CONFIG.txt);
         ChatAlyticsConfig config = YamlUtils.readYamlFromString(configYaml,
                                                                 ChatAlyticsConfig.class);
         LOG.info("Loaded config...");
 
-        slackDao = SlackApiDAOFactory.getSlackApiDao(config);
+        slackDao = getChatApiDao(config);
         LOG.info("Got Slack API DAO...");
-
-        dbDao = ChatAlyticsDAOFactory.getChatAlyticsDao(config);
-        LOG.info("Got database DAO...");
 
         this.collector = collector;
 
-        WebSocketContainer webSocketContainer = ContainerProvider.getWebSocketContainer();
+        WebSocketContainer webSocketContainer = getWebSocketContainer();
         openRealtimeConnection(config, webSocketContainer);
     }
 
-    public void openRealtimeConnection(ChatAlyticsConfig config, WebSocketContainer webSocket) {
-        webSocket = ContainerProvider.getWebSocketContainer();
+    /**
+     * @return The websocket container.
+     */
+    @VisibleForTesting
+    protected WebSocketContainer getWebSocketContainer() {
+        return JdkContainerProvider.getWebSocketContainer();
+    }
+
+    /**
+     * @return The slack API DAO
+     */
+    @VisibleForTesting
+    protected IChatApiDAO getChatApiDao(ChatAlyticsConfig  config) {
+        return SlackApiDAOFactory.getSlackApiDao(config);
+    }
+
+    /**
+     * Opens the websocket and connects to the slack realtime server
+     *
+     * @param config
+     *            The application configuration
+     * @param webSocket
+     *            The websocket to be used for connecting
+     */
+    protected void openRealtimeConnection(ChatAlyticsConfig config, WebSocketContainer webSocket) {
         URI webSocketUri = getRealtimeWebSocketURI();
         try {
-            webSocket.connectToServer(this, webSocketUri);
+            session = webSocket.connectToServer(this, webSocketUri);
+            LOG.info("RTM session created with id {}", session.getId());
         } catch (DeploymentException | IOException e) {
             String errMsg = String.format("Unable to connect to %s", webSocketUri);
             LOG.error(errMsg);
@@ -92,20 +126,65 @@ public class SlackMessageSpout extends BaseRichSpout {
         }
     }
 
+    /**
+     * Called when a new chat message event is received. A {@link FatMessage} is created and pushed
+     * to a concurrent queue for consumption.
+     *
+     * @param message
+     *            The message event
+     * @param session
+     *            The active websocket session
+     */
     @OnMessage
-    protected  void onEvent(String event) {
-        System.out.println(event);
+    public void onMessageEvent(Message message, Session session) {
+        LOG.debug("Got event {}", message);
+        Map<String, User> users = slackDao.getUsers();
+        Map<String, Room> rooms = slackDao.getRooms();
+
+        User fromUser = users.get(message.getFromUserId());
+        Room room = rooms.get(message.getRoomId());
+
+        FatMessage fateMessage = new FatMessage(message, fromUser, room);
+        unemittedMessages.add(fateMessage);
     }
 
+    /**
+     * Called whenever an exception occurs while the websocket session is active
+     *
+     * @param t
+     *            The exception
+     */
+    @OnError
+    public void onError(Throwable t) {
+        LOG.error(Throwables.getStackTraceAsString(t));
+    }
+
+    /**
+     * Consumes from a queue that is populated by the {@link #onMessageEvent(Message, Session)}
+     * method
+     */
     @Override
     public void nextTuple() {
-        // TODO Auto-generated method stub
-
+        while (!unemittedMessages.isEmpty()) {
+            FatMessage fatMessage = unemittedMessages.remove();
+            collector.emit(new Values(fatMessage));
+        }
     }
 
     @Override
     public void declareOutputFields(OutputFieldsDeclarer fields) {
         fields.declare(new Fields(SLACK_MESSAGE_FIELD_STR));
+    }
+
+    @Override
+    public void close() {
+        if (session != null) {
+            try {
+                session.close();
+            } catch (IOException e) {
+                LOG.error("Session did not close cleanly. Got {}", e.getMessage());
+            }
+        }
     }
 
 }
