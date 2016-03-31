@@ -8,6 +8,7 @@ import com.chatalytics.core.config.ChatAlyticsConfig;
 import com.chatalytics.core.model.ChatEntity;
 import com.chatalytics.core.model.FatMessage;
 import com.chatalytics.core.model.Message;
+import com.chatalytics.core.model.Room;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -28,7 +29,6 @@ import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.util.XMLUtils;
 import edu.stanford.nlp.util.XMLUtils.XMLTag;
 
-import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
 import java.net.URL;
@@ -119,21 +119,32 @@ public class EntityExtractionBolt extends BaseRichBolt {
                     } else {
                         occurrences = existingEntity.getOccurrences() + 1;
                     }
+                    Room room = fatMessage.getRoom();
+                    String roomName;
+                    if (room == null) {
+                        roomName = "";
+                    } else {
+                        roomName = room.getName();
+                    }
                     entities.put(entity, new ChatEntity(entity,
                                                         occurrences,
                                                         message.getDate(),
                                                         fatMessage.getUser().getMentionName(),
-                                                        fatMessage.getRoom().getName()));
+                                                        roomName));
                 }
 
+                tag = XMLUtils.readAndParseTag(r);
                 if (tag == null || tag.name.length() == 0) {
                     break;
                 }
             }
 
-        } catch (IOException e) {
+        } catch (Exception e) {
             LOG.error("Could not extract entity. Ignoring...", e);
         }
+
+        LOG.debug("Extracted {} entities", entities.size());
+
         return Lists.newArrayList(entities.values());
     }
 

@@ -10,7 +10,9 @@
   </appender>
 
   <logger name="backtype.storm" level="INFO"/>
+  <logger name="org.hibernate" level="INFO"/>
   <logger name="com.netflix" level="WARN"/>
+  <logger name="org.apache.storm.shade.org.apache.curator" level="WARN"/>
   <logger name="org.apache.zookeeper" level="WARN"/>
   <logger name="org.apache.storm.shade.org.apache.zookeeper" level="WARN"/>
   <root level="DEBUG">
