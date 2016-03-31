@@ -11,6 +11,8 @@ import com.google.common.util.concurrent.AbstractIdleService;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Interval;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Map;
@@ -18,6 +20,7 @@ import java.util.Map;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
+import javax.persistence.PersistenceException;
 import javax.persistence.Tuple;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
@@ -39,6 +42,8 @@ public class ChatAlyticsDAOImpl extends AbstractIdleService implements ChatAlyti
 
     private final EntityManager entityManager;
     private final EntityManagerFactory entityManagerFactory;
+
+    private static final Logger LOG = LoggerFactory.getLogger(ChatAlyticsDAOImpl.class);
 
     public ChatAlyticsDAOImpl(ChatAlyticsConfig hconfig) {
         this.entityManagerFactory =
@@ -88,7 +93,11 @@ public class ChatAlyticsDAOImpl extends AbstractIdleService implements ChatAlyti
     public void persistEntity(ChatEntity entity) {
         entityManager.getTransaction().begin();
         entityManager.persist(entity);
+        try {
         entityManager.getTransaction().commit();
+        } catch (PersistenceException e) {
+            LOG.error("Cannot store {}", entity, e);
+        }
     }
 
     /**
