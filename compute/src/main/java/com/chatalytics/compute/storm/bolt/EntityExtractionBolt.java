@@ -1,8 +1,8 @@
 package com.chatalytics.compute.storm.bolt;
 
 import com.chatalytics.compute.config.ConfigurationConstants;
-import com.chatalytics.compute.db.dao.ChatAlyticsDAO;
 import com.chatalytics.compute.db.dao.ChatAlyticsDAOFactory;
+import com.chatalytics.compute.db.dao.IEntityDAO;
 import com.chatalytics.compute.util.YamlUtils;
 import com.chatalytics.core.config.ChatAlyticsConfig;
 import com.chatalytics.core.model.ChatEntity;
@@ -52,7 +52,7 @@ public class EntityExtractionBolt extends BaseRichBolt {
     private static final int MAX_ENTITY_CHARS = 150;
 
     private AbstractSequenceClassifier<CoreLabel> classifier;
-    private ChatAlyticsDAO dbDao;
+    private IEntityDAO entityDao;
 
     @Override
     public void prepare(@SuppressWarnings("rawtypes") Map conf, TopologyContext context,
@@ -60,9 +60,9 @@ public class EntityExtractionBolt extends BaseRichBolt {
         String configStr = (String) conf.get(ConfigurationConstants.CHATALYTICS_CONFIG.txt);
         ChatAlyticsConfig config = YamlUtils.readYamlFromString(configStr, ChatAlyticsConfig.class);
         classifier = getClassifier(config);
-        dbDao = ChatAlyticsDAOFactory.getChatAlyticsDao(config);
-        if (!dbDao.isRunning()) {
-            dbDao.startAsync().awaitRunning();
+        entityDao = ChatAlyticsDAOFactory.getEntityDAO(config);
+        if (!entityDao.isRunning()) {
+            entityDao.startAsync().awaitRunning();
         }
     }
 
@@ -91,7 +91,7 @@ public class EntityExtractionBolt extends BaseRichBolt {
 
         List<ChatEntity> entities = extractEntities(fatMessage);
         for (ChatEntity entity : entities) {
-            dbDao.persistEntity(entity);
+            entityDao.persistEntity(entity);
         }
     }
 
@@ -161,7 +161,7 @@ public class EntityExtractionBolt extends BaseRichBolt {
 
     @Override
     public void cleanup() {
-        dbDao.stopAsync().awaitTerminated();
+        entityDao.stopAsync().awaitTerminated();
     }
 
 }

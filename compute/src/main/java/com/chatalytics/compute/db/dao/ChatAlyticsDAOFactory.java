@@ -3,23 +3,31 @@ package com.chatalytics.compute.db.dao;
 import com.chatalytics.core.config.ChatAlyticsConfig;
 
 /**
- * Factory for constructing {@link ChatAlyticsDAO}s.
+ * Factory for constructing DAOs.
  *
  * @author giannis
  *
  */
 public class ChatAlyticsDAOFactory {
 
-    private static ChatAlyticsDAO chatalyticsDaoImpl;
+    private static IChatAlyticsDAO chatalyticsDao;
+    private static IEntityDAO entityDao;
 
     private ChatAlyticsDAOFactory() {
         // hide constructor
     }
 
-    public static ChatAlyticsDAO getChatAlyticsDao(ChatAlyticsConfig config) {
-        if (chatalyticsDaoImpl == null) {
-            chatalyticsDaoImpl = new ChatAlyticsDAOImpl(config);
+    public static IChatAlyticsDAO getChatAlyticsDao(ChatAlyticsConfig config) {
+        if (chatalyticsDao == null) {
+            chatalyticsDao = new ChatAlyticsDAOImpl(config);
         }
-        return chatalyticsDaoImpl;
+        return chatalyticsDao;
+    }
+
+    public static IEntityDAO getEntityDAO(ChatAlyticsConfig config) {
+        if (entityDao == null) {
+            entityDao = new EntityDAOImpl(config);
+        }
+        return entityDao;
     }
 }

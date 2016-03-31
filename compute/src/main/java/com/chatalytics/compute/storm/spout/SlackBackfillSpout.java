@@ -2,7 +2,7 @@ package com.chatalytics.compute.storm.spout;
 
 import com.chatalytics.compute.chat.dao.IChatApiDAO;
 import com.chatalytics.compute.config.ConfigurationConstants;
-import com.chatalytics.compute.db.dao.ChatAlyticsDAO;
+import com.chatalytics.compute.db.dao.IChatAlyticsDAO;
 import com.chatalytics.compute.db.dao.ChatAlyticsDAOFactory;
 import com.chatalytics.compute.slack.dao.SlackApiDAOFactory;
 import com.chatalytics.compute.util.YamlUtils;
@@ -51,7 +51,7 @@ public class SlackBackfillSpout extends BaseRichSpout {
     private DateTime initDate;
     private SpoutOutputCollector collector;
     private int granularityMins;
-    private ChatAlyticsDAO dbDao;
+    private IChatAlyticsDAO dbDao;
 
     @Override
     public void open(@SuppressWarnings("rawtypes") Map conf, TopologyContext context,

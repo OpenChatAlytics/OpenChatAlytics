@@ -1,7 +1,7 @@
 package com.chatalytics.web.resources;
 
-import com.chatalytics.compute.db.dao.ChatAlyticsDAO;
-import com.chatalytics.compute.db.dao.ChatAlyticsDAOImpl;
+import com.chatalytics.compute.db.dao.IEntityDAO;
+import com.chatalytics.compute.db.dao.EntityDAOImpl;
 import com.chatalytics.core.config.ChatAlyticsConfig;
 import com.chatalytics.core.model.ChatEntity;
 import com.google.common.collect.Lists;
@@ -27,7 +27,7 @@ import static org.junit.Assert.assertEquals;
  */
 public class TrendingTopicsResourceTest {
 
-    private ChatAlyticsDAO chatalyticsDao;
+    private IEntityDAO entityDao;
     private TrendingTopicsResource underTest;
     private DateTimeZone dtZone;
     private DateTime mentionTime;
@@ -39,8 +39,8 @@ public class TrendingTopicsResourceTest {
         config.timeZone = "America/New_York";
         dtZone = DateTimeZone.forID(config.timeZone);
 
-        chatalyticsDao = new ChatAlyticsDAOImpl(config);
-        chatalyticsDao.startAsync().awaitRunning();
+        entityDao = new EntityDAOImpl(config);
+        entityDao.startAsync().awaitRunning();
 
         mentionTime = DateTime.now().withZone(DateTimeZone.UTC);
         List<ChatEntity> entities = Lists.newArrayListWithCapacity(10);
@@ -60,13 +60,13 @@ public class TrendingTopicsResourceTest {
 
     private void storeTestEntities(List<ChatEntity> entities) {
         for (ChatEntity entity : entities) {
-            chatalyticsDao.persistEntity(entity);
+            entityDao.persistEntity(entity);
         }
     }
 
     @After
     public void tearDown() throws Exception {
-        chatalyticsDao.stopAsync().awaitTerminated();
+        entityDao.stopAsync().awaitTerminated();
     }
 
     /**

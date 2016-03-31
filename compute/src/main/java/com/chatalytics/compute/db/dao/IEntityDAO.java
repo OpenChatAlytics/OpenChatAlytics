@@ -4,32 +4,12 @@ import com.chatalytics.core.model.ChatEntity;
 import com.google.common.base.Optional;
 import com.google.common.util.concurrent.Service;
 
-import org.joda.time.DateTime;
 import org.joda.time.Interval;
 
 import java.util.List;
 import java.util.Map;
 
-/**
- * Contains methods for persisting and retrieving objects from the chatalytics store.
- *
- * @author giannis
- *
- */
-public interface ChatAlyticsDAO extends Service {
-
-    /**
-     * @return The last date and time chat messages were pulled.
-     */
-    public DateTime getLastMessagePullTime();
-
-    /**
-     * Update the last pull time to a new one
-     *
-     * @param time
-     *            The time to update to
-     */
-    public void setLastMessagePullTime(DateTime time);
+public interface IEntityDAO extends Service {
 
     /**
      * Persists an entity to the database

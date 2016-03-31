@@ -1,7 +1,7 @@
 package com.chatalytics.web.resources;
 
 import com.chatalytics.compute.db.dao.ChatAlyticsDAOFactory;
-import com.chatalytics.compute.db.dao.ChatAlyticsDAO;
+import com.chatalytics.compute.db.dao.IEntityDAO;
 import com.chatalytics.core.config.ChatAlyticsConfig;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Optional;
@@ -53,12 +53,12 @@ public class TrendingTopicsResource {
     private static final int MAX_RESULTS = 10;
     private static final Logger LOG = LoggerFactory.getLogger(TrendingTopicsResource.class);
 
-    private final ChatAlyticsDAO dbDao;
+    private final IEntityDAO entityDao;
     private final DateTimeZone dateTimeZone;
     private final ObjectMapper objectMapper;
 
     public TrendingTopicsResource(ChatAlyticsConfig config) {
-        dbDao = ChatAlyticsDAOFactory.getChatAlyticsDao(config);
+        entityDao = ChatAlyticsDAOFactory.getEntityDAO(config);
         dateTimeZone = DateTimeZone.forID(config.timeZone);
         objectMapper = new ObjectMapper();
     }
@@ -80,8 +80,8 @@ public class TrendingTopicsResource {
         DateTime endTime = getDateTimeFromParameter(endTimeStr);
         Interval interval = new Interval(startTime, endTime);
 
-        Map<String, Long> topEntities = dbDao.getTopEntities(interval, roomName,
-                                                             username, MAX_RESULTS);
+        Map<String, Long> topEntities = entityDao.getTopEntities(interval, roomName, username,
+                                                                 MAX_RESULTS);
         String jsonResult = objectMapper.writeValueAsString(topEntities);
         return Response.ok(jsonResult).build();
     }
