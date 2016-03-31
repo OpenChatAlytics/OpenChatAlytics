@@ -36,8 +36,15 @@ public class MessageDeserializer extends JsonChatDeserializer<Message> {
         DateTime date = new DateTime(timeInMillis);
 
         JsonNode subtype = node.get("subtype");
-        if (subtype != null && "message_changed".equals(subtype.asText())) {
-            node = node.get("message");
+        if (subtype != null) {
+            if ("message_changed".equals(subtype.asText())) {
+                node = node.get("message");
+            } else if ("bot_message".equals(subtype.asText())) {
+                JsonNode attachmentNode = node.get("attachments");
+                if (attachmentNode != null) {
+                    node = attachmentNode;
+                }
+            }
         }
 
         String fromName = getAsTextOrNull(node.get("username"));
@@ -50,7 +57,15 @@ public class MessageDeserializer extends JsonChatDeserializer<Message> {
             fromUserId = fromUserIdNode.asText();
         }
 
-        String message = node.get("text").asText();
+        String message = getAsTextOrNull(node.get("text"));
+
+        try {
+            if (message == null) {
+                message = getAsTextOrNull(node.get("pretext"));
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(node.toString(), e);
+        }
 
         return new Message(date, fromName, fromUserId, message, channelId);
     }

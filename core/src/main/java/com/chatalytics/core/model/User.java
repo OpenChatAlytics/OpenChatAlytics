@@ -4,12 +4,15 @@ import com.google.common.base.MoreObjects;
 
 import org.joda.time.DateTime;
 
+import lombok.EqualsAndHashCode;
+
 /**
  * Chat user
  *
  * @author giannis
  *
  */
+@EqualsAndHashCode
 public class User {
 
     private final String userId;

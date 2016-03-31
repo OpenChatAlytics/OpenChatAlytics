@@ -4,6 +4,8 @@ import com.google.common.base.MoreObjects;
 
 import org.joda.time.DateTime;
 
+import lombok.EqualsAndHashCode;
+
 import java.io.Serializable;
 
 /**
@@ -12,6 +14,7 @@ import java.io.Serializable;
  * @author giannis
  *
  */
+@EqualsAndHashCode
 public class Room implements Serializable {
 
     private final String roomId;
@@ -28,8 +31,8 @@ public class Room implements Serializable {
     private static final long serialVersionUID = -31871889682914674L;
 
     public Room(String roomId, String name, String topic, DateTime lastActiveDate,
-            DateTime created, String ownerUserId, boolean archived, boolean privateRoom,
-            String guestAccessURL, String xmppJid) {
+                DateTime created, String ownerUserId, boolean archived, boolean privateRoom,
+                String guestAccessURL, String xmppJid) {
         this.roomId = roomId;
         this.name = name;
         this.topic = topic;

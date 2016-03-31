@@ -4,6 +4,8 @@ import com.google.common.base.MoreObjects;
 
 import org.joda.time.DateTime;
 
+import lombok.EqualsAndHashCode;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -17,6 +19,7 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = LastPullTime.LAST_PULL_TIME_TABLE_NAME)
+@EqualsAndHashCode
 public class LastPullTime {
 
     public static final String LAST_PULL_TIME_TABLE_NAME = "LAST_PULL_TIME";

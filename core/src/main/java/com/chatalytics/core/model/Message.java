@@ -4,6 +4,8 @@ import com.google.common.base.MoreObjects;
 
 import org.joda.time.DateTime;
 
+import lombok.EqualsAndHashCode;
+
 import java.io.Serializable;
 
 /**
@@ -12,6 +14,7 @@ import java.io.Serializable;
  * @author giannis
  *
  */
+@EqualsAndHashCode
 public class Message implements Serializable {
 
     private final DateTime date;

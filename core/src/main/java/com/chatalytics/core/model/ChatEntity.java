@@ -5,6 +5,8 @@ import com.google.common.base.MoreObjects;
 import org.hibernate.annotations.Type;
 import org.joda.time.DateTime;
 
+import lombok.EqualsAndHashCode;
+
 import java.io.Serializable;
 
 import javax.persistence.Column;
@@ -20,6 +22,7 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = ChatEntity.ENTITY_TABLE_NAME)
+@EqualsAndHashCode
 public class ChatEntity implements Serializable {
 
     public static final String ENTITY_TABLE_NAME = "ENTITIES";

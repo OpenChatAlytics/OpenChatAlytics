@@ -2,6 +2,8 @@ package com.chatalytics.core.model;
 
 import com.google.common.base.MoreObjects;
 
+import lombok.EqualsAndHashCode;
+
 import java.io.Serializable;
 
 /**
@@ -11,6 +13,7 @@ import java.io.Serializable;
  * @author giannis
  *
  */
+@EqualsAndHashCode
 public class FatMessage implements Serializable {
 
     private final Message message;
