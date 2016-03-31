@@ -2,6 +2,7 @@ package com.chatalytics.compute.storm;
 
 import com.chatalytics.compute.storm.bolt.EntityExtractionBolt;
 import com.chatalytics.compute.storm.spout.HipChatMessageSpout;
+import com.chatalytics.compute.storm.spout.SlackBackfillSpout;
 import com.chatalytics.compute.storm.spout.SlackMessageSpout;
 import com.chatalytics.core.InputSourceType;
 
@@ -12,7 +13,6 @@ import backtype.storm.topology.TopologyBuilder;
  * Declares and sets up the Storm topology.
  *
  * @author giannis
- *
  */
 public class ChatAlyticsStormTopology {
 
@@ -28,9 +28,14 @@ public class ChatAlyticsStormTopology {
         if (type == InputSourceType.HIPCHAT) {
             inputSpoutId = HipChatMessageSpout.SPOUT_ID;
             topologyBuilder.setSpout(inputSpoutId, new HipChatMessageSpout());
-        } else {
+        } else if (type == InputSourceType.SLACK) {
             inputSpoutId = SlackMessageSpout.SPOUT_ID;
             topologyBuilder.setSpout(inputSpoutId, new SlackMessageSpout());
+        } else if (type == InputSourceType.SLACK_BACKFILL) {
+            inputSpoutId = SlackBackfillSpout.SPOUT_ID;
+            topologyBuilder.setSpout(inputSpoutId, new SlackBackfillSpout());
+        } else {
+            throw new RuntimeException("Can't determine input source type from " + type);
         }
 
         topologyBuilder.setBolt(EntityExtractionBolt.BOLT_ID, new EntityExtractionBolt())

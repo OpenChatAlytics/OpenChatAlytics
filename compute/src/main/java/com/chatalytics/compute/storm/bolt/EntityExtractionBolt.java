@@ -49,19 +49,21 @@ public class EntityExtractionBolt extends BaseRichBolt {
     private static final Logger LOG = LoggerFactory.getLogger(EntityExtractionBolt.class);
     private static final long serialVersionUID = -1586393277809132608L;
     private static final String CHAT_ENTITY_FIELD_STR = "chat-entity";
+    private static final int MAX_ENTITY_CHARS = 150;
 
     private AbstractSequenceClassifier<CoreLabel> classifier;
     private ChatAlyticsDAO dbDao;
 
     @Override
     public void prepare(@SuppressWarnings("rawtypes") Map conf, TopologyContext context,
-            OutputCollector collector) {
-        String configYaml = (String) conf.get(ConfigurationConstants.CHATALYTICS_CONFIG.txt);
-        ChatAlyticsConfig config = YamlUtils.readYamlFromString(configYaml,
-                                                                 ChatAlyticsConfig.class);
+                        OutputCollector collector) {
+        String configStr = (String) conf.get(ConfigurationConstants.CHATALYTICS_CONFIG.txt);
+        ChatAlyticsConfig config = YamlUtils.readYamlFromString(configStr, ChatAlyticsConfig.class);
         classifier = getClassifier(config);
         dbDao = ChatAlyticsDAOFactory.getChatAlyticsDao(config);
-        dbDao.startAsync().awaitRunning();
+        if (!dbDao.isRunning()) {
+            dbDao.startAsync().awaitRunning();
+        }
     }
 
     /**
@@ -108,9 +110,18 @@ public class EntityExtractionBolt extends BaseRichBolt {
         Reader r = new StringReader(messageWithXML);
 
         try {
-            XMLTag tag = XMLUtils.readAndParseTag(r);
-            while (tag != null && tag.name.length() > 0) {
+            while (true) {
+                XMLTag tag = XMLUtils.readAndParseTag(r);
+                if (tag == null || tag.name.length() == 0) {
+                    break;
+                }
+
                 String entity = XMLUtils.readUntilTag(r);
+
+                if (entity.length() > MAX_ENTITY_CHARS) {
+                    continue;
+                }
+
                 if (!tag.isEndTag) {
                     ChatEntity existingEntity = entities.remove(entity);
                     long occurrences;
@@ -131,11 +142,6 @@ public class EntityExtractionBolt extends BaseRichBolt {
                                                         message.getDate(),
                                                         fatMessage.getUser().getMentionName(),
                                                         roomName));
-                }
-
-                tag = XMLUtils.readAndParseTag(r);
-                if (tag == null || tag.name.length() == 0) {
-                    break;
                 }
             }
 

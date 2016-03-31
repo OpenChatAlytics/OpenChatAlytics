@@ -92,11 +92,14 @@ public class ChatAlyticsDAOImpl extends AbstractIdleService implements ChatAlyti
     @Override
     public void persistEntity(ChatEntity entity) {
         entityManager.getTransaction().begin();
-        entityManager.persist(entity);
         try {
-        entityManager.getTransaction().commit();
+            entityManager.persist(entity);
+            entityManager.getTransaction().commit();
         } catch (PersistenceException e) {
-            LOG.error("Cannot store {}", entity, e);
+            LOG.error("Cannot store {}. {}", entity, e.getMessage());
+            if (entityManager.getTransaction().isActive()) {
+                entityManager.getTransaction().rollback();
+            }
         }
     }
 

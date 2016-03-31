@@ -1,9 +1,15 @@
+inputType: SLACK_BACKFILL
 timeZone: America/New_York
 apiDateFormat: YYYY-MM-dd
 classifier: classifiers/english.all.3class.distsim.crf.ser.gz
+filesToRead:
+    'com.chatalytics.bolts.sentiment.words': files/sentiment_words.csv
 hipchatConfig:
     baseHipChatURL: https://api.hipchat.com/v1/
-    authTokens: [0]
+    authTokens: ['0']
 slackConfig:
     baseSlackURL: https://slack.com/api/
-    authTokens: [0]
+    authTokens: ['0']
+backfillerConfig:
+    granularityMins: 5
+    startDate: '2016-03-30T00:00:00Z'

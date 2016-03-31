@@ -3,6 +3,7 @@ package com.chatalytics.core.config;
 import com.chatalytics.core.InputSourceType;
 
 import java.io.Serializable;
+import java.util.Map;
 
 /**
  * The configuration object. Fields of this object are serialized and put in the storm configuration
@@ -31,5 +32,12 @@ public class ChatAlyticsConfig implements Serializable {
     public HipChatConfig hipchatConfig = new HipChatConfig();
 
     public SlackConfig slackConfig = new SlackConfig();
+
+    public BackfillerConfig backfillerConfig = new BackfillerConfig();
+
+    /**
+     * Map of property name to file to read
+     */
+    public Map<String, String> filesToRead;
 
 }

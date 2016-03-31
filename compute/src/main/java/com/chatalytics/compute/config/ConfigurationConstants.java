@@ -14,14 +14,9 @@ public enum ConfigurationConstants {
     CHATALYTICS_CONFIG("com.chatalytics.config"),
 
     /**
-     * The property for getting the base URL for the hipchat API.
+     * Property for storing the list of sentiment words
      */
-    HIPCHAT_API_URL("com.chatalytics.hipchat.api.url"),
-
-    /**
-     * Contains the list of authentication tokens for the hipchat API.
-     */
-    HIPCHAT_AUTH_TOKENS("com.chatalytics.hipchat.auth.tokens");
+    SENTIMENT_WORDS("com.chatalytics.bolts.sentiment.words");
 
     public final String txt;
 
