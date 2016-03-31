@@ -1,8 +1,8 @@
 package com.chatalytics.compute.util;
 
-import org.apache.commons.io.IOUtils;
 import org.yaml.snakeyaml.Yaml;
 
+import java.io.IOException;
 import java.io.InputStream;
 
 /**
@@ -36,7 +36,9 @@ public class YamlUtils {
             Yaml yaml = new Yaml();
             return yaml.loadAs(is, clazz);
         } finally {
-            IOUtils.closeQuietly(is);
+            try {
+                is.close();
+            } catch (IOException e) { }
         }
     }
 }

@@ -5,8 +5,8 @@ import com.chatalytics.compute.config.ConfigurationConstants;
 import com.chatalytics.compute.util.YamlUtils;
 import com.chatalytics.core.config.ChatAlyticsConfig;
 import com.chatalytics.core.model.Message;
+import com.google.common.collect.Maps;
 
-import org.apache.storm.guava.collect.Maps;
 import org.joda.time.DateTime;
 import org.junit.After;
 import org.junit.Before;

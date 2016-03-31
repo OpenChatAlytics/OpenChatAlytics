@@ -6,8 +6,8 @@ import com.chatalytics.core.model.FatMessage;
 import com.chatalytics.core.model.Message;
 import com.chatalytics.core.model.Room;
 import com.chatalytics.core.model.User;
+import com.google.common.collect.Maps;
 
-import org.apache.storm.guava.collect.Maps;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.After;

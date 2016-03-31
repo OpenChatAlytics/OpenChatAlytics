@@ -12,7 +12,6 @@ import com.google.common.collect.Maps;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.WebResource;
 
-import org.apache.commons.lang.NotImplementedException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.type.CollectionType;
 import org.codehaus.jackson.map.type.MapType;
@@ -94,7 +93,7 @@ public class JsonHipChatDAO extends AbstractJSONChatApiDAO {
      */
     @Override
     public Map<String, User> getUsersForRoom(Room room) {
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException("get users for room is not supported");
     }
 
     /**

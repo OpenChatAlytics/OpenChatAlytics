@@ -10,9 +10,9 @@ import com.chatalytics.core.model.FatMessage;
 import com.chatalytics.core.model.Message;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.io.Resources;
 
-import org.apache.storm.guava.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -109,7 +109,7 @@ public class EntityExtractionBolt extends BaseRichBolt {
 
         try {
             XMLTag tag = XMLUtils.readAndParseTag(r);
-            while (tag.name.length() > 0) {
+            while (tag != null && tag.name.length() > 0) {
                 String entity = XMLUtils.readUntilTag(r);
                 if (!tag.isEndTag) {
                     ChatEntity existingEntity = entities.remove(entity);
@@ -126,7 +126,6 @@ public class EntityExtractionBolt extends BaseRichBolt {
                                                         fatMessage.getRoom().getName()));
                 }
 
-                tag = XMLUtils.readAndParseTag(r);
                 if (tag == null || tag.name.length() == 0) {
                     break;
                 }

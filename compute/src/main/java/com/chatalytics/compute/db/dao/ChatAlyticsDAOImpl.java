@@ -4,10 +4,10 @@ import com.chatalytics.core.config.ChatAlyticsConfig;
 import com.chatalytics.core.model.ChatEntity;
 import com.chatalytics.core.model.LastPullTime;
 import com.google.common.base.Optional;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.util.concurrent.AbstractIdleService;
 
-import org.apache.storm.guava.collect.Lists;
-import org.apache.storm.guava.collect.Maps;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Interval;

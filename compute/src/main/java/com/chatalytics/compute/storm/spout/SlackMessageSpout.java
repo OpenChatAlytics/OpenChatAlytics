@@ -11,8 +11,8 @@ import com.chatalytics.core.model.Message;
 import com.chatalytics.core.model.Room;
 import com.chatalytics.core.model.User;
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Throwables;
 
-import org.apache.storm.guava.base.Throwables;
 import org.glassfish.tyrus.container.jdk.client.JdkContainerProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

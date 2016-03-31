@@ -3,9 +3,9 @@ package com.chatalytics.web;
 import com.chatalytics.compute.util.YamlUtils;
 import com.chatalytics.core.config.ChatAlyticsConfig;
 import com.chatalytics.web.resources.TrendingTopicsResource;
+import com.google.common.collect.Sets;
 import com.sun.jersey.spi.container.servlet.ServletContainer;
 
-import org.apache.storm.guava.collect.Sets;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.servlet.Context;
 import org.mortbay.jetty.servlet.ServletHolder;
