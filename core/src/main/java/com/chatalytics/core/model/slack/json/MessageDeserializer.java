@@ -27,6 +27,19 @@ public class MessageDeserializer extends JsonChatDeserializer<Message> {
         ObjectCodec oc = jp.getCodec();
         JsonNode node = oc.readTree(jp);
 
+        String channelId = getAsTextOrNull(node.get("channel"));
+        String timestampStr = node.get("ts").asText();
+        String[] timestampElementsArr = timestampStr.split("\\.");
+        long seconds = Long.parseLong(timestampElementsArr[0]);
+        long nanos = Long.parseLong(timestampElementsArr[1]);
+        long timeInMillis = seconds * 1000 + nanos / 1000;
+        DateTime date = new DateTime(timeInMillis);
+
+        JsonNode subtype = node.get("subtype");
+        if (subtype != null && "message_changed".equals(subtype.asText())) {
+            node = node.get("message");
+        }
+
         String fromName = getAsTextOrNull(node.get("username"));
 
         JsonNode fromUserIdNode = node.get("user");
@@ -38,14 +51,6 @@ public class MessageDeserializer extends JsonChatDeserializer<Message> {
         }
 
         String message = node.get("text").asText();
-        String channelId = getAsTextOrNull(node.get("channel"));
-
-        String timestampStr = node.get("ts").asText();
-        String[] timestampElementsArr = timestampStr.split("\\.");
-        long seconds = Long.parseLong(timestampElementsArr[0]);
-        long nanos = Long.parseLong(timestampElementsArr[1]);
-        long timeInMillis = seconds * 1000 + nanos / 1000;
-        DateTime date = new DateTime(timeInMillis);
 
         return new Message(date, fromName, fromUserId, message, channelId);
     }
