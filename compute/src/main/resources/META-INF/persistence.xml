@@ -12,7 +12,7 @@
         <properties>
             <!-- if this is true, hibernate will print (to stdout) the SQL 
                 it executes, so you can check it to ensure it's not doing anything crazy -->
-            <property name="hibernate.show_sql" value="true" />
+            <property name="hibernate.show_sql" value="false" />
             <property name="hibernate.format_sql" value="true" />
             <!-- this tell Hibernate to update the DDL when it starts, very 
                 useful for development, dangerous in production -->
