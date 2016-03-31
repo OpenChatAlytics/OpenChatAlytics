@@ -12,6 +12,7 @@ public class ChatAlyticsDAOFactory {
 
     private static IChatAlyticsDAO chatalyticsDao;
     private static IEntityDAO entityDao;
+    private static IEmojiDAO emojiDao;
 
     private ChatAlyticsDAOFactory() {
         // hide constructor
@@ -29,5 +30,12 @@ public class ChatAlyticsDAOFactory {
             entityDao = new EntityDAOImpl(config);
         }
         return entityDao;
+    }
+
+    public static IEmojiDAO getEmojiDAO(ChatAlyticsConfig config) {
+        if (emojiDao == null) {
+            emojiDao = new EmojiDAOImpl(config);
+        }
+        return emojiDao;
     }
 }

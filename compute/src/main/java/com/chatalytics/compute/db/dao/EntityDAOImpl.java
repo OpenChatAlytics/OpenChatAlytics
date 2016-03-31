@@ -43,11 +43,10 @@ public class EntityDAOImpl extends AbstractIdleService implements IEntityDAO {
 
     private static final Logger LOG = LoggerFactory.getLogger(EntityDAOImpl.class);
 
-
     public EntityDAOImpl(ChatAlyticsConfig config) {
         this.entityManagerFactory =
-                Persistence.createEntityManagerFactory(config.persistenceUnitName);
-            this.entityManager = entityManagerFactory.createEntityManager();
+            Persistence.createEntityManagerFactory(config.persistenceUnitName);
+        this.entityManager = entityManagerFactory.createEntityManager();
     }
 
     /**
