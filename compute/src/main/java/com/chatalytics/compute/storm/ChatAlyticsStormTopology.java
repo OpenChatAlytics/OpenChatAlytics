@@ -2,6 +2,8 @@ package com.chatalytics.compute.storm;
 
 import com.chatalytics.compute.storm.bolt.EntityExtractionBolt;
 import com.chatalytics.compute.storm.spout.HipChatMessageSpout;
+import com.chatalytics.compute.storm.spout.SlackMessageSpout;
+import com.chatalytics.core.InputSourceType;
 
 import backtype.storm.generated.StormTopology;
 import backtype.storm.topology.TopologyBuilder;
@@ -14,16 +16,25 @@ import backtype.storm.topology.TopologyBuilder;
  */
 public class ChatAlyticsStormTopology {
 
-    public ChatAlyticsStormTopology() {
+    private final InputSourceType type;
 
+    public ChatAlyticsStormTopology(InputSourceType type) {
+        this.type = type;
     }
 
     public StormTopology get() {
         TopologyBuilder topologyBuilder = new TopologyBuilder();
-        topologyBuilder.setSpout(HipChatMessageSpout.SPOUT_ID, new HipChatMessageSpout());
+        String inputSpoutId;
+        if (type == InputSourceType.HIPCHAT) {
+            inputSpoutId = HipChatMessageSpout.SPOUT_ID;
+            topologyBuilder.setSpout(inputSpoutId, new HipChatMessageSpout());
+        } else {
+            inputSpoutId = SlackMessageSpout.SPOUT_ID;
+            topologyBuilder.setSpout(inputSpoutId, new SlackMessageSpout());
+        }
 
         topologyBuilder.setBolt(EntityExtractionBolt.BOLT_ID, new EntityExtractionBolt())
-            .shuffleGrouping(HipChatMessageSpout.SPOUT_ID);
+                       .shuffleGrouping(inputSpoutId);
 
         return topologyBuilder.createTopology();
     }

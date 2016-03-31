@@ -1,5 +1,7 @@
 package com.chatalytics.core.config;
 
+import com.chatalytics.core.InputSourceType;
+
 import java.io.Serializable;
 
 /**
@@ -13,6 +15,8 @@ import java.io.Serializable;
 public class ChatAlyticsConfig implements Serializable {
 
     private static final long serialVersionUID = -1251758543444208166L;
+
+    public InputSourceType inputType;
 
     public String apiDateFormat;
 

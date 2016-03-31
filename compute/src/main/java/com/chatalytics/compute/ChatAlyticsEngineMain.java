@@ -17,11 +17,13 @@ import java.net.URISyntaxException;
 public class ChatAlyticsEngineMain {
 
     public static void main(String[] args) throws FileNotFoundException, URISyntaxException {
-        ChatAlyticsStormTopology chatTopology = new ChatAlyticsStormTopology();
         ChatAlyticsConfig config = YamlUtils.readYamlFromResource("chatalytics.yaml",
                                                                   ChatAlyticsConfig.class);
-        ChatAlyticsService chatalyticsService = new ChatAlyticsService(chatTopology.get(),
-                                                                       config);
+
+        ChatAlyticsStormTopology chatTopology = new ChatAlyticsStormTopology(config.inputType);
+
+
+        ChatAlyticsService chatalyticsService = new ChatAlyticsService(chatTopology.get(), config);
         chatalyticsService.startAsync().awaitRunning();
 
     }
