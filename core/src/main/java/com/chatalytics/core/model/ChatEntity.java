@@ -33,7 +33,7 @@ public class ChatEntity implements IMentionable {
     public static final String ROOM_NAME_COLUMN = "ROOM_NAME";
     public static final String USER_NAME_COLUMN = "USER_NAME";
 
-    public static final long serialVersionUID = -4845804080646234253L;
+    public static final long serialVersionUID = -4845804080646234255L;
 
     private String entityValue;
     private int occurrences;

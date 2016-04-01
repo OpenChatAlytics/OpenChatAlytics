@@ -63,10 +63,10 @@ public interface IEntityDAO extends Service {
      *            Optionally supply a user name
      * @return The total number of times the entity was mentioned in the given time interval
      */
-    public long getTotalMentionsForEntity(String entity,
-                                          Interval interval,
-                                          Optional<String> roomName,
-                                          Optional<String> username);
+    public int getTotalMentionsForEntity(String entity,
+                                         Interval interval,
+                                         Optional<String> roomName,
+                                         Optional<String> username);
 
 
     /**

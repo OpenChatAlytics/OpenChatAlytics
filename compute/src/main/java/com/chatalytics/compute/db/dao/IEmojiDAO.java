@@ -63,10 +63,10 @@ public interface IEmojiDAO extends Service {
      *            Optionally supply a user name
      * @return The total number of times the emoji was mentioned in the given time interval
      */
-    public long getTotalMentionsForEmoji(String emoji,
-                                         Interval interval,
-                                         Optional<String> roomName,
-                                         Optional<String> username);
+    public int getTotalMentionsForEmoji(String emoji,
+                                        Interval interval,
+                                        Optional<String> roomName,
+                                        Optional<String> username);
 
     /**
      * Returns back the top emojis in the given time interval, and optionally by user name and/or

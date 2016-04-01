@@ -64,10 +64,10 @@ public class EntityDAOImpl extends AbstractIdleService implements IEntityDAO {
      * {@inheritDoc}
      */
     @Override
-    public long getTotalMentionsForEntity(String entity,
-                                          Interval interval,
-                                          Optional<String> roomName,
-                                          Optional<String> username) {
+    public int getTotalMentionsForEntity(String entity,
+                                         Interval interval,
+                                         Optional<String> roomName,
+                                         Optional<String> username) {
 
         return occurrenceStatsDAO.getTotalMentionsForType(entity, interval, roomName, username);
     }

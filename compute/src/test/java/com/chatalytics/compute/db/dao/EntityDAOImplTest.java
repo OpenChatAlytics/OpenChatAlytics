@@ -57,7 +57,7 @@ public class EntityDAOImplTest {
                                                             Optional.absent()));
 
         // make sure that the sums are correct for a bunch of different queries
-        long result = underTest.getTotalMentionsForEntity("entity1", timeInterval,
+        int result = underTest.getTotalMentionsForEntity("entity1", timeInterval,
                                                           Optional.absent(), Optional.absent());
         assertEquals(3, result);
 

@@ -72,10 +72,10 @@ public interface IMentionableDAO<T extends IMentionable> extends Closeable {
      *            Optionally supply a user name
      * @return The total number of times the entity was mentioned in the given time interval
      */
-    public long getTotalMentionsForType(String value,
-                                        Interval interval,
-                                        Optional<String> roomName,
-                                        Optional<String> username);
+    public int getTotalMentionsForType(String value,
+                                       Interval interval,
+                                       Optional<String> roomName,
+                                       Optional<String> username);
 
     /**
      * Returns back the top mentioned string representation of a type in the given time
