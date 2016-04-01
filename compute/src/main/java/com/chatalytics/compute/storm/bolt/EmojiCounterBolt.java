@@ -93,10 +93,10 @@ public class EmojiCounterBolt extends BaseRichBolt {
                     }
 
                     emojis.put(emoji, new EmojiEntity(emoji,
-                                                      fatMessage.getUser().getMentionName(),
-                                                      roomName,
+                                                      occurrences,
                                                       fatMessage.getMessage().getDate(),
-                                                      occurrences));
+                                                      fatMessage.getUser().getMentionName(),
+                                                      roomName));
                     emojiStrBuilder = new StringBuilder();
                 }
                 capturingEmoji = !capturingEmoji;

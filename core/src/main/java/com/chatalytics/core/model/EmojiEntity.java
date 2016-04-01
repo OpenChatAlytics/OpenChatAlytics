@@ -33,24 +33,38 @@ public class EmojiEntity implements IMentionable {
      * Emoji alias without ':'
      */
     private String emoji;
+    private int occurrences;
+    private DateTime mentionTime;
     private String username;
     private String roomName;
-    private DateTime mentionTime;
-    private int occurrences;
 
-    public EmojiEntity(String emoji, String username, String roomName, DateTime mentionTime,
-                       int occurrences) {
+    public EmojiEntity(String emoji, int occurrences, DateTime mentionTime, String username,
+                       String roomName) {
         this.emoji = emoji;
+        this.occurrences = occurrences;
+        this.mentionTime = mentionTime;
         this.username = username;
         this.roomName = roomName;
-        this.mentionTime = mentionTime;
-        this.occurrences = occurrences;
     }
 
     @Id
     @Column(name = EMOJI_COLUMN)
     public String getEmoji() {
         return emoji;
+    }
+
+    @Override
+    @Column(name = OCCURENCES_COLUMN)
+    public int getOccurrences() {
+        return occurrences;
+    }
+
+    @Override
+    @Id
+    @Column(name = MENTION_TIME_COLUMN)
+    @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
+    public DateTime getMentionTime() {
+        return mentionTime;
     }
 
     @Override
@@ -65,20 +79,6 @@ public class EmojiEntity implements IMentionable {
     @Column(name = ROOM_NAME_COLUMN)
     public String getRoomName() {
         return roomName;
-    }
-
-    @Override
-    @Id
-    @Column(name = MENTION_TIME_COLUMN)
-    @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
-    public DateTime getMentionTime() {
-        return mentionTime;
-    }
-
-    @Override
-    @Column(name = OCCURENCES_COLUMN)
-    public int getOccurrences() {
-        return occurrences;
     }
 
     @Override
