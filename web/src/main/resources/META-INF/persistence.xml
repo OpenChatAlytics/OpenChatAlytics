@@ -21,7 +21,7 @@
             <property name="java.naming.factory.initial" value=""/>
             <property name="hibernate.dialect" value="org.hibernate.dialect.H2Dialect" />
             <property name="hibernate.connection.driver_class" value="org.h2.Driver" />
-            <property name="hibernate.connection.url" value="jdbc:h2:mem:chatalytics;AUTO_SERVER=true" />
+            <property name="hibernate.connection.url" value="jdbc:h2:/mnt/chatalytics;AUTO_SERVER=true" />
             <property name="hibernate.connection.username" value="" />
             <property name="hibernate.connection.password" value="" />
             <property name="hibernate.hbm2ddl.auto" value="update" />
