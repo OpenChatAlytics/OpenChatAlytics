@@ -17,7 +17,7 @@ import java.util.Map;
  *
  * @param <T>
  */
-public interface IOccurrenceStatsDAO<T extends IMentionable> extends Closeable {
+public interface IMentionableDAO<T extends IMentionable> extends Closeable {
 
     /**
      * Persists an value we're interested in doing occurrence statistics on

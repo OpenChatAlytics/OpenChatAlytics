@@ -22,15 +22,14 @@ import javax.persistence.Persistence;
  */
 public class EmojiDAOImpl extends AbstractIdleService implements IEmojiDAO {
 
-    private final IOccurrenceStatsDAO<EmojiEntity> occurrenceStatsDAO;
+    private final IMentionableDAO<EmojiEntity> occurrenceStatsDAO;
     private final EntityManagerFactory entityManagerFactory;
 
     public EmojiDAOImpl(ChatAlyticsConfig config) {
         this.entityManagerFactory =
             Persistence.createEntityManagerFactory(config.persistenceUnitName);
         EntityManager entityManager = entityManagerFactory.createEntityManager();
-        this.occurrenceStatsDAO = new OccurrenceStatsDAO<>(entityManager, EmojiEntity.class,
-                                                           "emoji");
+        this.occurrenceStatsDAO = new MentionableDAO<>(entityManager, EmojiEntity.class, "emoji");
     }
 
     /**

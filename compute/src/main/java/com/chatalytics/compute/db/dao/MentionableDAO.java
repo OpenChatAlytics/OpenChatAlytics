@@ -27,23 +27,23 @@ import javax.persistence.criteria.Root;
 import javax.persistence.criteria.Selection;
 
 /**
- * Implementation of {@link IOccurrenceStatsDAO} that can store and retrieve {@link IMentionable}
- * types. {@link OccurrenceStatsDAO#close()} should be called on end
+ * Implementation of {@link IMentionableDAO} that can store and retrieve {@link IMentionable}
+ * types. {@link MentionableDAO#close()} should be called on end
  *
  * @author giannis
  *
  * @param <T>
  *            The storing type. Should implement {@link IMentionable}
  */
-public class OccurrenceStatsDAO<T extends IMentionable> implements IOccurrenceStatsDAO<T> {
+public class MentionableDAO<T extends IMentionable> implements IMentionableDAO<T> {
 
-    private static final Logger LOG = LoggerFactory.getLogger(OccurrenceStatsDAO.class);
+    private static final Logger LOG = LoggerFactory.getLogger(MentionableDAO.class);
 
     private final EntityManager entityManager;
     private final Class<T> type;
     private final String typeColumnName;
 
-    protected OccurrenceStatsDAO(EntityManager entityManager,
+    protected MentionableDAO(EntityManager entityManager,
                                  Class<T> type,
                                  String typeColumnName) {
         this.entityManager = entityManager;

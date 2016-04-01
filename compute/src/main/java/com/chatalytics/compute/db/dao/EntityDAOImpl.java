@@ -22,15 +22,15 @@ import javax.persistence.Persistence;
  */
 public class EntityDAOImpl extends AbstractIdleService implements IEntityDAO {
 
-    private final IOccurrenceStatsDAO<ChatEntity> occurrenceStatsDAO;
+    private final IMentionableDAO<ChatEntity> occurrenceStatsDAO;
     private final EntityManagerFactory entityManagerFactory;
 
     public EntityDAOImpl(ChatAlyticsConfig config) {
         this.entityManagerFactory =
             Persistence.createEntityManagerFactory(config.persistenceUnitName);
         EntityManager entityManager = entityManagerFactory.createEntityManager();
-        this.occurrenceStatsDAO = new OccurrenceStatsDAO<>(entityManager, ChatEntity.class,
-                                                           "entityValue");
+        this.occurrenceStatsDAO = new MentionableDAO<>(entityManager, ChatEntity.class,
+                                                       "entityValue");
     }
 
     /**
