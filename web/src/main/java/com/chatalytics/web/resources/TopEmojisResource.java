@@ -32,10 +32,10 @@ import javax.ws.rs.core.Response;
  * @author giannis
  *
  */
-@Path(TrendingTopicsResource.TRENDING_ENDPOINT)
+@Path(TopEmojisResource.EMOJI_ENDPOINT)
 public class TopEmojisResource {
 
-    public static final String TRENDING_ENDPOINT = "emoji";
+    public static final String EMOJI_ENDPOINT = "emoji";
     public static final String START_TIME_PARAM = "starttime";
     public static final String END_TIME_PARAM = "endtime";
     public static final String USER_PARAM = "user";
