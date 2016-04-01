@@ -7,15 +7,15 @@ import com.chatalytics.core.model.Message;
 import com.chatalytics.core.model.Room;
 import com.chatalytics.core.model.User;
 import com.chatalytics.core.model.slack.json.SlackJsonModule;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.type.CollectionType;
+import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.WebResource;
 
-import org.codehaus.jackson.JsonNode;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.map.type.CollectionType;
-import org.codehaus.jackson.map.type.TypeFactory;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -91,7 +91,7 @@ public class JsonSlackDAO extends AbstractJSONChatApiDAO {
             try {
                 JsonNode jsonNode = objMapper.readTree(jsonStr);
                 jsonNode = jsonNode.get("user");
-                User user = objMapper.readValue(jsonNode, User.class);
+                User user = objMapper.readValue(jsonNode.toString(), User.class);
                 result.put(user.getUserId(), user);
             } catch (IOException e) {
                 throw new RuntimeException("Can't deserialize user with ID:" + userId, e);
@@ -212,7 +212,7 @@ public class JsonSlackDAO extends AbstractJSONChatApiDAO {
                     return Lists.newArrayListWithCapacity(0);
                 }
             }
-            return objMapper.readValue(jsonNode, type);
+            return objMapper.readValue(jsonNode.toString(), type);
         } catch (IOException e) {
             LOG.error("Got exception when trying to deserialize list of {}", clazz, e);
             return Lists.newArrayListWithExpectedSize(0);

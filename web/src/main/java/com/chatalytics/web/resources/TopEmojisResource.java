@@ -5,11 +5,11 @@ import com.chatalytics.compute.db.dao.IEmojiDAO;
 import com.chatalytics.core.config.ChatAlyticsConfig;
 import com.chatalytics.web.utils.DateTimeUtils;
 import com.chatalytics.web.utils.ResourceUtils;
+import com.fasterxml.jackson.core.JsonGenerationException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Optional;
 
-import org.codehaus.jackson.JsonGenerationException;
-import org.codehaus.jackson.map.JsonMappingException;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Interval;

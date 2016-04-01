@@ -2,12 +2,11 @@ package com.chatalytics.core.model.slack.json;
 
 import com.chatalytics.core.model.User;
 import com.chatalytics.core.model.json.JsonChatDeserializer;
-
-import org.codehaus.jackson.JsonNode;
-import org.codehaus.jackson.JsonParser;
-import org.codehaus.jackson.JsonProcessingException;
-import org.codehaus.jackson.ObjectCodec;
-import org.codehaus.jackson.map.DeserializationContext;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.ObjectCodec;
+import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.JsonNode;
 
 import java.io.IOException;
 
@@ -20,8 +19,8 @@ import java.io.IOException;
 public class UserDeserializer extends JsonChatDeserializer<User> {
 
     @Override
-    public User deserialize(JsonParser jp, DeserializationContext context) throws IOException,
-            JsonProcessingException {
+    public User deserialize(JsonParser jp, DeserializationContext context)
+            throws IOException, JsonProcessingException {
 
         ObjectCodec oc = jp.getCodec();
         JsonNode node = oc.readTree(jp);

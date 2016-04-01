@@ -1,7 +1,7 @@
 package com.chatalytics.core.model.json;
 
-import org.codehaus.jackson.JsonNode;
-import org.codehaus.jackson.map.JsonDeserializer;
+import com.fasterxml.jackson.databind.JsonDeserializer;
+import com.fasterxml.jackson.databind.JsonNode;
 
 public abstract class JsonChatDeserializer<T> extends JsonDeserializer<T> {
 

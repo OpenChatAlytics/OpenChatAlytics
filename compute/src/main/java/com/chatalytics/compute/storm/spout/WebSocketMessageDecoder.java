@@ -2,8 +2,8 @@ package com.chatalytics.compute.storm.spout;
 
 import com.chatalytics.core.model.Message;
 import com.chatalytics.core.model.slack.json.SlackJsonModule;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
-import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
