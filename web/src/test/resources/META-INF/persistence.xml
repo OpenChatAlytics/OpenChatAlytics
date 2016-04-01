@@ -7,6 +7,7 @@
     <persistence-unit name="chatalytics-web-test" transaction-type="RESOURCE_LOCAL">
         <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
 
+        <class>com.chatalytics.core.model.EmojiEntity</class>
         <class>com.chatalytics.core.model.ChatEntity</class>
         <class>com.chatalytics.core.model.LastPullTime</class>
         <properties>

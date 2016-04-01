@@ -27,11 +27,20 @@ public class EmojiEntity {
     /**
      * Emoji alias without ':'
      */
-    private String emoji;
-    private String username;
-    private String roomName;
-    private DateTime mentionTime;
-    private long occurrences;
+    private final String emoji;
+    private final String username;
+    private final String roomName;
+    private final DateTime mentionTime;
+    private final int occurrences;
+
+    public EmojiEntity(String emoji, String username, String roomName, DateTime mentionTime,
+                      int occurrences) {
+        this.emoji = emoji;
+        this.username = username;
+        this.roomName = roomName;
+        this.mentionTime = mentionTime;
+        this.occurrences = occurrences;
+    }
 
     @Id
     @Column(name = EMOJI_COLUMN)
@@ -59,7 +68,7 @@ public class EmojiEntity {
     }
 
     @Column(name = OCCURENCES_COLUMN)
-    public long getOccurrences() {
+    public int getOccurrences() {
         return occurrences;
     }
 
