@@ -29,7 +29,7 @@ import static org.junit.Assert.assertEquals;
 public class TrendingTopicsResourceTest {
 
     private IEntityDAO entityDao;
-    private TrendingTopicsResource underTest;
+    private TrendingTopicsResource undertest;
     private DateTimeZone dtZone;
     private DateTime mentionTime;
 
@@ -56,7 +56,7 @@ public class TrendingTopicsResourceTest {
         entities.add(new ChatEntity("e3", 3, mentionTime.minusHours(2), "u3", "r1"));
         entities.add(new ChatEntity("e4", 3, mentionTime.minusHours(1), "u1", "r4"));
         storeTestEntities(entities);
-        underTest = new TrendingTopicsResource(config);
+        undertest = new TrendingTopicsResource(config);
     }
 
     private void storeTestEntities(List<ChatEntity> entities) {
@@ -73,13 +73,13 @@ public class TrendingTopicsResourceTest {
         DateTimeFormatter dtf = DateTimeUtils.PARAMETER_WITH_DAY_DTF.withZone(dtZone);
         String startTimeStr = dtf.print(mentionTime.minusDays(1));
         String endTimeStr = dtf.print(mentionTime.plusDays(1));
-        Response response = underTest.getTrendingTopics(startTimeStr, endTimeStr, "u1", "r1");
+        Response response = undertest.getTrendingTopics(startTimeStr, endTimeStr, "u1", "r1");
         assertEquals("{\"e1\":5,\"e2\":1}", response.getEntity());
 
-        response = underTest.getTrendingTopics(startTimeStr, endTimeStr, "u1", null);
+        response = undertest.getTrendingTopics(startTimeStr, endTimeStr, "u1", null);
         assertEquals("{\"e1\":5,\"e4\":3,\"e2\":1}", response.getEntity());
 
-        response = underTest.getTrendingTopics(startTimeStr, endTimeStr, null, null);
+        response = undertest.getTrendingTopics(startTimeStr, endTimeStr, null, null);
         assertEquals("{\"e2\":14,\"e1\":11,\"e3\":6,\"e4\":3}", response.getEntity());
     }
 

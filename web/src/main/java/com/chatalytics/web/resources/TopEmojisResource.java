@@ -1,7 +1,7 @@
 package com.chatalytics.web.resources;
 
 import com.chatalytics.compute.db.dao.ChatAlyticsDAOFactory;
-import com.chatalytics.compute.db.dao.IEntityDAO;
+import com.chatalytics.compute.db.dao.IEmojiDAO;
 import com.chatalytics.core.config.ChatAlyticsConfig;
 import com.chatalytics.web.utils.DateTimeUtils;
 import com.chatalytics.web.utils.ResourceUtils;
@@ -27,39 +27,40 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 /**
- * REST endpoint for getting trending topics collected from chat messages
+ * REST endpoint for getting top emojis collected from chat messages
  *
  * @author giannis
  *
  */
 @Path(TrendingTopicsResource.TRENDING_ENDPOINT)
-public class TrendingTopicsResource {
+public class TopEmojisResource {
 
-    public static final String TRENDING_ENDPOINT = "trending";
+    public static final String TRENDING_ENDPOINT = "emoji";
     public static final String START_TIME_PARAM = "starttime";
     public static final String END_TIME_PARAM = "endtime";
     public static final String USER_PARAM = "user";
     public static final String ROOM_PARAM = "room";
 
-    private static final int MAX_RESULTS = 10;
-    private static final Logger LOG = LoggerFactory.getLogger(TrendingTopicsResource.class);
+    private static final int MAX_RESULTS = 20;
 
-    private final IEntityDAO entityDao;
+    private static final Logger LOG = LoggerFactory.getLogger(TopEmojisResource.class);
+
+    private final IEmojiDAO emojiDao;
     private final DateTimeZone dtZone;
     private final ObjectMapper objectMapper;
 
-    public TrendingTopicsResource(ChatAlyticsConfig config) {
-        entityDao = ChatAlyticsDAOFactory.getEntityDAO(config);
+    public TopEmojisResource(ChatAlyticsConfig config) {
+        emojiDao = ChatAlyticsDAOFactory.getEmojiDAO(config);
         dtZone = DateTimeZone.forID(config.timeZone);
         objectMapper = new ObjectMapper();
     }
 
     @POST
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getTrendingTopics(@FormParam(START_TIME_PARAM) String startTimeStr,
-                                      @FormParam(END_TIME_PARAM) String endTimeStr,
-                                      @FormParam(USER_PARAM) String user,
-                                      @FormParam(ROOM_PARAM) String room)
+    public Response getTopEmojis(@FormParam(START_TIME_PARAM) String startTimeStr,
+                                 @FormParam(END_TIME_PARAM) String endTimeStr,
+                                 @FormParam(USER_PARAM) String user,
+                                 @FormParam(ROOM_PARAM) String room)
                     throws JsonGenerationException, JsonMappingException, IOException {
 
         LOG.debug("Got query for starttime={}, endtime={}, user={}, room={}",
@@ -72,9 +73,10 @@ public class TrendingTopicsResource {
         DateTime endTime = DateTimeUtils.getDateTimeFromParameter(endTimeStr, dtZone);
         Interval interval = new Interval(startTime, endTime);
 
-        Map<String, Long> topEntities = entityDao.getTopEntities(interval, roomName, username,
-                                                                 MAX_RESULTS);
+        Map<String, Long> topEntities = emojiDao.getTopEmojis(interval, roomName, username,
+                                                              MAX_RESULTS);
         String jsonResult = objectMapper.writeValueAsString(topEntities);
         return Response.ok(jsonResult).build();
     }
+
 }
