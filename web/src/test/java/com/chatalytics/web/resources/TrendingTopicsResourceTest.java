@@ -1,9 +1,10 @@
 package com.chatalytics.web.resources;
 
-import com.chatalytics.compute.db.dao.IEntityDAO;
 import com.chatalytics.compute.db.dao.EntityDAOImpl;
+import com.chatalytics.compute.db.dao.IEntityDAO;
 import com.chatalytics.core.config.ChatAlyticsConfig;
 import com.chatalytics.core.model.ChatEntity;
+import com.chatalytics.web.utils.DateTimeUtils;
 import com.google.common.collect.Lists;
 
 import org.joda.time.DateTime;
@@ -64,17 +65,12 @@ public class TrendingTopicsResourceTest {
         }
     }
 
-    @After
-    public void tearDown() throws Exception {
-        entityDao.stopAsync().awaitTerminated();
-    }
-
     /**
      * Tests to see if the correct trending topics are returned
      */
     @Test
     public void testGetTrendingTopics() throws Exception {
-        DateTimeFormatter dtf = TrendingTopicsResource.PARAMETER_WITH_DAY_DTF.withZone(dtZone);
+        DateTimeFormatter dtf = DateTimeUtils.PARAMETER_WITH_DAY_DTF.withZone(dtZone);
         String startTimeStr = dtf.print(mentionTime.minusDays(1));
         String endTimeStr = dtf.print(mentionTime.plusDays(1));
         Response response = underTest.getTrendingTopics(startTimeStr, endTimeStr, "u1", "r1");
@@ -87,15 +83,9 @@ public class TrendingTopicsResourceTest {
         assertEquals("{\"e2\":14,\"e1\":11,\"e3\":6,\"e4\":3}", response.getEntity());
     }
 
-    /**
-     * Tests to see if the correct date with the right timezone is returned when parsing parameters
-     */
-    @Test
-    public void testGetDateTimeFromParameter() {
-        DateTime dateTime = underTest.getDateTimeFromParameter("2015-01-01");
-        DateTime expectedDateTime =
-            new DateTime(2015, 1, 1, 0, 0).withZone(dtZone).toDateTime(DateTimeZone.UTC);
-        assertEquals(expectedDateTime, dateTime);
+    @After
+    public void tearDown() throws Exception {
+        entityDao.stopAsync().awaitTerminated();
     }
 
 }
