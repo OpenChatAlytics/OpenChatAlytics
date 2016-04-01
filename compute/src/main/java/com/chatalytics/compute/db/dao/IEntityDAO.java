@@ -44,7 +44,8 @@ public interface IEntityDAO extends Service {
      * @return A list of {@link ChatEntity} representing all the times this entity was mentioned
      *         in the given time period
      */
-    public List<ChatEntity> getAllMentionsForEntity(String entity, Interval interval,
+    public List<ChatEntity> getAllMentionsForEntity(String entity,
+                                                    Interval interval,
                                                     Optional<String> roomName,
                                                     Optional<String> username);
 
@@ -62,7 +63,8 @@ public interface IEntityDAO extends Service {
      *            Optionally supply a user name
      * @return The total number of times the entity was mentioned in the given time interval
      */
-    public long getTotalMentionsForEntity(String entity, Interval interval,
+    public long getTotalMentionsForEntity(String entity,
+                                          Interval interval,
                                           Optional<String> roomName,
                                           Optional<String> username);
 

@@ -124,7 +124,7 @@ public class EntityExtractionBolt extends BaseRichBolt {
 
                 if (!tag.isEndTag) {
                     ChatEntity existingEntity = entities.remove(entity);
-                    long occurrences;
+                    int occurrences;
                     if (existingEntity == null) {
                         occurrences = 1;
                     } else {

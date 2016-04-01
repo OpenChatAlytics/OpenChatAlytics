@@ -6,26 +6,31 @@ import com.google.common.base.Optional;
 import com.google.common.util.concurrent.AbstractIdleService;
 
 import org.joda.time.Interval;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+import java.util.List;
 import java.util.Map;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
-import javax.persistence.PersistenceException;
 
+/**
+ * Implementation of the {@link IEmojiDAO} that can store and retrieve emojis
+ *
+ * @author giannis
+ *
+ */
 public class EmojiDAOImpl extends AbstractIdleService implements IEmojiDAO {
 
-    private final EntityManager entityManager;
+    private final IOccurrenceStatsDAO<EmojiEntity> occurrenceStatsDAO;
     private final EntityManagerFactory entityManagerFactory;
-    private static final Logger LOG = LoggerFactory.getLogger(EmojiDAOImpl.class);
 
     public EmojiDAOImpl(ChatAlyticsConfig config) {
         this.entityManagerFactory =
             Persistence.createEntityManagerFactory(config.persistenceUnitName);
-        this.entityManager = entityManagerFactory.createEntityManager();
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
+        this.occurrenceStatsDAO = new OccurrenceStatsDAO<>(entityManager, EmojiEntity.class,
+                                                           "emoji");
     }
 
     /**
@@ -33,31 +38,63 @@ public class EmojiDAOImpl extends AbstractIdleService implements IEmojiDAO {
      */
     @Override
     public void persistEmoji(EmojiEntity emoji) {
-        entityManager.getTransaction().begin();
-        try {
-            entityManager.persist(emoji);
-            entityManager.getTransaction().commit();
-        } catch (PersistenceException e) {
-            LOG.error("Cannot store {}. {}", emoji, e.getMessage());
-            if (entityManager.getTransaction().isActive()) {
-                entityManager.getTransaction().rollback();
-            }
-        }
+        occurrenceStatsDAO.persistValue(emoji);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public Map<String, Long> getTopEmojis(Interval interval, Optional<String> roomName,
-            Optional<String> username, int resultSize) {
-        return null;
+    public EmojiEntity getEmoji(EmojiEntity emoji) {
+        return occurrenceStatsDAO.getValue(emoji);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    protected void shutDown() throws Exception {
-        entityManager.close();
-        entityManagerFactory.close();
+    public List<EmojiEntity> getAllMentionsForEmoji(String emoji,
+                                                    Interval interval,
+                                                    Optional<String> roomName,
+                                                    Optional<String> username) {
+        return occurrenceStatsDAO.getAllMentionsForType(emoji, interval, roomName, username);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public long getTotalMentionsForEmoji(String emoji,
+                                         Interval interval,
+                                         Optional<String> roomName,
+                                         Optional<String> username) {
+        return occurrenceStatsDAO.getTotalMentionsForType(emoji, interval, roomName, username);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Map<String, Long> getTopEmojis(Interval interval,
+                                          Optional<String> roomName,
+                                          Optional<String> username,
+                                          int resultSize) {
+        return occurrenceStatsDAO.getTopValuesOfType(interval, roomName, username, resultSize);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void startUp() throws Exception {
+    }
+
+    /**
+     * Closes the entity manager and the entity manager factory
+     */
+    @Override
+    protected void shutDown() throws Exception {
+        occurrenceStatsDAO.close();
+        entityManagerFactory.close();
     }
 }
