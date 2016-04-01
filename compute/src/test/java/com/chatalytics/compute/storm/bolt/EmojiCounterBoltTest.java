@@ -58,6 +58,7 @@ public class EmojiCounterBoltTest {
         assertEquals(room.getName(), firstEmoji.getRoomName());
         assertEquals(mentionTime, firstEmoji.getMentionTime());
         assertEquals(emoji, firstEmoji.getEmoji());
+        assertEquals(1, firstEmoji.getOccurrences());
     }
 
     /**
@@ -75,12 +76,13 @@ public class EmojiCounterBoltTest {
 
         List<EmojiEntity> emojis = undertest.getEmojisFromMessage(fatMessage);
 
-        assertEquals(3, emojis.size());
+        assertEquals(1, emojis.size());
         EmojiEntity firstEmoji = emojis.get(0);
         assertEquals(user.getMentionName(), firstEmoji.getUsername());
         assertEquals(room.getName(), firstEmoji.getRoomName());
         assertEquals(mentionTime, firstEmoji.getMentionTime());
         assertEquals(emoji, firstEmoji.getEmoji());
+        assertEquals(3, firstEmoji.getOccurrences());
     }
 
 }
