@@ -5,6 +5,7 @@ import com.google.common.base.MoreObjects;
 import org.joda.time.DateTime;
 
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 
 import java.io.Serializable;
 
@@ -15,6 +16,7 @@ import java.io.Serializable;
  *
  */
 @EqualsAndHashCode
+@Getter
 public class Room implements Serializable {
 
     private final String roomId;
@@ -43,46 +45,6 @@ public class Room implements Serializable {
         this.privateRoom = privateRoom;
         this.guestAccessURL = guestAccessURL;
         this.xmppJid = xmppJid;
-    }
-
-    public String getRoomId() {
-        return roomId;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getTopic() {
-        return topic;
-    }
-
-    public DateTime getLastActiveDate() {
-        return lastActiveDate;
-    }
-
-    public DateTime getCreationDate() {
-        return creationDate;
-    }
-
-    public String getOwnerUserId() {
-        return ownerUserId;
-    }
-
-    public boolean isArchived() {
-        return archived;
-    }
-
-    public boolean isPrivateRoom() {
-        return privateRoom;
-    }
-
-    public String getGuestAccessURL() {
-        return guestAccessURL;
-    }
-
-    public String getXmppJid() {
-        return xmppJid;
     }
 
     @Override

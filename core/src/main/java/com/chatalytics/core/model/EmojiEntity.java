@@ -5,7 +5,9 @@ import com.google.common.base.MoreObjects;
 import org.hibernate.annotations.Type;
 import org.joda.time.DateTime;
 
+import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
+import lombok.Setter;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -15,7 +17,10 @@ import javax.persistence.Table;
 @Entity
 @Table(name = EmojiEntity.EMOJI_TABLE_NAME)
 @EqualsAndHashCode
-public class EmojiEntity {
+@Setter(value = AccessLevel.PROTECTED) // for hibernate
+public class EmojiEntity implements IMentionable {
+
+    private static final long serialVersionUID = 7180644692083145759L;
 
     public static final String EMOJI_TABLE_NAME = "EMOJI";
     public static final String EMOJI_COLUMN = "EMOJI_VALUE";
@@ -27,14 +32,14 @@ public class EmojiEntity {
     /**
      * Emoji alias without ':'
      */
-    private final String emoji;
-    private final String username;
-    private final String roomName;
-    private final DateTime mentionTime;
-    private final int occurrences;
+    private String emoji;
+    private String username;
+    private String roomName;
+    private DateTime mentionTime;
+    private int occurrences;
 
     public EmojiEntity(String emoji, String username, String roomName, DateTime mentionTime,
-                      int occurrences) {
+                       int occurrences) {
         this.emoji = emoji;
         this.username = username;
         this.roomName = roomName;
@@ -48,18 +53,21 @@ public class EmojiEntity {
         return emoji;
     }
 
+    @Override
     @Id
     @Column(name = USER_NAME_COLUMN)
     public String getUsername() {
         return username;
     }
 
+    @Override
     @Id
     @Column(name = ROOM_NAME_COLUMN)
     public String getRoomName() {
         return roomName;
     }
 
+    @Override
     @Id
     @Column(name = MENTION_TIME_COLUMN)
     @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
@@ -67,6 +75,7 @@ public class EmojiEntity {
         return mentionTime;
     }
 
+    @Override
     @Column(name = OCCURENCES_COLUMN)
     public int getOccurrences() {
         return occurrences;

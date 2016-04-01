@@ -5,6 +5,7 @@ import com.google.common.base.MoreObjects;
 import org.joda.time.DateTime;
 
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 
 import java.io.Serializable;
 
@@ -15,6 +16,7 @@ import java.io.Serializable;
  *
  */
 @EqualsAndHashCode
+@Getter
 public class Message implements Serializable {
 
     private final DateTime date;
@@ -32,26 +34,6 @@ public class Message implements Serializable {
         this.fromUserId = fromUserId;
         this.message = message;
         this.roomId = roomId;
-    }
-
-    public DateTime getDate() {
-        return date;
-    }
-
-    public String getFromName() {
-        return fromName;
-    }
-
-    public String getFromUserId() {
-        return fromUserId;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public String getRoomId() {
-        return roomId;
     }
 
     @Override

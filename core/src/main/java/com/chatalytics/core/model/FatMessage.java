@@ -3,6 +3,7 @@ package com.chatalytics.core.model;
 import com.google.common.base.MoreObjects;
 
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 
 import java.io.Serializable;
 
@@ -14,6 +15,7 @@ import java.io.Serializable;
  *
  */
 @EqualsAndHashCode
+@Getter
 public class FatMessage implements Serializable {
 
     private final Message message;
@@ -26,18 +28,6 @@ public class FatMessage implements Serializable {
         this.message = message;
         this.user = user;
         this.room = room;
-    }
-
-    public Message getMessage() {
-        return message;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public Room getRoom() {
-        return room;
     }
 
     @Override

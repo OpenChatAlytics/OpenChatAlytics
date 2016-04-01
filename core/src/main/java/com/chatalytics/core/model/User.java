@@ -5,6 +5,7 @@ import com.google.common.base.MoreObjects;
 import org.joda.time.DateTime;
 
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 
 /**
  * Chat user
@@ -13,6 +14,7 @@ import lombok.EqualsAndHashCode;
  *
  */
 @EqualsAndHashCode
+@Getter
 public class User {
 
     private final String userId;
@@ -45,58 +47,6 @@ public class User {
         this.statusMessage = statusMessage;
         this.timezone = timezone;
         this.title = title;
-    }
-
-    public String getUserId() {
-        return userId;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public boolean isDeleted() {
-        return deleted;
-    }
-
-    public boolean isGroupAdmin() {
-        return groupAdmin;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getMentionName() {
-        return mentionName;
-    }
-
-    public String getPhotoUrl() {
-        return photoUrl;
-    }
-
-    public DateTime getLastActiveDate() {
-        return lastActiveDate;
-    }
-
-    public DateTime getCreationDate() {
-        return creationDate;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public String getStatusMessage() {
-        return statusMessage;
-    }
-
-    public String getTimezone() {
-        return timezone;
-    }
-
-    public String getTitle() {
-        return title;
     }
 
     @Override

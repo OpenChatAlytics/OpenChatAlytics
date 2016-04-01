@@ -5,9 +5,9 @@ import com.google.common.base.MoreObjects;
 import org.hibernate.annotations.Type;
 import org.joda.time.DateTime;
 
+import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
-
-import java.io.Serializable;
+import lombok.Setter;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -23,7 +23,8 @@ import javax.persistence.Table;
 @Entity
 @Table(name = ChatEntity.ENTITY_TABLE_NAME)
 @EqualsAndHashCode
-public class ChatEntity implements Serializable {
+@Setter(value = AccessLevel.PROTECTED) // for hibernate
+public class ChatEntity implements IMentionable {
 
     public static final String ENTITY_TABLE_NAME = "ENTITIES";
     public static final String ENTITY_VALUE_COLUMN = "ENTITY_VALUE";
@@ -35,7 +36,7 @@ public class ChatEntity implements Serializable {
     public static final long serialVersionUID = -4845804080646234253L;
 
     private String entityValue;
-    private long occurrences;
+    private int occurrences;
     private DateTime mentionTime;
     private String username;
     private String roomName;
@@ -43,7 +44,7 @@ public class ChatEntity implements Serializable {
     public ChatEntity() {
     }
 
-    public ChatEntity(String entityValue, long occurrences, DateTime mentionTime,
+    public ChatEntity(String entityValue, int occurrences, DateTime mentionTime,
                       String username, String roomName) {
         this.entityValue = entityValue;
         this.occurrences = occurrences;
@@ -58,11 +59,13 @@ public class ChatEntity implements Serializable {
         return entityValue;
     }
 
+    @Override
     @Column(name = OCCURENCES_COLUMN)
-    public long getOccurrences() {
+    public int getOccurrences() {
         return occurrences;
     }
 
+    @Override
     @Id
     @Column(name = MENTION_TIME_COLUMN)
     @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
@@ -70,36 +73,18 @@ public class ChatEntity implements Serializable {
         return mentionTime;
     }
 
+    @Override
     @Id
     @Column(name = USER_NAME_COLUMN)
     public String getUsername() {
         return username;
     }
 
+    @Override
     @Id
     @Column(name = ROOM_NAME_COLUMN)
     public String getRoomName() {
         return roomName;
-    }
-
-    protected void setEntityValue(String entityValue) {
-        this.entityValue = entityValue;
-    }
-
-    protected void setOccurrences(long occurrences) {
-        this.occurrences = occurrences;
-    }
-
-    protected void setMentionTime(DateTime mentionTime) {
-        this.mentionTime = mentionTime;
-    }
-
-    protected void setUsername(String username) {
-        this.username = username;
-    }
-
-    protected void setRoomName(String roomName) {
-        this.roomName = roomName;
     }
 
     @Override
