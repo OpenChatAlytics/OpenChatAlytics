@@ -93,12 +93,12 @@
         <groupId>org.clojure</groupId>
         <version>0.1.3</version>
       </dependency>
-      <dependency>
-        <groupId>org.projectlombok</groupId>
-        <artifactId>lombok</artifactId>
-        <version>1.16.8</version>
-        <scope>provided</scope>
-      </dependency>
+  <dependency>
+    <groupId>org.projectlombok</groupId>
+    <artifactId>lombok</artifactId>
+    <version>1.16.8</version>
+    <scope>provided</scope>
+  </dependency>
 
       <dependency>
         <groupId>org.hibernate</groupId>
@@ -131,7 +131,7 @@
       <dependency>
         <groupId>com.sun.jersey</groupId>
         <artifactId>jersey-client</artifactId>
-        <version>1.12</version>
+        <version>1.19.1</version>
       </dependency>
       <dependency>
         <groupId>edu.stanford.nlp</groupId>
@@ -145,7 +145,7 @@
       </dependency>
       <dependency>
         <groupId>org.hibernate.javax.persistence</groupId>
-        <artifactId>hibernate-jpa-2.0-api</artifactId>
+        <artifactId>hibernate-jpa-2.1-api</artifactId>
         <version>1.0.0.Final</version>
       </dependency>
       <dependency>
@@ -174,19 +174,24 @@
       <!-- Web dependencies -->
 
       <dependency>
-        <groupId>com.sun.jersey</groupId>
-        <artifactId>jersey-servlet</artifactId>
-        <version>1.12</version>
+          <groupId>org.eclipse.jetty</groupId>
+          <artifactId>jetty-server</artifactId>
+          <version>9.3.8.v20160314</version>
       </dependency>
       <dependency>
-        <groupId>org.mortbay.jetty</groupId>
-        <artifactId>jetty</artifactId>
-        <version>6.1.26</version>
+          <groupId>org.eclipse.jetty</groupId>
+          <artifactId>jetty-servlet</artifactId>
+          <version>9.3.8.v20160314</version>
       </dependency>
       <dependency>
         <groupId>com.sun.jersey</groupId>
         <artifactId>jersey-core</artifactId>
-        <version>1.12</version>
+        <version>1.19.1</version>
+      </dependency>
+      <dependency>
+          <groupId>com.sun.jersey</groupId>
+          <artifactId>jersey-servlet</artifactId>
+          <version>1.19.1</version>
       </dependency>
 
       <!-- End web dependencies -->

@@ -2,10 +2,10 @@
 <configuration scan="false">
 
   <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-    <file>compute.log</file>
+    <file>web.log</file>
     <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">        
         <!-- daily rollover -->
-        <fileNamePattern>compute.%d{yyyy-MM-dd}.log.gz</fileNamePattern>
+        <fileNamePattern>web.%d{yyyy-MM-dd}.log.gz</fileNamePattern>
         <maxHistory>5</maxHistory>
     </rollingPolicy>
     <encoder>
@@ -21,12 +21,7 @@
     </encoder>
   </appender>
 
-  <logger name="backtype.storm" level="INFO"/>
   <logger name="org.hibernate" level="INFO"/>
-  <logger name="com.netflix" level="WARN"/>
-  <logger name="org.apache.storm.shade.org.apache.curator" level="WARN"/>
-  <logger name="org.apache.zookeeper" level="WARN"/>
-  <logger name="org.apache.storm.shade.org.apache.zookeeper" level="WARN"/>
   <root level="DEBUG">
     <appender-ref ref="STDOUT"/>
     <appender-ref ref="FILE"/>

@@ -7,9 +7,9 @@ import com.chatalytics.web.resources.TrendingTopicsResource;
 import com.google.common.collect.Sets;
 import com.sun.jersey.spi.container.servlet.ServletContainer;
 
-import org.mortbay.jetty.Server;
-import org.mortbay.jetty.servlet.Context;
-import org.mortbay.jetty.servlet.ServletHolder;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.servlet.ServletContextHandler;
+import org.eclipse.jetty.servlet.ServletHolder;
 
 import java.util.Set;
 
@@ -38,15 +38,20 @@ public class ServerMain extends Application {
 
         // Start the server
         Server server = new Server(PORT);
-        Context root = new Context(server, "/", Context.SESSIONS);
         ServletContainer servletContainer = new ServletContainer(serverMain);
-        ServletHolder servletHolder = new ServletHolder(servletContainer);
-        root.addServlet(servletHolder, "/");
+        ServletContextHandler adminContext = new ServletContextHandler();
+        ServletHolder servletHolder = new ServletHolder("/*", servletContainer);
+        adminContext.addServlet(servletHolder, "/*");
+        server.setHandler(adminContext);
         server.start();
+
+
     }
 
     @Override
     public Set<Object> getSingletons() {
+
+        System.out.println("!!!@)#@!($*@(%*@#$(%*^@#$(*^@#%(*^@#%(*^@#%(*&^FDISHGSDFKNGSDFKNGSDFKNG");
         return Sets.newHashSet(new TrendingTopicsResource(config),
                                new TopEmojisResource(config));
     }
