@@ -1,5 +1,6 @@
 package com.chatalytics.compute.storm;
 
+import com.chatalytics.compute.storm.bolt.EmojiCounterBolt;
 import com.chatalytics.compute.storm.bolt.EntityExtractionBolt;
 import com.chatalytics.compute.storm.spout.HipChatMessageSpout;
 import com.chatalytics.compute.storm.spout.SlackBackfillSpout;
@@ -38,7 +39,12 @@ public class ChatAlyticsStormTopology {
             throw new RuntimeException("Can't determine input source type from " + type);
         }
 
+        // entity extraction bolt
         topologyBuilder.setBolt(EntityExtractionBolt.BOLT_ID, new EntityExtractionBolt())
+                       .shuffleGrouping(inputSpoutId);
+
+        // emoji bolt
+        topologyBuilder.setBolt(EmojiCounterBolt.BOLT_ID, new EmojiCounterBolt())
                        .shuffleGrouping(inputSpoutId);
 
         return topologyBuilder.createTopology();

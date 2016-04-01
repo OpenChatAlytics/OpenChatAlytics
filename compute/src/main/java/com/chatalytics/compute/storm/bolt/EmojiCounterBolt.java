@@ -106,6 +106,9 @@ public class EmojiCounterBolt extends BaseRichBolt {
                 emojiStrBuilder.append(ch);
             }
         }
+
+        LOG.debug("Extracted {} emojis", emojis.size());
+
         return Lists.newArrayList(emojis.values());
     }
 
