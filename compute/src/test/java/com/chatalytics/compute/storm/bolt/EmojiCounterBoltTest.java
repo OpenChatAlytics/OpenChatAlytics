@@ -85,4 +85,24 @@ public class EmojiCounterBoltTest {
         assertEquals(3, firstEmoji.getOccurrences());
     }
 
+    @Test
+    public void testGetEmojisFromMessage_withDanglingColons() {
+        Message message = new Message(mentionTime, "randomFrom", "randomUserId",
+                                      String.format("test http:// message :     testwith :%s::%s: "
+                                          + "test :%s:", emoji, emoji, emoji),
+                                      "randomRoomId");
+
+        FatMessage fatMessage = new FatMessage(message, user, room);
+
+        List<EmojiEntity> emojis = undertest.getEmojisFromMessage(fatMessage);
+
+        assertEquals(1, emojis.size());
+        EmojiEntity firstEmoji = emojis.get(0);
+        assertEquals(user.getMentionName(), firstEmoji.getUsername());
+        assertEquals(room.getName(), firstEmoji.getRoomName());
+        assertEquals(mentionTime, firstEmoji.getMentionTime());
+        assertEquals(emoji, firstEmoji.getEmoji());
+        assertEquals(3, firstEmoji.getOccurrences());
+    }
+
 }

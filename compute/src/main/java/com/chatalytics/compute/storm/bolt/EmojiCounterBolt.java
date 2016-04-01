@@ -103,6 +103,13 @@ public class EmojiCounterBolt extends BaseRichBolt {
                 continue;
             }
             if (capturingEmoji) {
+
+                if (ch == ' ' || ch == '\t') {
+                    capturingEmoji = !capturingEmoji;
+                    emojiStrBuilder = new StringBuilder();
+                    continue;
+                }
+
                 emojiStrBuilder.append(ch);
             }
         }
