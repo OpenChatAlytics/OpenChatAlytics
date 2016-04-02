@@ -50,8 +50,6 @@ public class ServerMain extends Application {
 
     @Override
     public Set<Object> getSingletons() {
-
-        System.out.println("!!!@)#@!($*@(%*@#$(%*^@#$(*^@#%(*^@#%(*^@#%(*&^FDISHGSDFKNGSDFKNGSDFKNG");
         return Sets.newHashSet(new TrendingTopicsResource(config),
                                new TopEmojisResource(config));
     }
