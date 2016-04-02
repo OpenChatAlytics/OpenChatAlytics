@@ -13,6 +13,7 @@ You may need to also download the caseless models from the [Stanford Core NLP](h
 ##Running in Docker mode
 Navigate to the top level directory where the Dockerfile is and run the following command:
 `docker build -t chatalytics ./`
+
 This will build a new Docker image named chatalytics. You can get a list of all the images by running:
 `docker images`
 
@@ -22,7 +23,7 @@ To start the container in the backgroung based on that image run:
 You should be able to see the container running by executing:
 `docker ps`
 
-To ssh into the container run
+To ssh into the container run:
 `docker exec -i -t chatalytics bash`
 
 To stop the container run:
