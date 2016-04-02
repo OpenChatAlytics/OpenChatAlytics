@@ -18,3 +18,4 @@ target
 hs_err_pid*
 
 *.log
+nop.yml
