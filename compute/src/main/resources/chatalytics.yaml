@@ -1,4 +1,4 @@
-inputType: SLACK_BACKFILL
+inputType: SLACK
 timeZone: America/New_York
 apiDateFormat: YYYY-MM-dd
 classifier: classifiers/english.all.3class.distsim.crf.ser.gz
