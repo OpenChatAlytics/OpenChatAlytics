@@ -241,6 +241,7 @@
                 <exclude>log4j*.xml</exclude>
                 <exclude>chatalytics.yaml</exclude>
                 <exclude>classifiers</exclude>
+                <exclude>corpus/*</exclude>
               </excludes>
             </filter>
           </filters>
