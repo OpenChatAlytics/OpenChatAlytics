@@ -15,4 +15,4 @@ backfillerConfig:
     startDate: '2016-03-30T00:00:00Z'
 localTestConfig:
     randomSeed: 0
-    messageCorpusFile: corpus/test_corpus.txt
+    messageCorpusFile: compute/corpus/test_corpus.txt

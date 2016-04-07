@@ -10,7 +10,6 @@ import com.chatalytics.core.model.Message;
 import com.chatalytics.core.model.Room;
 import com.chatalytics.core.model.User;
 import com.google.common.collect.Lists;
-import com.google.common.io.Resources;
 
 import org.apache.storm.shade.com.google.common.collect.Maps;
 import org.joda.time.DateTime;
@@ -26,8 +25,8 @@ import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Values;
 
 import java.io.IOException;
-import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
@@ -94,10 +93,13 @@ public class LocalTestSpout extends BaseRichSpout {
 
         String filename = localConfig.messageCorpusFile;
         try {
-            URI uri = Resources.getResource(localConfig.messageCorpusFile).toURI();
-            this.sentences = Files.readAllLines(Paths.get(uri));
+            URL corpusURL = ClassLoader.getSystemResource(filename);
+            if (corpusURL == null) {
+                throw new IllegalArgumentException("Can't find corpus. Specified: " + filename);
+            }
+            this.sentences = Files.readAllLines(Paths.get(corpusURL.toURI()));
         } catch (IOException | URISyntaxException e) {
-            throw new RuntimeException("Can't read file from config. Specified: " + filename, e);
+            throw new IllegalArgumentException("Can't read corpus. Specified: " + filename, e);
         }
 
         // create the number generator
