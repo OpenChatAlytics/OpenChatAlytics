@@ -1,4 +1,4 @@
-inputType: SLACK
+inputType: LOCAL_TEST
 timeZone: America/New_York
 apiDateFormat: YYYY-MM-dd
 classifier: compute/classifiers/english.all.3class.distsim.crf.ser.gz
@@ -13,3 +13,6 @@ slackConfig:
 backfillerConfig:
     granularityMins: 5
     startDate: '2016-03-30T00:00:00Z'
+localTestConfig:
+    randomSeed: 0
+    messageCorpusFile: corpus/test_corpus.txt
