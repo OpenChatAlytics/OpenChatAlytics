@@ -1,7 +1,7 @@
 #ChatAlytics
 
 [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/OpenChatAlytics?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-
+[![Apache 2.0 Licensed](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](https://github.com/OpenChatAlytics/OpenChatAlytics/blob/master/LICENSE.txt)
 
 ##Short Summary
 ChatAlytics is a realtime platform for processing HipChat and Slack messages using Storm as the processing framework. Implementors can connect their own models into the topology for coming up with metrics. Those metrics can then be accessed through a REST API that ChatAlytics provides. This project also contains [HuBot](https://github.com/hipchat/hubot-hipchat) coffee scripts that hit the endpoints in ChatAlytics.
