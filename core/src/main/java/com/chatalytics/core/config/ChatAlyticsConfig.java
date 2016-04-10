@@ -33,6 +33,8 @@ public class ChatAlyticsConfig implements Serializable {
 
     public SlackConfig slackConfig = new SlackConfig();
 
+    public LocalTestConfig localTestConfig = new LocalTestConfig();
+
     public BackfillerConfig backfillerConfig = new BackfillerConfig();
 
     /**

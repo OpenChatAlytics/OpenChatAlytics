@@ -144,8 +144,8 @@ public class SlackMessageSpout extends BaseRichSpout {
         User fromUser = users.get(message.getFromUserId());
         Room room = rooms.get(message.getRoomId());
 
-        FatMessage fateMessage = new FatMessage(message, fromUser, room);
-        unemittedMessages.add(fateMessage);
+        FatMessage fatMessage = new FatMessage(message, fromUser, room);
+        unemittedMessages.add(fatMessage);
     }
 
     /**

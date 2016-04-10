@@ -3,6 +3,7 @@ package com.chatalytics.compute.storm;
 import com.chatalytics.compute.storm.bolt.EmojiCounterBolt;
 import com.chatalytics.compute.storm.bolt.EntityExtractionBolt;
 import com.chatalytics.compute.storm.spout.HipChatMessageSpout;
+import com.chatalytics.compute.storm.spout.LocalTestSpout;
 import com.chatalytics.compute.storm.spout.SlackBackfillSpout;
 import com.chatalytics.compute.storm.spout.SlackMessageSpout;
 import com.chatalytics.core.InputSourceType;
@@ -35,6 +36,9 @@ public class ChatAlyticsStormTopology {
         } else if (type == InputSourceType.SLACK_BACKFILL) {
             inputSpoutId = SlackBackfillSpout.SPOUT_ID;
             topologyBuilder.setSpout(inputSpoutId, new SlackBackfillSpout());
+        } else if (type == InputSourceType.LOCAL_TEST) {
+            inputSpoutId = LocalTestSpout.SPOUT_ID;
+            topologyBuilder.setSpout(inputSpoutId, new LocalTestSpout());
         } else {
             throw new RuntimeException("Can't determine input source type from " + type);
         }
