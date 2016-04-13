@@ -90,20 +90,21 @@ public class RealtimeResource {
     }
 
     /**
-     * Tries to close the session
+     * Closes a session
      *
+     * @param session
+     *            The session to close
      * @param reason
-     *            Reason for closing
+     *            The reason for closing
      */
     @OnClose
-    public void close(CloseReason reason) {
-        LOG.info("Closing {} sessions", sessions.size());
-        for (Session session : sessions) {
-            try {
-                session.close();
-            } catch (IOException e) {
-                LOG.warn("Couldn't close {}", session.getId());
-            }
+    public void close(Session session, CloseReason reason) {
+        LOG.info("Closing session {}. Reason {}", session.getId(), reason);
+        try {
+            session.close();
+            sessions.remove(session);
+        } catch (IOException e) {
+            LOG.warn("Couldn't close {}", session.getId());
         }
     }
 
