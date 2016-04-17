@@ -66,7 +66,7 @@ public class TopEmojisResourceTest {
     }
 
     /**
-     * Tests to see if the correct trending topics are returned
+     * Tests to see if the correct top emojis are returned
      */
     @Test
     public void testGetTopEmojis() throws Exception {
