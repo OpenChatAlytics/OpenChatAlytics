@@ -4,7 +4,7 @@ import com.chatalytics.compute.util.YamlUtils;
 import com.chatalytics.core.config.ChatAlyticsConfig;
 import com.chatalytics.web.resources.EventsResource;
 import com.chatalytics.web.resources.TopEmojisResource;
-import com.chatalytics.web.resources.TrendingTopicsResource;
+import com.chatalytics.web.resources.EntitiesResource;
 import com.google.common.collect.Sets;
 import com.sun.jersey.spi.container.servlet.ServletContainer;
 
@@ -79,7 +79,7 @@ public class ServerMain extends Application {
 
     @Override
     public Set<Object> getSingletons() {
-        return Sets.newHashSet(new TrendingTopicsResource(config),
+        return Sets.newHashSet(new EntitiesResource(config),
                                new TopEmojisResource(config),
                                new ApiListingResource());
     }
