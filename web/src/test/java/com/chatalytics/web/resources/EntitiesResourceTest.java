@@ -6,6 +6,7 @@ import com.chatalytics.core.config.ChatAlyticsConfig;
 import com.chatalytics.core.model.ChatEntity;
 import com.chatalytics.web.utils.DateTimeUtils;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -15,8 +16,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.List;
-
-import javax.ws.rs.core.Response;
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 
@@ -73,14 +73,27 @@ public class EntitiesResourceTest {
         DateTimeFormatter dtf = DateTimeUtils.PARAMETER_WITH_DAY_DTF.withZone(dtZone);
         String startTimeStr = dtf.print(mentionTime.minusDays(1));
         String endTimeStr = dtf.print(mentionTime.plusDays(1));
-        Response response = undertest.getTrendingTopics(startTimeStr, endTimeStr, "u1", "r1");
-        assertEquals("{\"e1\":5,\"e2\":1}", response.getEntity());
+        Map<String, Long> response = undertest.getTrendingTopics(startTimeStr, endTimeStr, "u1",
+                                                                 "r1", null);
+        Map<String, Long> expected = Maps.newHashMap();
+        expected.put("e1", 5L);
+        expected.put("e2", 1L);
+        assertEquals(expected, response);
 
-        response = undertest.getTrendingTopics(startTimeStr, endTimeStr, "u1", null);
-        assertEquals("{\"e1\":5,\"e4\":3,\"e2\":1}", response.getEntity());
+        response = undertest.getTrendingTopics(startTimeStr, endTimeStr, "u1", null, null);
+        expected.clear();
+        expected.put("e1", 5L);
+        expected.put("e4", 3L);
+        expected.put("e2", 1L);
+        assertEquals(expected, response);
 
-        response = undertest.getTrendingTopics(startTimeStr, endTimeStr, null, null);
-        assertEquals("{\"e2\":14,\"e1\":11,\"e3\":6,\"e4\":3}", response.getEntity());
+        response = undertest.getTrendingTopics(startTimeStr, endTimeStr, null, null, null);
+        expected.clear();
+        expected.put("e2", 14L);
+        expected.put("e1", 11L);
+        expected.put("e3", 6L);
+        expected.put("e4", 3L);
+        assertEquals(expected, response);
     }
 
     @After
