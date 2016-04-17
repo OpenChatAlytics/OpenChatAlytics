@@ -57,7 +57,17 @@ public class EntityDAOImpl extends AbstractIdleService implements IEntityDAO {
                                                     Interval interval,
                                                     Optional<String> roomName,
                                                     Optional<String> username) {
-        return occurrenceStatsDAO.getAllMentionsForType(entity, interval, roomName, username);
+        return occurrenceStatsDAO.getAllMentionsForValue(entity, interval, roomName, username);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<ChatEntity> getAllMentions(Interval interval,
+                                           Optional<String> roomName,
+                                           Optional<String> username) {
+        return occurrenceStatsDAO.getAllMentions(interval, roomName, username);
     }
 
     /**
