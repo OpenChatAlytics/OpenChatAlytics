@@ -1,9 +1,7 @@
 package com.chatalytics.compute.storm.bolt;
 
-import com.chatalytics.compute.config.ConfigurationConstants;
 import com.chatalytics.compute.db.dao.ChatAlyticsDAOFactory;
 import com.chatalytics.compute.db.dao.IEntityDAO;
-import com.chatalytics.compute.util.YamlUtils;
 import com.chatalytics.core.config.ChatAlyticsConfig;
 import com.chatalytics.core.model.ChatEntity;
 import com.chatalytics.core.model.FatMessage;
@@ -20,7 +18,6 @@ import org.slf4j.LoggerFactory;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
-import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
@@ -44,7 +41,7 @@ import java.util.Map;
  * @author giannis
  *
  */
-public class EntityExtractionBolt extends BaseRichBolt {
+public class EntityExtractionBolt extends ChatAlyticsBaseBolt {
 
     private static final long serialVersionUID = -1586393277809132608L;
     private static final Logger LOG = LoggerFactory.getLogger(EntityExtractionBolt.class);
@@ -58,10 +55,8 @@ public class EntityExtractionBolt extends BaseRichBolt {
     private OutputCollector collector;
 
     @Override
-    public void prepare(@SuppressWarnings("rawtypes") Map conf, TopologyContext context,
-                        OutputCollector collector) {
-        String configStr = (String) conf.get(ConfigurationConstants.CHATALYTICS_CONFIG.txt);
-        ChatAlyticsConfig config = YamlUtils.readYamlFromString(configStr, ChatAlyticsConfig.class);
+    public void prepare(ChatAlyticsConfig config, @SuppressWarnings("rawtypes") Map conf,
+                        TopologyContext context, OutputCollector collector) {
         classifier = getClassifier(config);
         entityDao = ChatAlyticsDAOFactory.getEntityDAO(config);
         if (!entityDao.isRunning()) {
@@ -88,10 +83,6 @@ public class EntityExtractionBolt extends BaseRichBolt {
     public void execute(Tuple input) {
         LOG.info("Got tuple: {}", input);
         FatMessage fatMessage = (FatMessage) input.getValue(0);
-        if (fatMessage == null) {
-            LOG.warn("Got a null tuple");
-            return;
-        }
 
         List<ChatEntity> entities = extractEntities(fatMessage);
         for (ChatEntity entity : entities) {

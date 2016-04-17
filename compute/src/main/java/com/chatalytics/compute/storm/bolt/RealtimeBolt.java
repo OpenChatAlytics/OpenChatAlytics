@@ -1,7 +1,5 @@
 package com.chatalytics.compute.storm.bolt;
 
-import com.chatalytics.compute.config.ConfigurationConstants;
-import com.chatalytics.compute.util.YamlUtils;
 import com.chatalytics.core.config.ChatAlyticsConfig;
 import com.chatalytics.core.model.ChatAlyticsEvent;
 import com.chatalytics.core.realtime.ChatAlyticsEventEncoder;
@@ -16,7 +14,6 @@ import org.slf4j.LoggerFactory;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
-import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Tuple;
 
 import java.io.IOException;
@@ -42,7 +39,7 @@ import static com.google.common.base.CaseFormat.UPPER_CAMEL;
  * @author giannis
  */
 @ClientEndpoint(encoders = { ChatAlyticsEventEncoder.class, ConnectionTypeEncoderDecoder.class })
-public class RealtimeBolt extends BaseRichBolt {
+public class RealtimeBolt extends ChatAlyticsBaseBolt {
 
     private static final long serialVersionUID = -214311696491358951L;
     private static final Logger LOG = LoggerFactory.getLogger(RealtimeBolt.class);
@@ -50,11 +47,8 @@ public class RealtimeBolt extends BaseRichBolt {
     private Session session;
 
     @Override
-    public void prepare(@SuppressWarnings("rawtypes") Map conf, TopologyContext context,
-                        OutputCollector collector) {
-        String configStr = (String) conf.get(ConfigurationConstants.CHATALYTICS_CONFIG.txt);
-        ChatAlyticsConfig config = YamlUtils.readYamlFromString(configStr, ChatAlyticsConfig.class);
-
+    public void prepare(ChatAlyticsConfig config, @SuppressWarnings("rawtypes") Map conf,
+                        TopologyContext context, OutputCollector collector) {
         WebSocketContainer webSocketContainer = getWebSocketContainer();
         this.session = openRealtimeConnection(webSocketContainer, config);
     }

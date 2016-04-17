@@ -1,9 +1,7 @@
 package com.chatalytics.compute.storm.bolt;
 
-import com.chatalytics.compute.config.ConfigurationConstants;
 import com.chatalytics.compute.db.dao.ChatAlyticsDAOFactory;
 import com.chatalytics.compute.db.dao.IEmojiDAO;
-import com.chatalytics.compute.util.YamlUtils;
 import com.chatalytics.core.config.ChatAlyticsConfig;
 import com.chatalytics.core.model.EmojiEntity;
 import com.chatalytics.core.model.FatMessage;
@@ -18,7 +16,6 @@ import org.slf4j.LoggerFactory;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
-import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
@@ -27,21 +24,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.PrimitiveIterator.OfInt;
 
-public class EmojiCounterBolt extends BaseRichBolt {
+public class EmojiCounterBolt extends ChatAlyticsBaseBolt {
 
     private static final long serialVersionUID = -3543087188985057557L;
     public static final String BOLT_ID = "EMOJI_COUNTER_BOLT_ID";
-    public static final String EMOJI_ENTITY_FIELD_STR = "emoji-entity";
+    private static final String EMOJI_ENTITY_FIELD_STR = "emoji-entity";
     private static final Logger LOG = LoggerFactory.getLogger(EmojiCounterBolt.class);
 
     private IEmojiDAO emojiDao;
     private OutputCollector collector;
 
     @Override
-    public void prepare(@SuppressWarnings("rawtypes") Map conf, TopologyContext context,
-                        OutputCollector collector) {
-        String configStr = (String) conf.get(ConfigurationConstants.CHATALYTICS_CONFIG.txt);
-        ChatAlyticsConfig config = YamlUtils.readYamlFromString(configStr, ChatAlyticsConfig.class);
+    public void prepare(ChatAlyticsConfig config, @SuppressWarnings("rawtypes") Map conf,
+                        TopologyContext context, OutputCollector collector) {
         emojiDao = ChatAlyticsDAOFactory.getEmojiDAO(config);
         this.collector = collector;
     }
@@ -50,10 +45,6 @@ public class EmojiCounterBolt extends BaseRichBolt {
     public void execute(Tuple input) {
         LOG.info("Got tuple: {}", input);
         FatMessage fatMessage = (FatMessage) input.getValue(0);
-        if (fatMessage == null) {
-            LOG.warn("Got a null tuple");
-            return;
-        }
 
         List<EmojiEntity> emojis = getEmojisFromMessage(fatMessage);
 

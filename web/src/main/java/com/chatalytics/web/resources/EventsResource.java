@@ -4,6 +4,7 @@ import com.chatalytics.core.model.ChatAlyticsEvent;
 import com.chatalytics.core.realtime.ChatAlyticsEventDecoder;
 import com.chatalytics.core.realtime.ChatAlyticsEventEncoder;
 import com.chatalytics.core.realtime.ConnectionTypeEncoderDecoder;
+import com.chatalytics.web.constant.WebConstants;
 import com.google.common.base.Throwables;
 
 import org.apache.storm.shade.com.google.common.collect.Sets;
@@ -35,20 +36,29 @@ import javax.websocket.server.ServerEndpoint;
 @ClientEndpoint(decoders = { ChatAlyticsEventDecoder.class, ConnectionTypeEncoderDecoder.class })
 public class EventsResource {
 
-    public static final String RT_EVENT_ENDPOINT = "/events";
+    public static final String RT_EVENT_ENDPOINT = WebConstants.API_PATH + "events";
     private static final Logger LOG = LoggerFactory.getLogger(EventsResource.class);
 
     private final Set<Session> sessions;
+    private boolean connectedToCompute;
 
     public EventsResource() {
         this.sessions = Sets.newConcurrentHashSet();
+        connectedToCompute = false;
     }
 
     @OnOpen
     public void onOpen(Session session) {
         if (session.getRequestURI().getPath().startsWith(RT_EVENT_ENDPOINT)) {
             LOG.info("Got a new web subscription connection request with ID {}", session.getId());
-
+            if (!connectedToCompute) {
+                try {
+                session.close(new CloseReason(CloseReason.CloseCodes.UNEXPECTED_CONDITION,
+                                              "WebServer not connected to Compute"));
+                } catch (IOException e) {
+                    LOG.warn("Couldn't close {}. Reason {}", session.getId(), e.getMessage());
+                }
+            }
             // cleanup sessions
             Set<Session> closedSessions = Sets.newHashSet();
             for (Session existingSession : sessions) {
@@ -61,6 +71,7 @@ public class EventsResource {
             sessions.add(session);
         } else {
             LOG.info("Handshaked with compute server...");
+            connectedToCompute = true;
         }
     }
 
@@ -74,12 +85,16 @@ public class EventsResource {
      */
     @OnClose
     public void close(Session session, CloseReason reason) {
-        LOG.info("Closing session {}. Reason {}", session.getId(), reason);
-        try {
-            session.close();
-            sessions.remove(session);
-        } catch (IOException e) {
-            LOG.warn("Couldn't close {}", session.getId());
+        if (session.getRequestURI().getPath().startsWith(RT_EVENT_ENDPOINT)) {
+            LOG.info("Closing session {}. Reason {}", session.getId(), reason);
+            try {
+                session.close();
+                sessions.remove(session);
+            } catch (IOException e) {
+                LOG.warn("Couldn't close {}", session.getId());
+            }
+        } else {
+            connectedToCompute = false;
         }
     }
 
