@@ -4,6 +4,7 @@ import com.chatalytics.compute.db.dao.ChatAlyticsDAOFactory;
 import com.chatalytics.compute.db.dao.IEntityDAO;
 import com.chatalytics.core.config.ChatAlyticsConfig;
 import com.chatalytics.core.json.JsonObjectMapperFactory;
+import com.chatalytics.core.model.ChatEntity;
 import com.chatalytics.web.constant.WebConstants;
 import com.chatalytics.web.utils.DateTimeUtils;
 import com.chatalytics.web.utils.ResourceUtils;
@@ -19,6 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.GET;
@@ -57,6 +59,7 @@ public class EntitiesResource {
     }
 
     @GET
+    @Path("trending")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getTrendingTopics(@QueryParam(START_TIME_PARAM) String startTimeStr,
                                       @QueryParam(END_TIME_PARAM) String endTimeStr,
@@ -64,7 +67,7 @@ public class EntitiesResource {
                                       @QueryParam(ROOM_PARAM) String room)
                     throws JsonGenerationException, JsonMappingException, IOException {
 
-        LOG.debug("Got query for starttime={}, endtime={}, user={}, room={}",
+        LOG.debug("Got trending topics query for starttime={}, endtime={}, user={}, room={}",
                   startTimeStr, endTimeStr, user, room);
 
         Optional<String> username = ResourceUtils.getOptionalForParameter(user);
@@ -78,5 +81,25 @@ public class EntitiesResource {
                                                                  MAX_RESULTS);
         String jsonResult = objectMapper.writeValueAsString(topEntities);
         return Response.ok(jsonResult).build();
+    }
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<ChatEntity> getAllEntites(@QueryParam(START_TIME_PARAM) String startTimeStr,
+                                          @QueryParam(END_TIME_PARAM) String endTimeStr,
+                                          @QueryParam(USER_PARAM) String user,
+                                          @QueryParam(ROOM_PARAM) String room) {
+
+        LOG.debug("Got all entities query for starttime={}, endtime={}, user={}, room={}",
+                  startTimeStr, endTimeStr, user, room);
+
+        Optional<String> username = ResourceUtils.getOptionalForParameter(user);
+        Optional<String> roomName = ResourceUtils.getOptionalForParameter(room);
+
+        DateTime startTime = DateTimeUtils.getDateTimeFromParameter(startTimeStr, dtZone);
+        DateTime endTime = DateTimeUtils.getDateTimeFromParameter(endTimeStr, dtZone);
+        Interval interval = new Interval(startTime, endTime);
+
+        return entityDao.getAllMentions(interval, roomName, username);
     }
 }
