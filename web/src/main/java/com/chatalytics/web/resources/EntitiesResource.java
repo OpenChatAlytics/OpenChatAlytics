@@ -29,28 +29,28 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 /**
- * REST endpoint for getting trending topics collected from chat messages
+ * REST endpoint for getting entity stats collected from chat messages
  *
  * @author giannis
  *
  */
-@Path(TrendingTopicsResource.TRENDING_ENDPOINT)
-public class TrendingTopicsResource {
+@Path(EntitiesResource.ENTITIES_ENDPOINT)
+public class EntitiesResource {
 
-    public static final String TRENDING_ENDPOINT = WebConstants.API_PATH + "trending";
+    public static final String ENTITIES_ENDPOINT = WebConstants.API_PATH + "entities";
     public static final String START_TIME_PARAM = "starttime";
     public static final String END_TIME_PARAM = "endtime";
     public static final String USER_PARAM = "user";
     public static final String ROOM_PARAM = "room";
 
     private static final int MAX_RESULTS = 10;
-    private static final Logger LOG = LoggerFactory.getLogger(TrendingTopicsResource.class);
+    private static final Logger LOG = LoggerFactory.getLogger(EntitiesResource.class);
 
     private final IEntityDAO entityDao;
     private final DateTimeZone dtZone;
     private final ObjectMapper objectMapper;
 
-    public TrendingTopicsResource(ChatAlyticsConfig config) {
+    public EntitiesResource(ChatAlyticsConfig config) {
         entityDao = ChatAlyticsDAOFactory.getEntityDAO(config);
         dtZone = DateTimeZone.forID(config.timeZone);
         objectMapper = JsonObjectMapperFactory.createObjectMapper(config.inputType);

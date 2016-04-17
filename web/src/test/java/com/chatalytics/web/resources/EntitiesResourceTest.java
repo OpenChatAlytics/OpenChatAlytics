@@ -21,15 +21,15 @@ import javax.ws.rs.core.Response;
 import static org.junit.Assert.assertEquals;
 
 /**
- * Tests {@link TrendingTopicsResource}.
+ * Tests {@link EntitiesResource}.
  *
  * @author giannis
  *
  */
-public class TrendingTopicsResourceTest {
+public class EntitiesResourceTest {
 
     private IEntityDAO entityDao;
-    private TrendingTopicsResource undertest;
+    private EntitiesResource undertest;
     private DateTimeZone dtZone;
     private DateTime mentionTime;
 
@@ -56,7 +56,7 @@ public class TrendingTopicsResourceTest {
         entities.add(new ChatEntity("e3", 3, mentionTime.minusHours(2), "u3", "r1"));
         entities.add(new ChatEntity("e4", 3, mentionTime.minusHours(1), "u1", "r4"));
         storeTestEntities(entities);
-        undertest = new TrendingTopicsResource(config);
+        undertest = new EntitiesResource(config);
     }
 
     private void storeTestEntities(List<ChatEntity> entities) {

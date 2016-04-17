@@ -85,6 +85,7 @@ public class EntityExtractionBolt extends ChatAlyticsBaseBolt {
         FatMessage fatMessage = (FatMessage) input.getValue(0);
 
         List<ChatEntity> entities = extractEntities(fatMessage);
+
         for (ChatEntity entity : entities) {
             entityDao.persistEntity(entity);
             collector.emit(new Values(entity));
