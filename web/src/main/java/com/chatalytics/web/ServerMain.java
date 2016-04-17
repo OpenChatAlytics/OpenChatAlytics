@@ -2,9 +2,11 @@ package com.chatalytics.web;
 
 import com.chatalytics.compute.util.YamlUtils;
 import com.chatalytics.core.config.ChatAlyticsConfig;
-import com.chatalytics.web.resources.EventsResource;
-import com.chatalytics.web.resources.TopEmojisResource;
+import com.chatalytics.core.json.JsonObjectMapperFactory;
+import com.chatalytics.web.resources.EmojisResource;
 import com.chatalytics.web.resources.EntitiesResource;
+import com.chatalytics.web.resources.EventsResource;
+import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
 import com.google.common.collect.Sets;
 import com.sun.jersey.spi.container.servlet.ServletContainer;
 
@@ -79,9 +81,14 @@ public class ServerMain extends Application {
 
     @Override
     public Set<Object> getSingletons() {
+        // specify object mapper
+        JacksonJaxbJsonProvider jsonProvider = new JacksonJaxbJsonProvider();
+        jsonProvider.setMapper(JsonObjectMapperFactory.createObjectMapper(config.inputType));
+
         return Sets.newHashSet(new EntitiesResource(config),
-                               new TopEmojisResource(config),
-                               new ApiListingResource());
+                               new EmojisResource(config),
+                               new ApiListingResource(),
+                               jsonProvider);
     }
 
     protected void startComputeClient() {

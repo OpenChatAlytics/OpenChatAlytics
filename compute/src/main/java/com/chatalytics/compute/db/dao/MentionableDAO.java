@@ -43,9 +43,7 @@ public class MentionableDAO<T extends IMentionable> implements IMentionableDAO<T
     private final Class<T> type;
     private final String typeColumnName;
 
-    protected MentionableDAO(EntityManager entityManager,
-                                 Class<T> type,
-                                 String typeColumnName) {
+    protected MentionableDAO(EntityManager entityManager, Class<T> type, String typeColumnName) {
         this.entityManager = entityManager;
         this.type = type;
         this.typeColumnName = typeColumnName;
@@ -80,21 +78,41 @@ public class MentionableDAO<T extends IMentionable> implements IMentionableDAO<T
      * {@inheritDoc}
      */
     @Override
-    public List<T> getAllMentionsForType(String value, Interval interval, Optional<String> roomName,
-                                         Optional<String> username) {
+    public List<T> getAllMentionsForValue(String value, Interval interval,
+                                          Optional<String> roomName, Optional<String> username) {
+        return internalGetAllMentionsForValue(Optional.of(value), interval, roomName, username);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<T> getAllMentions(Interval interval, Optional<String> roomName,
+                                  Optional<String> username) {
+        return internalGetAllMentionsForValue(Optional.absent(), interval, roomName, username);
+    }
+
+    public List<T> internalGetAllMentionsForValue(Optional<String> value,
+                                                  Interval interval,
+                                                  Optional<String> roomName,
+                                                  Optional<String> username) {
 
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<T> query = cb.createQuery(type);
         Root<T> from = query.from(type);
-        ParameterExpression<String> valueParam = cb.parameter(String.class);
         ParameterExpression<DateTime> startDateParam = cb.parameter(DateTime.class);
         ParameterExpression<DateTime> endDateParam = cb.parameter(DateTime.class);
 
         List<Predicate> wherePredicates = Lists.newArrayListWithCapacity(4);
-        wherePredicates.add(cb.equal(from.get(typeColumnName), valueParam));
         wherePredicates.add(cb.between(from.get("mentionTime"), startDateParam, endDateParam));
 
         // Add the optional parameters
+        ParameterExpression<String> valueParam = null;
+        if (value.isPresent()) {
+            valueParam = cb.parameter(String.class);
+            wherePredicates.add(cb.equal(from.get(typeColumnName), valueParam));
+
+        }
         ParameterExpression<String> roomNameParam = null;
         if (roomName.isPresent()) {
             roomNameParam = cb.parameter(String.class);
@@ -109,7 +127,6 @@ public class MentionableDAO<T extends IMentionable> implements IMentionableDAO<T
         query.where(wherePredicates.toArray(new Predicate[wherePredicates.size()]));
 
         TypedQuery<T> finalQuery = entityManager.createQuery(query)
-                                                .setParameter(valueParam, value)
                                                 .setParameter(startDateParam, interval.getStart())
                                                 .setParameter(endDateParam, interval.getEnd());
         if (roomName.isPresent()) {
@@ -117,6 +134,10 @@ public class MentionableDAO<T extends IMentionable> implements IMentionableDAO<T
         }
         if (username.isPresent()) {
             finalQuery.setParameter(usernameParam, username.get());
+        }
+        if (value.isPresent()) {
+            finalQuery.setParameter(valueParam, value.get());
+
         }
         return finalQuery.getResultList();
     }

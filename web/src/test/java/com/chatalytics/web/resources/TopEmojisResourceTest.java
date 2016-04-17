@@ -21,7 +21,7 @@ import javax.ws.rs.core.Response;
 import static org.junit.Assert.assertEquals;
 
 /**
- * Tests {@link TopEmojisResource}
+ * Tests {@link EmojisResource}
  *
  * @author giannis
  *
@@ -29,7 +29,7 @@ import static org.junit.Assert.assertEquals;
 public class TopEmojisResourceTest {
 
     private IEmojiDAO entityDao;
-    private TopEmojisResource undertest;
+    private EmojisResource undertest;
     private DateTimeZone dtZone;
     private DateTime mentionTime;
 
@@ -56,7 +56,7 @@ public class TopEmojisResourceTest {
         emojis.add(new EmojiEntity("e3", 3, mentionTime.minusHours(2), "u3", "r1"));
         emojis.add(new EmojiEntity("e4", 3, mentionTime.minusHours(1), "u1", "r4"));
         storeTestEmojis(emojis);
-        undertest = new TopEmojisResource(config);
+        undertest = new EmojisResource(config);
     }
 
     private void storeTestEmojis(List<EmojiEntity> emojis) {

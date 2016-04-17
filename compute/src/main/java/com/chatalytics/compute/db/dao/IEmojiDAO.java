@@ -17,7 +17,7 @@ public interface IEmojiDAO extends Service {
      * @param emoji
      *            The emoji to be persisted
      */
-    public void persistEmoji(EmojiEntity emoji);
+     void persistEmoji(EmojiEntity emoji);
 
     /**
      * Gets an emoji from the database. Note that all fields in {@link EmojiEntity} need to be set.
@@ -27,7 +27,7 @@ public interface IEmojiDAO extends Service {
      * @param emoji
      *            Emoji to be retrieved
      */
-    public EmojiEntity getEmoji(EmojiEntity emoji);
+    EmojiEntity getEmoji(EmojiEntity emoji);
 
     /**
      * Returns all the mention occurrences for an emoji inside the given <code>interval</code>.
@@ -44,10 +44,25 @@ public interface IEmojiDAO extends Service {
      * @return A list of {@link EmojiEntity} representing all the times this emoji was mentioned in
      *         the given time period
      */
-    public List<EmojiEntity> getAllMentionsForEmoji(String emoji,
-                                                    Interval interval,
-                                                    Optional<String> roomName,
-                                                    Optional<String> username);
+     List<EmojiEntity> getAllMentionsForEmoji(String emoji,
+                                              Interval interval,
+                                              Optional<String> roomName,
+                                              Optional<String> username);
+
+    /**
+     * Returns all the mention occurrences of all the emojis inside the given <code>interval</code>
+     *
+     * @param interval
+     *            The interval of interest. Note that the query is inclusive of the start time and
+     *            exclusive of the end time.
+     * @param roomName Optionally supply a room name
+     * @param username Optionally supply a user name
+     * @return A list of {@link EmojiEntity} representing all the times emojis were mentioned in the
+     *         given time period
+     */
+     List<EmojiEntity> getAllMentions(Interval interval,
+                                      Optional<String> roomName,
+                                      Optional<String> username);
 
     /**
      * Returns the total number of times an emoji was mentioned in the given <code>interval</code>.
@@ -63,7 +78,7 @@ public interface IEmojiDAO extends Service {
      *            Optionally supply a user name
      * @return The total number of times the emoji was mentioned in the given time interval
      */
-    public int getTotalMentionsForEmoji(String emoji,
+     int getTotalMentionsForEmoji(String emoji,
                                         Interval interval,
                                         Optional<String> roomName,
                                         Optional<String> username);
@@ -82,9 +97,9 @@ public interface IEmojiDAO extends Service {
      *            The number of top entities to return back
      * @return Returns back a map of emoji to number of occurrences.
      */
-    public Map<String, Long> getTopEmojis(Interval interval,
-                                          Optional<String> roomName,
-                                          Optional<String> username,
-                                          int resultSize);
+     Map<String, Long> getTopEmojis(Interval interval,
+                                    Optional<String> roomName,
+                                    Optional<String> username,
+                                    int resultSize);
 
 }

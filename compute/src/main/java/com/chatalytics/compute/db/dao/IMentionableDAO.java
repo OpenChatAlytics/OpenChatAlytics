@@ -25,8 +25,7 @@ public interface IMentionableDAO<T extends IMentionable> extends Closeable {
      * @param value
      *            The value to be persisted
      */
-    public void persistValue(T value);
-
+    void persistValue(T value);
 
     /**
      * Gets a type <code>T</code> from the database. Note that all fields need to be set.
@@ -34,7 +33,7 @@ public interface IMentionableDAO<T extends IMentionable> extends Closeable {
      * @param entity
      *            Entity to be retrieved
      */
-    public T getValue(T value);
+    T getValue(T value);
 
     /**
      * Returns all the mention occurrences for type <code>T</code> inside the given
@@ -52,10 +51,26 @@ public interface IMentionableDAO<T extends IMentionable> extends Closeable {
      * @return A list of <code>T</code> representing all the times this entity was mentioned
      *         in the given time period
      */
-    public List<T> getAllMentionsForType(String value,
-                                         Interval interval,
-                                         Optional<String> roomName,
-                                         Optional<String> username);
+    List<T> getAllMentionsForValue(String value,
+                                   Interval interval,
+                                   Optional<String> roomName,
+                                   Optional<String> username);
+
+    /**
+     * Returns all the values and all the mention occurrences of type <code>T</code> inside the
+     * given <code>interval</code>
+     *
+     * @param interval
+     *            The interval of interest. Note that the query is inclusive of the start time and
+     *            exclusive of the end time.
+     * @param roomName
+     *            Optionally supply a room name
+     * @param username
+     *            Optionally supply a user name
+     * @return A list of <code>T</code> representing all the times this entity was mentioned
+     *         in the given time period
+     */
+    List<T> getAllMentions(Interval interval, Optional<String> roomName, Optional<String> username);
 
     /**
      * Returns the total number of times a type <code>T</code> was mentioned in the given
@@ -72,10 +87,10 @@ public interface IMentionableDAO<T extends IMentionable> extends Closeable {
      *            Optionally supply a user name
      * @return The total number of times the entity was mentioned in the given time interval
      */
-    public int getTotalMentionsForType(String value,
-                                       Interval interval,
-                                       Optional<String> roomName,
-                                       Optional<String> username);
+    int getTotalMentionsForType(String value,
+                                Interval interval,
+                                Optional<String> roomName,
+                                Optional<String> username);
 
     /**
      * Returns back the top mentioned string representation of a type in the given time
@@ -91,15 +106,15 @@ public interface IMentionableDAO<T extends IMentionable> extends Closeable {
      *            The number of top entities to return back
      * @return Returns back a map of the string representation of a type to number of occurrences.
      */
-    public Map<String, Long> getTopValuesOfType(Interval interval,
-                                                Optional<String> roomName,
-                                                Optional<String> username,
-                                                int resultSize);
+    Map<String, Long> getTopValuesOfType(Interval interval,
+                                         Optional<String> roomName,
+                                         Optional<String> username,
+                                         int resultSize);
 
     /**
      * Gets the type this DAO is working with
      *
      * @return The type this DAO is performing occurrence stats on
      */
-    public Class<T> getType();
+    Class<T> getType();
 }

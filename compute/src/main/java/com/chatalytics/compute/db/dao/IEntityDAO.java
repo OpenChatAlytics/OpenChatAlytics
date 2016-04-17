@@ -17,7 +17,7 @@ public interface IEntityDAO extends Service {
      * @param entity
      *            The entity to be persisted
      */
-    public void persistEntity(ChatEntity entity);
+    void persistEntity(ChatEntity entity);
 
     /**
      * Gets an entity from the database. Note that all fields in entity need to be set. Use
@@ -27,7 +27,7 @@ public interface IEntityDAO extends Service {
      * @param entity
      *            Entity to be retrieved
      */
-    public ChatEntity getEntity(ChatEntity entity);
+    ChatEntity getEntity(ChatEntity entity);
 
     /**
      * Returns all the mention occurrences for an entity inside the given <code>interval</code>.
@@ -44,10 +44,27 @@ public interface IEntityDAO extends Service {
      * @return A list of {@link ChatEntity} representing all the times this entity was mentioned
      *         in the given time period
      */
-    public List<ChatEntity> getAllMentionsForEntity(String entity,
-                                                    Interval interval,
-                                                    Optional<String> roomName,
-                                                    Optional<String> username);
+     List<ChatEntity> getAllMentionsForEntity(String entity,
+                                              Interval interval,
+                                              Optional<String> roomName,
+                                              Optional<String> username);
+
+     /**
+      * Returns all the mention occurrences for an entity inside the given <code>interval</code>.
+      *
+      * @param interval
+      *            The interval of interest. Note that the query is inclusive of the start time and
+      *            exclusive of the end time.
+      * @param roomName
+      *            Optionally supply a room name
+      * @param username
+      *            Optionally supply a user name
+      * @return A list of {@link ChatEntity} representing all the times this entity was mentioned
+      *         in the given time period
+      */
+      List<ChatEntity> getAllMentions(Interval interval,
+                                      Optional<String> roomName,
+                                      Optional<String> username);
 
     /**
      * Returns the total number of times an entity was mentioned in the given <code>interval</code>.
@@ -63,10 +80,10 @@ public interface IEntityDAO extends Service {
      *            Optionally supply a user name
      * @return The total number of times the entity was mentioned in the given time interval
      */
-    public int getTotalMentionsForEntity(String entity,
-                                         Interval interval,
-                                         Optional<String> roomName,
-                                         Optional<String> username);
+     int getTotalMentionsForEntity(String entity,
+                                   Interval interval,
+                                   Optional<String> roomName,
+                                   Optional<String> username);
 
 
     /**
@@ -83,8 +100,8 @@ public interface IEntityDAO extends Service {
      *            The number of top entities to return back
      * @return Returns back a map of entity value to number of occurrences.
      */
-    public Map<String, Long> getTopEntities(Interval interval,
-                                            Optional<String> roomName,
-                                            Optional<String> username,
-                                            int resultSize);
+     Map<String, Long> getTopEntities(Interval interval,
+                                      Optional<String> roomName,
+                                      Optional<String> username,
+                                      int resultSize);
 }
