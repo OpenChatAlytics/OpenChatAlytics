@@ -83,10 +83,6 @@ public class EntityExtractionBolt extends ChatAlyticsBaseBolt {
     public void execute(Tuple input) {
         LOG.info("Got tuple: {}", input);
         FatMessage fatMessage = (FatMessage) input.getValue(0);
-        if (fatMessage == null) {
-            LOG.warn("Got a null tuple");
-            return;
-        }
 
         List<ChatEntity> entities = extractEntities(fatMessage);
         for (ChatEntity entity : entities) {

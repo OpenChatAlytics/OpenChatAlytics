@@ -28,7 +28,7 @@ public class EmojiCounterBolt extends ChatAlyticsBaseBolt {
 
     private static final long serialVersionUID = -3543087188985057557L;
     public static final String BOLT_ID = "EMOJI_COUNTER_BOLT_ID";
-    public static final String EMOJI_ENTITY_FIELD_STR = "emoji-entity";
+    private static final String EMOJI_ENTITY_FIELD_STR = "emoji-entity";
     private static final Logger LOG = LoggerFactory.getLogger(EmojiCounterBolt.class);
 
     private IEmojiDAO emojiDao;
@@ -45,10 +45,6 @@ public class EmojiCounterBolt extends ChatAlyticsBaseBolt {
     public void execute(Tuple input) {
         LOG.info("Got tuple: {}", input);
         FatMessage fatMessage = (FatMessage) input.getValue(0);
-        if (fatMessage == null) {
-            LOG.warn("Got a null tuple");
-            return;
-        }
 
         List<EmojiEntity> emojis = getEmojisFromMessage(fatMessage);
 
