@@ -4,6 +4,7 @@ import com.chatalytics.compute.db.dao.ChatAlyticsDAOFactory;
 import com.chatalytics.compute.db.dao.IEmojiDAO;
 import com.chatalytics.core.config.ChatAlyticsConfig;
 import com.chatalytics.core.json.JsonObjectMapperFactory;
+import com.chatalytics.web.constant.WebConstants;
 import com.chatalytics.web.utils.DateTimeUtils;
 import com.chatalytics.web.utils.ResourceUtils;
 import com.fasterxml.jackson.core.JsonGenerationException;
@@ -20,10 +21,10 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.Map;
 
-import javax.ws.rs.FormParam;
-import javax.ws.rs.POST;
+import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -36,7 +37,7 @@ import javax.ws.rs.core.Response;
 @Path(TopEmojisResource.EMOJI_ENDPOINT)
 public class TopEmojisResource {
 
-    public static final String EMOJI_ENDPOINT = "emoji";
+    public static final String EMOJI_ENDPOINT = WebConstants.API_PATH + "emoji";
     public static final String START_TIME_PARAM = "starttime";
     public static final String END_TIME_PARAM = "endtime";
     public static final String USER_PARAM = "user";
@@ -56,12 +57,12 @@ public class TopEmojisResource {
         objectMapper = JsonObjectMapperFactory.createObjectMapper(config.inputType);
     }
 
-    @POST
+    @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getTopEmojis(@FormParam(START_TIME_PARAM) String startTimeStr,
-                                 @FormParam(END_TIME_PARAM) String endTimeStr,
-                                 @FormParam(USER_PARAM) String user,
-                                 @FormParam(ROOM_PARAM) String room)
+    public Response getTopEmojis(@QueryParam(START_TIME_PARAM) String startTimeStr,
+                                 @QueryParam(END_TIME_PARAM) String endTimeStr,
+                                 @QueryParam(USER_PARAM) String user,
+                                 @QueryParam(ROOM_PARAM) String room)
                     throws JsonGenerationException, JsonMappingException, IOException {
 
         LOG.debug("Got query for starttime={}, endtime={}, user={}, room={}",
