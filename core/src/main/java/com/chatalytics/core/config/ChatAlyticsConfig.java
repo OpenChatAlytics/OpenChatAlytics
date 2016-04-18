@@ -3,7 +3,6 @@ package com.chatalytics.core.config;
 import com.chatalytics.core.InputSourceType;
 
 import java.io.Serializable;
-import java.util.Map;
 
 /**
  * The configuration object. Fields of this object are serialized and put in the storm configuration
@@ -19,31 +18,12 @@ public class ChatAlyticsConfig implements Serializable {
 
     public InputSourceType inputType;
 
-    public String apiDateFormat;
-
     public String timeZone = "America/New_York";
-
-    public int apiRetries = 3;
-
-    public String classifier = "classifiers/english.all.3class.distsim.crf.ser.gz";
 
     public String persistenceUnitName = "chatalytics-db";
 
-    public final String rtComputePath = "/rtcompute";
+    public WebConfig webConfig = new WebConfig();
 
-    public int rtComputePort = 9000;
-
-    public HipChatConfig hipchatConfig = new HipChatConfig();
-
-    public SlackConfig slackConfig = new SlackConfig();
-
-    public LocalTestConfig localTestConfig = new LocalTestConfig();
-
-    public BackfillerConfig backfillerConfig = new BackfillerConfig();
-
-    /**
-     * Map of property name to file to read
-     */
-    public Map<String, String> filesToRead;
+    public ComputeConfig computeConfig = new ComputeConfig();
 
 }
