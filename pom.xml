@@ -326,6 +326,11 @@
             </goals>
           </execution>
         </executions>
+        <configuration>
+          <excludes>
+            <exclude>com/chatalytics/core/config/*</exclude>
+          </excludes>
+        </configuration>
       </plugin>
     </plugins>
   </build>
