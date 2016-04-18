@@ -57,7 +57,7 @@ public class EntityExtractionBolt extends ChatAlyticsBaseBolt {
     @Override
     public void prepare(ChatAlyticsConfig config, @SuppressWarnings("rawtypes") Map conf,
                         TopologyContext context, OutputCollector collector) {
-        classifier = getClassifier(config);
+        classifier = getClassifier(config.computeConfig.classifier);
         entityDao = ChatAlyticsDAOFactory.getEntityDAO(config);
         if (!entityDao.isRunning()) {
             entityDao.startAsync().awaitRunning();
@@ -72,8 +72,8 @@ public class EntityExtractionBolt extends ChatAlyticsBaseBolt {
      *            The configuration object containing information about which classifier to use.
      * @return The classifier to use for extracting entities.
      */
-    private AbstractSequenceClassifier<CoreLabel> getClassifier(ChatAlyticsConfig config) {
-        URL classifierURL = Resources.getResource(config.classifier);
+    private AbstractSequenceClassifier<CoreLabel> getClassifier(String classifierStr) {
+        URL classifierURL = Resources.getResource(classifierStr);
         AbstractSequenceClassifier<CoreLabel> classifier =
             CRFClassifier.getClassifierNoExceptions(classifierURL.getPath());
         return classifier;

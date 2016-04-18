@@ -38,20 +38,20 @@ public class JsonSlackDAO extends AbstractJSONChatApiDAO {
     private static final Logger LOG = LoggerFactory.getLogger(JsonSlackDAO.class);
 
     private final WebResource resource;
-    private final ChatAlyticsConfig config;
     private final ObjectMapper objMapper;
+    private final int apiRetries;
 
     public JsonSlackDAO(ChatAlyticsConfig config, Client client) {
-        super(config.slackConfig.authTokens, AUTH_TOKEN_PARAM);
-        this.resource = client.resource(config.slackConfig.baseSlackURL);
-        this.config = config;
+        super(config.computeConfig.slackConfig.authTokens, AUTH_TOKEN_PARAM);
+        this.resource = client.resource(config.computeConfig.slackConfig.baseSlackURL);
+        this.apiRetries = config.computeConfig.apiRetries;
         this.objMapper = JsonObjectMapperFactory.createObjectMapper(config.inputType);
     }
 
     @Override
     public Map<String, Room> getRooms() {
         WebResource roomResource = resource.path("channels.list");
-        String jsonStr = getJsonResultWithRetries(roomResource, config.apiRetries);
+        String jsonStr = getJsonResultWithRetries(roomResource, apiRetries);
         Collection<Room> roomCol = deserializeJsonStr(jsonStr, "channels", Room.class, objMapper);
         Map<String, Room> result = Maps.newHashMapWithExpectedSize(roomCol.size());
         for (Room room : roomCol) {
@@ -63,7 +63,7 @@ public class JsonSlackDAO extends AbstractJSONChatApiDAO {
     @Override
     public Map<String, User> getUsers() {
         WebResource userResource = resource.path("users.list");
-        String jsonStr = getJsonResultWithRetries(userResource, config.apiRetries);
+        String jsonStr = getJsonResultWithRetries(userResource, apiRetries);
         Collection<User> userCol = deserializeJsonStr(jsonStr, "members", User.class, objMapper);
         Map<String, User> result = Maps.newHashMapWithExpectedSize(userCol.size());
         for (User user : userCol) {
@@ -76,7 +76,7 @@ public class JsonSlackDAO extends AbstractJSONChatApiDAO {
     public Map<String, User> getUsersForRoom(Room room) {
         WebResource roomResource = resource.path("channels.info");
         roomResource = roomResource.queryParam("channel", room.getRoomId());
-        String jsonStr = getJsonResultWithRetries(roomResource, config.apiRetries);
+        String jsonStr = getJsonResultWithRetries(roomResource, apiRetries);
         Collection<String> userIdCol = deserializeJsonStr(jsonStr,
                                                           Lists.newArrayList("channel", "members"),
                                                           String.class,
@@ -86,7 +86,7 @@ public class JsonSlackDAO extends AbstractJSONChatApiDAO {
         for (String userId : userIdCol) {
             WebResource userResource = resource.path("users.info");
             userResource = userResource.queryParam("user", userId);
-            jsonStr = getJsonResultWithRetries(userResource, config.apiRetries);
+            jsonStr = getJsonResultWithRetries(userResource, apiRetries);
             try {
                 JsonNode jsonNode = objMapper.readTree(jsonStr);
                 jsonNode = jsonNode.get("user");
@@ -104,7 +104,7 @@ public class JsonSlackDAO extends AbstractJSONChatApiDAO {
      */
     public URI getRealtimeWebSocketURI() {
         WebResource rtmResource = resource.path("rtm.start");
-        String jsonStr = getJsonResultWithRetries(rtmResource, config.apiRetries);
+        String jsonStr = getJsonResultWithRetries(rtmResource, apiRetries);
         try {
             String webSocketUrl = objMapper.readTree(jsonStr).get("url").asText();
             return URI.create(webSocketUrl);
@@ -135,10 +135,8 @@ public class JsonSlackDAO extends AbstractJSONChatApiDAO {
                                    .queryParam("inclusive", "1")
                                    .queryParam("count", "1000");
 
-        String jsonStr = getJsonResultWithRetries(roomResource, config.apiRetries);
-        Collection<Message> messagesCol = deserializeJsonStr(jsonStr,
-                                                             "messages",
-                                                             Message.class,
+        String jsonStr = getJsonResultWithRetries(roomResource, apiRetries);
+        Collection<Message> messagesCol = deserializeJsonStr(jsonStr, "messages", Message.class,
                                                              objMapper);
         return Lists.newArrayList(messagesCol);
     }

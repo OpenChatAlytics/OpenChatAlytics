@@ -38,7 +38,6 @@ import javax.ws.rs.core.Application;
 public class ServerMain extends Application {
 
     private static final Logger LOG = LoggerFactory.getLogger(ServerMain.class);
-    public static final int PORT = 8080;
 
     private final ChatAlyticsConfig config;
     private final RealtimeComputeClient realtimeComputeClient;
@@ -48,11 +47,11 @@ public class ServerMain extends Application {
         this.realtimeComputeClient = realtimeComputeClient;
 
         // Sets up classpath scanning for Swagger + JAXRS
-        // Resources available at localhost:8080/swagger.json
+        // Resources available at localhost/swagger.json
         BeanConfig beanConfig = new BeanConfig();
-        beanConfig.setHost("localhost:" + PORT);
+        beanConfig.setHost("localhost:" + config.webConfig.port);
         beanConfig.setBasePath("/");
-        beanConfig.setResourcePackage("com.chatalytics.web.resources");
+        beanConfig.setResourcePackage(EntitiesResource.class.getPackage().toString());
         beanConfig.setScan(true);
     }
 
@@ -66,7 +65,7 @@ public class ServerMain extends Application {
         serverMain.startComputeClient();
 
         // Start the server
-        Server server = new Server(PORT);
+        Server server = new Server(config.webConfig.port);
         ServletContainer servletContainer = new ServletContainer(serverMain);
         ServletHolder servletHolder = new ServletHolder("/*", servletContainer);
         ServletContextHandler context = new ServletContextHandler();

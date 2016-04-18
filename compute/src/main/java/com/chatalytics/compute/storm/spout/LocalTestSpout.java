@@ -85,7 +85,7 @@ public class LocalTestSpout extends BaseRichSpout {
 
         LOG.info("Loaded config...");
 
-        LocalTestConfig localConfig = config.localTestConfig;
+        LocalTestConfig localConfig = config.computeConfig.localTestConfig;
 
         this.sleepMs = localConfig.sleepMs;
         this.collector = collector;

@@ -58,8 +58,8 @@ public class RealtimeComputeClient extends AbstractIdleService {
     private Session openRealtimeConnection(WebSocketContainer webSocketContainer,
             ChatAlyticsConfig config) throws DeploymentException, IOException {
         URI rtURI = URI.create(String.format("ws://localhost:%d%s/%s",
-                                             config.rtComputePort,
-                                             config.rtComputePath,
+                                             config.computeConfig.rtComputePort,
+                                             config.computeConfig.rtComputePath,
                                              ConnectionType.SUBSCRIBER));
         Session session = webSocketContainer.connectToServer(eventResource, rtURI);
         LOG.info("Connected to realtime compute server");

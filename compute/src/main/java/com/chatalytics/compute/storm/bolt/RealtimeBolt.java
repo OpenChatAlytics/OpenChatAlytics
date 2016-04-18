@@ -50,7 +50,8 @@ public class RealtimeBolt extends ChatAlyticsBaseBolt {
     public void prepare(ChatAlyticsConfig config, @SuppressWarnings("rawtypes") Map conf,
                         TopologyContext context, OutputCollector collector) {
         WebSocketContainer webSocketContainer = getWebSocketContainer();
-        this.session = openRealtimeConnection(webSocketContainer, config);
+        this.session = openRealtimeConnection(webSocketContainer,
+                                              config.computeConfig.rtComputePort);
     }
 
     @Override
@@ -91,10 +92,9 @@ public class RealtimeBolt extends ChatAlyticsBaseBolt {
      *            ChatAlytics config
      * @return An optional session
      */
-    private Session openRealtimeConnection(WebSocketContainer webSocketContainer,
-                                                     ChatAlyticsConfig config) {
+    private Session openRealtimeConnection(WebSocketContainer webSocketContainer, int rtPort) {
         URI rtURI = URI.create(String.format("ws://localhost:%d%s/%s",
-                                             config.rtComputePort,
+                                             rtPort,
                                              RT_COMPUTE_ENDPOINT,
                                              ConnectionType.PUBLISHER));
         try {

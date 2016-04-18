@@ -1,10 +1,14 @@
 package com.chatalytics.core.config;
 
+import java.io.Serializable;
+
 /**
  * Config file for testing with a local spout that can emit random messages
  *
  */
-public class LocalTestConfig {
+public class LocalTestConfig implements Serializable {
+
+    private static final long serialVersionUID = -5527223071338609488L;
 
     /**
      * The amount of time to pass by before another message gets emitted

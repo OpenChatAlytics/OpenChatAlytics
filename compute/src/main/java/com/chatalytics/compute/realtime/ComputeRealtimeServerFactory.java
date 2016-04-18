@@ -25,7 +25,7 @@ public class ComputeRealtimeServerFactory {
      * @return A newly created {@link ComputeRealtimeServer}
      */
     public static ComputeRealtimeServer createComputeRealtimeServer(ChatAlyticsConfig config) {
-        Server server = new Server(config.rtComputePort);
+        Server server = new Server(config.computeConfig.rtComputePort);
         ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
         context.setContextPath("/");
         server.setHandler(context);

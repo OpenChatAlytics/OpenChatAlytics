@@ -2,8 +2,8 @@ package com.chatalytics.compute.storm.spout;
 
 import com.chatalytics.compute.chat.dao.IChatApiDAO;
 import com.chatalytics.compute.config.ConfigurationConstants;
-import com.chatalytics.compute.db.dao.IChatAlyticsDAO;
 import com.chatalytics.compute.db.dao.ChatAlyticsDAOFactory;
+import com.chatalytics.compute.db.dao.IChatAlyticsDAO;
 import com.chatalytics.compute.slack.dao.SlackApiDAOFactory;
 import com.chatalytics.compute.util.YamlUtils;
 import com.chatalytics.core.config.BackfillerConfig;
@@ -61,18 +61,19 @@ public class SlackBackfillSpout extends BaseRichSpout {
         ChatAlyticsConfig config = YamlUtils.readYamlFromString(configYaml,
                                                                 ChatAlyticsConfig.class);
 
-        Preconditions.checkArgument(config.backfillerConfig.granularityMins > 0,
+        BackfillerConfig backfillerConfig = config.computeConfig.backfillerConfig;
+        Preconditions.checkArgument(backfillerConfig.granularityMins > 0,
                 "The granularity needs to be > 0");
-        this.granularityMins = config.backfillerConfig.granularityMins;
+        this.granularityMins = backfillerConfig.granularityMins;
         this.slackDao = getChatApiDao(config);
         this.collector = collector;
-        if (config.backfillerConfig.startDate == null) {
+        if (backfillerConfig.startDate == null) {
             // go back a day
             this.initDate = new DateTime(DateTimeZone.UTC).withHourOfDay(0)
                                                            .withMinuteOfHour(0)
                                                            .minusDays(1);
         } else {
-            this.initDate = DateTime.parse(config.backfillerConfig.startDate);
+            this.initDate = DateTime.parse(backfillerConfig.startDate);
         }
 
         this.dbDao = ChatAlyticsDAOFactory.getChatAlyticsDao(config);

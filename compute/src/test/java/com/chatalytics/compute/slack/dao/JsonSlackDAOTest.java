@@ -3,6 +3,7 @@ package com.chatalytics.compute.slack.dao;
 import com.chatalytics.compute.util.YamlUtils;
 import com.chatalytics.core.InputSourceType;
 import com.chatalytics.core.config.ChatAlyticsConfig;
+import com.chatalytics.core.config.SlackConfig;
 import com.chatalytics.core.model.Message;
 import com.chatalytics.core.model.Room;
 import com.chatalytics.core.model.User;
@@ -44,14 +45,18 @@ public class JsonSlackDAOTest {
     private JsonSlackDAO underTest;
     private WebResource mockResource;
     private ChatAlyticsConfig config;
+    private SlackConfig slackConfig;
+    private int apiRetries;
 
     @Before
     public void setUp() throws Exception {
         this.config = YamlUtils.readYamlFromResource("chatalytics.yaml", ChatAlyticsConfig.class);
-        config.inputType = InputSourceType.SLACK;
+        this.config.inputType = InputSourceType.SLACK;
+        this.slackConfig = config.computeConfig.slackConfig;
+        this.apiRetries = config.computeConfig.apiRetries;
         Client mockClient = mock(Client.class);
         mockResource = mock(WebResource.class);
-        when(mockClient.resource(config.slackConfig.baseSlackURL)).thenReturn(mockResource);
+        when(mockClient.resource(slackConfig.baseSlackURL)).thenReturn(mockResource);
         underTest = spy(new JsonSlackDAO(config, mockClient));
     }
 
@@ -68,7 +73,7 @@ public class JsonSlackDAOTest {
         Path channelsPath = Paths.get(channelListURI);
         String channelsResponseStr = new String(Files.readAllBytes(channelsPath));
         doReturn(channelsResponseStr).when(underTest).getJsonResultWithRetries(mockChanResource,
-                                                                               config.apiRetries);
+                                                                               apiRetries);
 
         Map<String, Room> rooms = underTest.getRooms();
         assertEquals(2, rooms.size());
@@ -90,7 +95,7 @@ public class JsonSlackDAOTest {
         Path usersPath = Paths.get(userListURI);
         String usersResponseStr = new String(Files.readAllBytes(usersPath));
         doReturn(usersResponseStr).when(underTest).getJsonResultWithRetries(mockUserResource,
-                                                                            config.apiRetries);
+                                                                            apiRetries);
 
         Map<String, User> users = underTest.getUsers();
         assertEquals(2, users.size());
@@ -113,7 +118,7 @@ public class JsonSlackDAOTest {
         Path channelsInfoPath = Paths.get(chanInfoURI);
         String chanInfoResponseStr = new String(Files.readAllBytes(channelsInfoPath));
         doReturn(chanInfoResponseStr).when(underTest).getJsonResultWithRetries(mockChanInfoResrc,
-                                                                               config.apiRetries);
+                                                                               apiRetries);
 
         // users.info
         WebResource mockUserInfoResource = mock(WebResource.class);
@@ -125,7 +130,7 @@ public class JsonSlackDAOTest {
         Path usersInfoPath = Paths.get(userInfoURI);
         String userInfoResponseStr = new String(Files.readAllBytes(usersInfoPath));
         doReturn(userInfoResponseStr).when(underTest).getJsonResultWithRetries(user1InfoResource,
-                                                                               config.apiRetries);
+                                                                               apiRetries);
 
         // user 2
         WebResource user2InfoResource = mock(WebResource.class);
@@ -134,7 +139,7 @@ public class JsonSlackDAOTest {
         usersInfoPath = Paths.get(userInfoURI);
         userInfoResponseStr = new String(Files.readAllBytes(usersInfoPath));
         doReturn(userInfoResponseStr).when(underTest).getJsonResultWithRetries(user2InfoResource,
-                                                                               config.apiRetries);
+                                                                               apiRetries);
 
         Room mockRoom = mock(Room.class);
         when(mockRoom.getRoomId()).thenReturn("C0SDFG423");
@@ -159,7 +164,7 @@ public class JsonSlackDAOTest {
         Path historyPath = Paths.get(historyURI);
         String historyResponseStr = new String(Files.readAllBytes(historyPath));
         doReturn(historyResponseStr).when(underTest).getJsonResultWithRetries(mockHistoryResrc,
-                                                                              config.apiRetries);
+                                                                              apiRetries);
 
         Room mockRoom = mock(Room.class);
         when(mockRoom.getRoomId()).thenReturn("C0SDFG423");
@@ -183,8 +188,7 @@ public class JsonSlackDAOTest {
         when(mockResource.path("rtm.start")).thenReturn(mockRtmResrc);
         String rtmResponseStr =
             "{\"ok\": true, \"url\":\"wss:\\/\\/ms9.slack-msgs.com\\/websocket\\/7I5yBpcvk\"}";
-        doReturn(rtmResponseStr).when(underTest).getJsonResultWithRetries(mockRtmResrc,
-                                                                          config.apiRetries);
+        doReturn(rtmResponseStr).when(underTest).getJsonResultWithRetries(mockRtmResrc, apiRetries);
 
         assertEquals(URI.create("wss://ms9.slack-msgs.com/websocket/7I5yBpcvk"),
                      underTest.getRealtimeWebSocketURI());
@@ -199,8 +203,7 @@ public class JsonSlackDAOTest {
         WebResource mockRtmResrc = mock(WebResource.class);
         when(mockResource.path("rtm.start")).thenReturn(mockRtmResrc);
         String rtmResponseStr = "{malformedJSON";
-        doReturn(rtmResponseStr).when(underTest).getJsonResultWithRetries(mockRtmResrc,
-                                                                          config.apiRetries);
+        doReturn(rtmResponseStr).when(underTest).getJsonResultWithRetries(mockRtmResrc, apiRetries);
         try {
             underTest.getRealtimeWebSocketURI();
         } catch (Exception e) {
