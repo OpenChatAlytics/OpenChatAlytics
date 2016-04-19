@@ -24,11 +24,8 @@ import backtype.storm.tuple.Values;
 import edu.stanford.nlp.ie.AbstractSequenceClassifier;
 import edu.stanford.nlp.ie.crf.CRFClassifier;
 import edu.stanford.nlp.ling.CoreLabel;
-import edu.stanford.nlp.util.XMLUtils;
-import edu.stanford.nlp.util.XMLUtils.XMLTag;
+import edu.stanford.nlp.util.Triple;
 
-import java.io.Reader;
-import java.io.StringReader;
 import java.net.URL;
 import java.util.List;
 import java.util.Map;
@@ -101,49 +98,39 @@ public class EntityExtractionBolt extends ChatAlyticsBaseBolt {
      */
     @VisibleForTesting
     protected List<ChatEntity> extractEntities(FatMessage fatMessage) {
+
         Message message = fatMessage.getMessage();
-        Map<String, ChatEntity> entities = Maps.newHashMap();
-        String messageWithXML = classifier.classifyWithInlineXML(message.getMessage());
-        Reader r = new StringReader(messageWithXML);
+        String messageStr = message.getMessage();
 
-        try {
-            while (true) {
-                XMLTag tag = XMLUtils.readAndParseTag(r);
-                if (tag == null || tag.name.length() == 0) {
-                    break;
-                }
+        List<Triple<String,Integer,Integer>> classification =
+                classifier.classifyToCharacterOffsets(messageStr);
+        Map<String, ChatEntity> entities = Maps.newHashMapWithExpectedSize(classification.size());
 
-                String entity = XMLUtils.readUntilTag(r);
-
-                if (entity.length() > MAX_ENTITY_CHARS) {
-                    continue;
-                }
-
-                if (!tag.isEndTag) {
-                    ChatEntity existingEntity = entities.remove(entity);
-                    int occurrences;
-                    if (existingEntity == null) {
-                        occurrences = 1;
-                    } else {
-                        occurrences = existingEntity.getOccurrences() + 1;
-                    }
-                    Room room = fatMessage.getRoom();
-                    String roomName;
-                    if (room == null) {
-                        roomName = "";
-                    } else {
-                        roomName = room.getName();
-                    }
-                    entities.put(entity, new ChatEntity(entity,
-                                                        occurrences,
-                                                        message.getDate(),
-                                                        fatMessage.getUser().getMentionName(),
-                                                        roomName));
-                }
+        for (Triple<String, Integer, Integer> triple : classification) {
+            if (triple.third - triple.second > MAX_ENTITY_CHARS) {
+                continue;
             }
+            String entity = messageStr.substring(triple.second, triple.third);
+            ChatEntity existingEntity = entities.remove(entity);
+            int occurrences;
+            if (existingEntity == null) {
+                occurrences = 1;
+            } else {
+                occurrences = existingEntity.getOccurrences() + 1;
+            }
+            Room room = fatMessage.getRoom();
+            String roomName;
+            if (room == null) {
+                roomName = "";
+            } else {
+                roomName = room.getName();
+            }
+            entities.put(entity, new ChatEntity(entity,
+                                                occurrences,
+                                                message.getDate(),
+                                                fatMessage.getUser().getMentionName(),
+                                                roomName));
 
-        } catch (Exception e) {
-            LOG.error("Could not extract entity. Ignoring...", e);
         }
 
         LOG.debug("Extracted {} entities", entities.size());
