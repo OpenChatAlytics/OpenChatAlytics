@@ -6,15 +6,14 @@ import com.chatalytics.core.realtime.ChatAlyticsEventEncoder;
 import com.chatalytics.core.realtime.ConnectionType;
 import com.chatalytics.core.realtime.ConnectionTypeEncoderDecoder;
 
+import org.apache.storm.task.OutputCollector;
+import org.apache.storm.task.TopologyContext;
+import org.apache.storm.topology.OutputFieldsDeclarer;
+import org.apache.storm.tuple.Tuple;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import backtype.storm.task.OutputCollector;
-import backtype.storm.task.TopologyContext;
-import backtype.storm.topology.OutputFieldsDeclarer;
-import backtype.storm.tuple.Tuple;
 
 import java.io.IOException;
 import java.io.Serializable;

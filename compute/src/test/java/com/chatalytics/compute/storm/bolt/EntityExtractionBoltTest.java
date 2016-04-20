@@ -8,14 +8,13 @@ import com.chatalytics.core.model.Room;
 import com.chatalytics.core.model.User;
 import com.google.common.collect.Maps;
 
+import org.apache.storm.task.OutputCollector;
+import org.apache.storm.task.TopologyContext;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
-import backtype.storm.task.OutputCollector;
-import backtype.storm.task.TopologyContext;
 
 import java.util.List;
 import java.util.Map;

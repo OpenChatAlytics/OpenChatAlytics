@@ -2,8 +2,8 @@ package com.chatalytics.compute.storm.spout;
 
 import com.chatalytics.compute.chat.dao.IChatApiDAO;
 import com.chatalytics.compute.config.ConfigurationConstants;
-import com.chatalytics.compute.db.dao.IChatAlyticsDAO;
 import com.chatalytics.compute.db.dao.ChatAlyticsDAOFactory;
+import com.chatalytics.compute.db.dao.IChatAlyticsDAO;
 import com.chatalytics.compute.hipchat.dao.HipChatApiDAOFactory;
 import com.chatalytics.compute.util.YamlUtils;
 import com.chatalytics.core.config.ChatAlyticsConfig;
@@ -13,17 +13,16 @@ import com.chatalytics.core.model.Room;
 import com.chatalytics.core.model.User;
 import com.google.common.collect.Lists;
 
+import org.apache.storm.spout.SpoutOutputCollector;
+import org.apache.storm.task.TopologyContext;
+import org.apache.storm.topology.OutputFieldsDeclarer;
+import org.apache.storm.topology.base.BaseRichSpout;
+import org.apache.storm.tuple.Fields;
+import org.apache.storm.tuple.Values;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import backtype.storm.spout.SpoutOutputCollector;
-import backtype.storm.task.TopologyContext;
-import backtype.storm.topology.OutputFieldsDeclarer;
-import backtype.storm.topology.base.BaseRichSpout;
-import backtype.storm.tuple.Fields;
-import backtype.storm.tuple.Values;
 
 import java.util.List;
 import java.util.Map;
