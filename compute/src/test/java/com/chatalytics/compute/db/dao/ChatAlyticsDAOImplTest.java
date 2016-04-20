@@ -24,7 +24,8 @@ public class ChatAlyticsDAOImplTest {
     public void setUp() throws Exception {
         ChatAlyticsConfig config = new ChatAlyticsConfig();
         config.persistenceUnitName = "chatalytics-db-test";
-        underTest = new ChatAlyticsDAOImpl(config);
+
+        underTest = ChatAlyticsDAOFactory.createChatAlyticsDao(config);
         underTest.startAsync().awaitRunning();
     }
 

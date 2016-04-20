@@ -55,7 +55,7 @@ public class EntityExtractionBolt extends ChatAlyticsBaseBolt {
     public void prepare(ChatAlyticsConfig config, @SuppressWarnings("rawtypes") Map conf,
                         TopologyContext context, OutputCollector collector) {
         classifier = getClassifier(config.computeConfig.classifier);
-        entityDao = ChatAlyticsDAOFactory.getEntityDAO(config);
+        entityDao = ChatAlyticsDAOFactory.createEntityDAO(config);
         if (!entityDao.isRunning()) {
             entityDao.startAsync().awaitRunning();
         }

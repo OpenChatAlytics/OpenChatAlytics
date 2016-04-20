@@ -1,6 +1,5 @@
 package com.chatalytics.compute.db.dao;
 
-import com.chatalytics.core.config.ChatAlyticsConfig;
 import com.chatalytics.core.model.EmojiEntity;
 import com.google.common.base.Optional;
 import com.google.common.util.concurrent.AbstractIdleService;
@@ -10,9 +9,7 @@ import org.joda.time.Interval;
 import java.util.List;
 import java.util.Map;
 
-import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
 
 /**
  * Implementation of the {@link IEmojiDAO} that can store and retrieve emojis
@@ -23,13 +20,10 @@ import javax.persistence.Persistence;
 public class EmojiDAOImpl extends AbstractIdleService implements IEmojiDAO {
 
     private final IMentionableDAO<EmojiEntity> occurrenceStatsDAO;
-    private final EntityManagerFactory entityManagerFactory;
 
-    public EmojiDAOImpl(ChatAlyticsConfig config) {
-        this.entityManagerFactory =
-            Persistence.createEntityManagerFactory(config.persistenceUnitName);
-        EntityManager entityManager = entityManagerFactory.createEntityManager();
-        this.occurrenceStatsDAO = new MentionableDAO<>(entityManager, EmojiEntity.class, "emoji");
+    public EmojiDAOImpl(EntityManagerFactory entityManagerFactory) {
+        this.occurrenceStatsDAO = new MentionableDAO<>(entityManagerFactory, EmojiEntity.class,
+                                                       "emoji");
     }
 
     /**
@@ -104,6 +98,5 @@ public class EmojiDAOImpl extends AbstractIdleService implements IEmojiDAO {
     @Override
     protected void shutDown() throws Exception {
         occurrenceStatsDAO.close();
-        entityManagerFactory.close();
     }
 }

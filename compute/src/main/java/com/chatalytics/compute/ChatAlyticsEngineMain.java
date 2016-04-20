@@ -1,5 +1,6 @@
 package com.chatalytics.compute;
 
+import com.chatalytics.compute.db.dao.ChatAlyticsDAOFactory;
 import com.chatalytics.compute.realtime.ComputeRealtimeServer;
 import com.chatalytics.compute.realtime.ComputeRealtimeServerFactory;
 import com.chatalytics.compute.storm.ChatAlyticsService;
@@ -29,8 +30,24 @@ public class ChatAlyticsEngineMain {
         ChatAlyticsService chatalyticsService = new ChatAlyticsService(chatTopology.get(),
                                                                        rtServer,
                                                                        config);
-        chatalyticsService.startAsync().awaitRunning();
 
+        addShutdownHook(chatalyticsService);
+        chatalyticsService.startAsync().awaitRunning();
+    }
+
+    /**
+     * Closes all open resources
+     *
+     * @param chatalyticsService The chatalytics service to close
+     */
+    public static void addShutdownHook(ChatAlyticsService chatalyticsService) {
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+            @Override
+            public void run() {
+                chatalyticsService.stopAsync().awaitTerminated();
+                ChatAlyticsDAOFactory.closeEntityManagerFactory();
+            }
+        });
     }
 
 }

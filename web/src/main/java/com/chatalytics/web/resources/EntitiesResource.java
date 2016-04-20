@@ -50,7 +50,7 @@ public class EntitiesResource {
     private final DateTimeZone dtZone;
 
     public EntitiesResource(ChatAlyticsConfig config) {
-        entityDao = ChatAlyticsDAOFactory.getEntityDAO(config);
+        entityDao = ChatAlyticsDAOFactory.createEntityDAO(config);
         dtZone = DateTimeZone.forID(config.timeZone);
     }
 
