@@ -1,6 +1,5 @@
 package com.chatalytics.compute.db.dao;
 
-import com.chatalytics.core.config.ChatAlyticsConfig;
 import com.chatalytics.core.model.LastPullTime;
 import com.google.common.util.concurrent.AbstractIdleService;
 
@@ -11,7 +10,6 @@ import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
 
 /**
  * Implementation of the {@link IChatAlyticsDAO} using SQL lite
@@ -22,11 +20,8 @@ import javax.persistence.Persistence;
 public class ChatAlyticsDAOImpl extends AbstractIdleService implements IChatAlyticsDAO {
 
     private final EntityManager entityManager;
-    private final EntityManagerFactory entityManagerFactory;
 
-    public ChatAlyticsDAOImpl(ChatAlyticsConfig config) {
-        this.entityManagerFactory =
-            Persistence.createEntityManagerFactory(config.persistenceUnitName);
+    public ChatAlyticsDAOImpl(EntityManagerFactory entityManagerFactory) {
         this.entityManager = entityManagerFactory.createEntityManager();
     }
 
@@ -68,7 +63,6 @@ public class ChatAlyticsDAOImpl extends AbstractIdleService implements IChatAlyt
     @Override
     protected void shutDown() throws Exception {
         entityManager.close();
-        entityManagerFactory.close();
     }
 
     @Override

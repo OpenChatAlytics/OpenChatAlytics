@@ -1,6 +1,6 @@
 package com.chatalytics.web.resources;
 
-import com.chatalytics.compute.db.dao.EmojiDAOImpl;
+import com.chatalytics.compute.db.dao.ChatAlyticsDAOFactory;
 import com.chatalytics.compute.db.dao.IEmojiDAO;
 import com.chatalytics.core.config.ChatAlyticsConfig;
 import com.chatalytics.core.model.EmojiEntity;
@@ -40,7 +40,7 @@ public class TopEmojisResourceTest {
         config.timeZone = "America/New_York";
         dtZone = DateTimeZone.forID(config.timeZone);
 
-        entityDao = new EmojiDAOImpl(config);
+        entityDao = ChatAlyticsDAOFactory.createEmojiDAO(config);
         entityDao.startAsync().awaitRunning();
 
         mentionTime = DateTime.now().withZone(DateTimeZone.UTC);

@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
 import javax.persistence.PersistenceException;
 import javax.persistence.Tuple;
 import javax.persistence.TypedQuery;
@@ -43,8 +44,9 @@ public class MentionableDAO<T extends IMentionable> implements IMentionableDAO<T
     private final Class<T> type;
     private final String typeColumnName;
 
-    protected MentionableDAO(EntityManager entityManager, Class<T> type, String typeColumnName) {
-        this.entityManager = entityManager;
+    protected MentionableDAO(EntityManagerFactory entityManagerFactory, Class<T> type,
+                             String typeColumnName) {
+        this.entityManager = entityManagerFactory.createEntityManager();
         this.type = type;
         this.typeColumnName = typeColumnName;
     }

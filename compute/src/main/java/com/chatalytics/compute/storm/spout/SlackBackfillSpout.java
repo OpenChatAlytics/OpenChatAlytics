@@ -76,7 +76,7 @@ public class SlackBackfillSpout extends BaseRichSpout {
             this.initDate = DateTime.parse(backfillerConfig.startDate);
         }
 
-        this.dbDao = ChatAlyticsDAOFactory.getChatAlyticsDao(config);
+        this.dbDao = ChatAlyticsDAOFactory.createChatAlyticsDao(config);
     }
 
     /**

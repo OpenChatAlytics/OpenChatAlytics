@@ -1,6 +1,6 @@
 package com.chatalytics.web.resources;
 
-import com.chatalytics.compute.db.dao.EntityDAOImpl;
+import com.chatalytics.compute.db.dao.ChatAlyticsDAOFactory;
 import com.chatalytics.compute.db.dao.IEntityDAO;
 import com.chatalytics.core.config.ChatAlyticsConfig;
 import com.chatalytics.core.model.ChatEntity;
@@ -40,7 +40,7 @@ public class EntitiesResourceTest {
         config.timeZone = "America/New_York";
         dtZone = DateTimeZone.forID(config.timeZone);
 
-        entityDao = new EntityDAOImpl(config);
+        entityDao = ChatAlyticsDAOFactory.createEntityDAO(config);
         entityDao.startAsync().awaitRunning();
 
         mentionTime = DateTime.now().withZone(DateTimeZone.UTC);

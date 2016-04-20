@@ -56,7 +56,7 @@ public class HipChatMessageSpout extends BaseRichSpout {
         hipchatDao = HipChatApiDAOFactory.getHipChatApiDao(config);
         LOG.info("Got HipChat API DAO...");
 
-        dbDao = ChatAlyticsDAOFactory.getChatAlyticsDao(config);
+        dbDao = ChatAlyticsDAOFactory.createChatAlyticsDao(config);
         LOG.info("Got database DAO...");
 
         dtz = DateTimeZone.forID(config.timeZone);

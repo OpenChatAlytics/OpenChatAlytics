@@ -1,5 +1,6 @@
 package com.chatalytics.web;
 
+import com.chatalytics.compute.db.dao.ChatAlyticsDAOFactory;
 import com.chatalytics.compute.util.YamlUtils;
 import com.chatalytics.core.config.ChatAlyticsConfig;
 import com.chatalytics.core.json.JsonObjectMapperFactory;
@@ -73,9 +74,10 @@ public class ServerMain extends Application {
         server.setHandler(context);
         setWebSocketEndpoints(context, eventResource);
 
+        addShutdownHook(computeClient);
+
         server.start();
         server.join();
-        computeClient.stopAsync().awaitTerminated();
     }
 
     @Override
@@ -124,6 +126,21 @@ public class ServerMain extends Application {
                                     }).build();
 
         wsContainer.addEndpoint(serverConfig);
+    }
+
+    /**
+     * Closes all open resources
+     *
+     * @param computeClient The compute client to close
+     */
+    private static void addShutdownHook(RealtimeComputeClient computeClient) {
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+            @Override
+            public void run() {
+                computeClient.stopAsync().awaitTerminated();
+                ChatAlyticsDAOFactory.closeEntityManagerFactory();
+            }
+        });
     }
 
 }

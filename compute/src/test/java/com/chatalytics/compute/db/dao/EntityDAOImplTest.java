@@ -23,14 +23,14 @@ import static org.junit.Assert.assertEquals;
  */
 public class EntityDAOImplTest {
 
-    private EntityDAOImpl underTest;
+    private IEntityDAO underTest;
     private DateTime mentionDate;
 
     @Before
     public void setUp() throws Exception {
         ChatAlyticsConfig config = new ChatAlyticsConfig();
         config.persistenceUnitName = "chatalytics-db-test";
-        underTest = new EntityDAOImpl(config);
+        underTest = ChatAlyticsDAOFactory.createEntityDAO(config);
         underTest.startAsync().awaitRunning();
 
         mentionDate = new DateTime().withZone(DateTimeZone.UTC);

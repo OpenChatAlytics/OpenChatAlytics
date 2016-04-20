@@ -51,7 +51,7 @@ public class EmojisResource {
     private final DateTimeZone dtZone;
 
     public EmojisResource(ChatAlyticsConfig config) {
-        emojiDao = ChatAlyticsDAOFactory.getEmojiDAO(config);
+        emojiDao = ChatAlyticsDAOFactory.createEmojiDAO(config);
         dtZone = DateTimeZone.forID(config.timeZone);
     }
 

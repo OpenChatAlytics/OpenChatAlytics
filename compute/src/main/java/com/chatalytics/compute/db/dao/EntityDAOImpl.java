@@ -1,6 +1,5 @@
 package com.chatalytics.compute.db.dao;
 
-import com.chatalytics.core.config.ChatAlyticsConfig;
 import com.chatalytics.core.model.ChatEntity;
 import com.google.common.base.Optional;
 import com.google.common.util.concurrent.AbstractIdleService;
@@ -10,9 +9,7 @@ import org.joda.time.Interval;
 import java.util.List;
 import java.util.Map;
 
-import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
 
 /**
  * Implementation of the {@link IEntityDAO} that can store and retrieve entities
@@ -23,13 +20,9 @@ import javax.persistence.Persistence;
 public class EntityDAOImpl extends AbstractIdleService implements IEntityDAO {
 
     private final IMentionableDAO<ChatEntity> occurrenceStatsDAO;
-    private final EntityManagerFactory entityManagerFactory;
 
-    public EntityDAOImpl(ChatAlyticsConfig config) {
-        this.entityManagerFactory =
-            Persistence.createEntityManagerFactory(config.persistenceUnitName);
-        EntityManager entityManager = entityManagerFactory.createEntityManager();
-        this.occurrenceStatsDAO = new MentionableDAO<>(entityManager, ChatEntity.class,
+    public EntityDAOImpl(EntityManagerFactory entityManagerFactory) {
+        this.occurrenceStatsDAO = new MentionableDAO<>(entityManagerFactory, ChatEntity.class,
                                                        "entityValue");
     }
 
@@ -104,6 +97,5 @@ public class EntityDAOImpl extends AbstractIdleService implements IEntityDAO {
     @Override
     protected void shutDown() throws Exception {
         occurrenceStatsDAO.close();
-        entityManagerFactory.close();
     }
 }
