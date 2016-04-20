@@ -10,8 +10,9 @@ import com.chatalytics.compute.storm.spout.SlackBackfillSpout;
 import com.chatalytics.compute.storm.spout.SlackMessageSpout;
 import com.chatalytics.core.InputSourceType;
 
-import backtype.storm.generated.StormTopology;
-import backtype.storm.topology.TopologyBuilder;
+import org.apache.storm.generated.StormTopology;
+import org.apache.storm.topology.TopologyBuilder;
+
 
 /**
  * Declares and sets up the Storm topology.
