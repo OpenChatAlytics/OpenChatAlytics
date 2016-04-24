@@ -10,6 +10,7 @@ import org.joda.time.Interval;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
@@ -36,19 +37,18 @@ import javax.persistence.criteria.Selection;
  * @param <T>
  *            The storing type. Should implement {@link IMentionable}
  */
-public class MentionableDAO<T extends IMentionable> implements IMentionableDAO<T> {
+public class MentionableDAO<K extends Serializable, T extends IMentionable<K>>
+        implements IMentionableDAO<K, T> {
 
     private static final Logger LOG = LoggerFactory.getLogger(MentionableDAO.class);
+    private static final String TYPE_COLUMN_NAME = "value";
 
     private final EntityManager entityManager;
     private final Class<T> type;
-    private final String typeColumnName;
 
-    protected MentionableDAO(EntityManagerFactory entityManagerFactory, Class<T> type,
-                             String typeColumnName) {
+    protected MentionableDAO(EntityManagerFactory entityManagerFactory, Class<T> type) {
         this.entityManager = entityManagerFactory.createEntityManager();
         this.type = type;
-        this.typeColumnName = typeColumnName;
     }
 
     /**
@@ -80,7 +80,7 @@ public class MentionableDAO<T extends IMentionable> implements IMentionableDAO<T
      * {@inheritDoc}
      */
     @Override
-    public List<T> getAllMentionsForValue(String value, Interval interval,
+    public List<T> getAllMentionsForValue(K value, Interval interval,
                                           Optional<String> roomName, Optional<String> username) {
         return internalGetAllMentionsForValue(Optional.of(value), interval, roomName, username);
     }
@@ -94,7 +94,7 @@ public class MentionableDAO<T extends IMentionable> implements IMentionableDAO<T
         return internalGetAllMentionsForValue(Optional.absent(), interval, roomName, username);
     }
 
-    public List<T> internalGetAllMentionsForValue(Optional<String> value,
+    public List<T> internalGetAllMentionsForValue(Optional<K> value,
                                                   Interval interval,
                                                   Optional<String> roomName,
                                                   Optional<String> username) {
@@ -109,10 +109,12 @@ public class MentionableDAO<T extends IMentionable> implements IMentionableDAO<T
         wherePredicates.add(cb.between(from.get("mentionTime"), startDateParam, endDateParam));
 
         // Add the optional parameters
-        ParameterExpression<String> valueParam = null;
+        ParameterExpression<K> valueParam = null;
         if (value.isPresent()) {
-            valueParam = cb.parameter(String.class);
-            wherePredicates.add(cb.equal(from.get(typeColumnName), valueParam));
+            @SuppressWarnings("unchecked")
+            Class<K> valueClass = (Class<K>) value.get().getClass();
+            valueParam = cb.parameter(valueClass);
+            wherePredicates.add(cb.equal(from.get(TYPE_COLUMN_NAME), valueParam));
 
         }
         ParameterExpression<String> roomNameParam = null;
@@ -148,13 +150,14 @@ public class MentionableDAO<T extends IMentionable> implements IMentionableDAO<T
      * {@inheritDoc}
      */
     @Override
-    public int getTotalMentionsForType(String value, Interval interval, Optional<String> roomName,
+    public int getTotalMentionsForType(K value, Interval interval, Optional<String> roomName,
                                        Optional<String> username) {
 
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Integer> query = cb.createQuery(Integer.class);
         Root<T> from = query.from(type);
-        ParameterExpression<String> valueParam = cb.parameter(String.class);
+        @SuppressWarnings("unchecked")
+        ParameterExpression<K> valueParam = (ParameterExpression<K>) cb.parameter(value.getClass());
         ParameterExpression<DateTime> startDateParam = cb.parameter(DateTime.class);
         ParameterExpression<DateTime> endDateParam = cb.parameter(DateTime.class);
         Expression<Integer> sum = cb.sum(from.get("occurrences"));
@@ -162,7 +165,7 @@ public class MentionableDAO<T extends IMentionable> implements IMentionableDAO<T
         query.select(sum.alias("occurrences"));
 
         List<Predicate> wherePredicates = Lists.newArrayListWithCapacity(4);
-        wherePredicates.add(cb.equal(from.get(typeColumnName), valueParam));
+        wherePredicates.add(cb.equal(from.get(TYPE_COLUMN_NAME), valueParam));
         wherePredicates.add(cb.between(from.get("mentionTime"), startDateParam, endDateParam));
 
         // Add the optional parameters
@@ -205,10 +208,10 @@ public class MentionableDAO<T extends IMentionable> implements IMentionableDAO<T
      * {@inheritDoc}
      */
     @Override
-    public Map<String, Long> getTopValuesOfType(Interval interval,
-                                                Optional<String> roomName,
-                                                Optional<String> username,
-                                                int resultSize) {
+    public Map<K, Long> getTopValuesOfType(Interval interval,
+                                           Optional<String> roomName,
+                                           Optional<String> username,
+                                           int resultSize) {
 
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Tuple> query = cb.createTupleQuery();
@@ -217,8 +220,8 @@ public class MentionableDAO<T extends IMentionable> implements IMentionableDAO<T
         ParameterExpression<DateTime> startDateParam = cb.parameter(DateTime.class);
         ParameterExpression<DateTime> endDateParam = cb.parameter(DateTime.class);
 
-        Path<String> typeValuePath = from.get(typeColumnName);
-        Selection<String> typeValueAlias = typeValuePath.alias("typeValue_sel");
+        Path<K> typeValuePath = from.get(TYPE_COLUMN_NAME);
+        Selection<K> typeValueAlias = typeValuePath.alias("typeValue_sel");
 
 
         Expression<Long> occurrencesSum = cb.sum(from.get("occurrences"));
@@ -257,7 +260,7 @@ public class MentionableDAO<T extends IMentionable> implements IMentionableDAO<T
         }
         List<Tuple> resultList = finalQuery.getResultList();
         // linked hashmap to preserve order
-        Map<String, Long> result = Maps.newLinkedHashMap();
+        Map<K, Long> result = Maps.newLinkedHashMap();
         for (Tuple tuple : resultList) {
             result.put(tuple.get(typeValueAlias), tuple.get(occurrencesSumAlias));
         }
@@ -271,7 +274,6 @@ public class MentionableDAO<T extends IMentionable> implements IMentionableDAO<T
     public Class<T> getType() {
         return type;
     }
-
 
     /**
      * Closes the entity manager

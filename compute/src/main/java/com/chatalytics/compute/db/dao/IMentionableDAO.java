@@ -6,6 +6,7 @@ import com.google.common.base.Optional;
 import org.joda.time.Interval;
 
 import java.io.Closeable;
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
@@ -17,7 +18,8 @@ import java.util.Map;
  *
  * @param <T>
  */
-public interface IMentionableDAO<T extends IMentionable> extends Closeable {
+public interface IMentionableDAO<K extends Serializable, T extends IMentionable<K>>
+        extends Closeable {
 
     /**
      * Persists an value we're interested in doing occurrence statistics on
@@ -51,7 +53,7 @@ public interface IMentionableDAO<T extends IMentionable> extends Closeable {
      * @return A list of <code>T</code> representing all the times this entity was mentioned
      *         in the given time period
      */
-    List<T> getAllMentionsForValue(String value,
+    List<T> getAllMentionsForValue(K value,
                                    Interval interval,
                                    Optional<String> roomName,
                                    Optional<String> username);
@@ -87,14 +89,14 @@ public interface IMentionableDAO<T extends IMentionable> extends Closeable {
      *            Optionally supply a user name
      * @return The total number of times the entity was mentioned in the given time interval
      */
-    int getTotalMentionsForType(String value,
+    int getTotalMentionsForType(K value,
                                 Interval interval,
                                 Optional<String> roomName,
                                 Optional<String> username);
 
     /**
-     * Returns back the top mentioned string representation of a type in the given time
-     * <code>interval</code>, and optionally by user name and/or room name
+     * Returns back the top mentioned values of a type in the given time <code>interval</code>, and
+     * optionally by user name and/or room name
      *
      * @param interval
      *            The time interval to search in
@@ -104,12 +106,12 @@ public interface IMentionableDAO<T extends IMentionable> extends Closeable {
      *            Optional user name to filter by
      * @param resultSize
      *            The number of top entities to return back
-     * @return Returns back a map of the string representation of a type to number of occurrences.
+     * @return Returns back a map of the value of a type to number of occurrences.
      */
-    Map<String, Long> getTopValuesOfType(Interval interval,
-                                         Optional<String> roomName,
-                                         Optional<String> username,
-                                         int resultSize);
+    Map<K, Long> getTopValuesOfType(Interval interval,
+                                    Optional<String> roomName,
+                                    Optional<String> username,
+                                    int resultSize);
 
     /**
      * Gets the type this DAO is working with

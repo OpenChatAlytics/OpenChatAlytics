@@ -19,11 +19,10 @@ import javax.persistence.EntityManagerFactory;
  */
 public class EmojiDAOImpl extends AbstractIdleService implements IEmojiDAO {
 
-    private final IMentionableDAO<EmojiEntity> occurrenceStatsDAO;
+    private final IMentionableDAO<String, EmojiEntity> occurrenceStatsDAO;
 
     public EmojiDAOImpl(EntityManagerFactory entityManagerFactory) {
-        this.occurrenceStatsDAO = new MentionableDAO<>(entityManagerFactory, EmojiEntity.class,
-                                                       "emoji");
+        this.occurrenceStatsDAO = new MentionableDAO<>(entityManagerFactory, EmojiEntity.class);
     }
 
     /**

@@ -24,10 +24,10 @@ import javax.persistence.Table;
 @Table(name = ChatEntity.ENTITY_TABLE_NAME)
 @EqualsAndHashCode
 @Setter(value = AccessLevel.PROTECTED) // for hibernate
-public class ChatEntity implements IMentionable {
+public class ChatEntity implements IMentionable<String> {
 
     public static final String ENTITY_TABLE_NAME = "ENTITIES";
-    public static final String ENTITY_VALUE_COLUMN = "ENTITY_VALUE";
+    public static final String ENTITY_VALUE_COLUMN = "VALUE";
     public static final String OCCURENCES_COLUMN = "OCCURRENCES";
     public static final String MENTION_TIME_COLUMN = "MENTION_TIME";
     public static final String ROOM_NAME_COLUMN = "ROOM_NAME";
@@ -35,7 +35,7 @@ public class ChatEntity implements IMentionable {
 
     public static final long serialVersionUID = -4845804080646234255L;
 
-    private String entityValue;
+    private String value;
     private int occurrences;
     private DateTime mentionTime;
     private String username;
@@ -43,19 +43,20 @@ public class ChatEntity implements IMentionable {
 
     protected ChatEntity() {} // for jackson
 
-    public ChatEntity(String entityValue, int occurrences, DateTime mentionTime,
+    public ChatEntity(String value, int occurrences, DateTime mentionTime,
                       String username, String roomName) {
-        this.entityValue = entityValue;
+        this.value = value;
         this.occurrences = occurrences;
         this.mentionTime = mentionTime;
         this.username = username;
         this.roomName = roomName;
     }
 
+    @Override
     @Id
     @Column(name = ENTITY_VALUE_COLUMN)
-    public String getEntityValue() {
-        return entityValue;
+    public String getValue() {
+        return value;
     }
 
     @Override
@@ -89,7 +90,7 @@ public class ChatEntity implements IMentionable {
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this.getClass())
-                          .add("entityValue", entityValue)
+                          .add("value", value)
                           .add("occurrences", occurrences)
                           .add("mentionTime", mentionTime)
                           .add("username", username)
