@@ -15,7 +15,7 @@ import lombok.Getter;
 @Getter
 @EqualsAndHashCode
 @AllArgsConstructor
-public class MessageSummary implements IMentionable {
+public class MessageSummary implements IMentionable<Integer> {
 
     private static final long serialVersionUID = 4610523559744723974L;
 
@@ -26,4 +26,9 @@ public class MessageSummary implements IMentionable {
      * Occurrences will always be 1. This field is here to make JSON serialization easier
      */
     private final int occurrences = 1;
+
+    @Override
+    public Integer getValue() {
+        return occurrences;
+    }
 }

@@ -65,16 +65,16 @@ public class EntityExtractionBoltTest {
         FatMessage fatMessage = new FatMessage(msg, mockUser, mockRoom);
         List<ChatEntity> entities = underTest.extractEntities(fatMessage);
         Map<String, ChatEntity> entitiesMap = Maps.newHashMapWithExpectedSize(entities.size());
-        entities.forEach((entity) -> entitiesMap.put(entity.getEntityValue(), entity));
+        entities.forEach((entity) -> entitiesMap.put(entity.getValue(), entity));
         assertEquals(2, entities.size());
 
         ChatEntity entity = entitiesMap.get(ent1);
-        assertEquals(ent1, entity.getEntityValue());
+        assertEquals(ent1, entity.getValue());
         assertEquals(1, entity.getOccurrences());
         assertEquals(date, entity.getMentionTime());
 
         entity = entitiesMap.get(ent2);
-        assertEquals(ent2, entity.getEntityValue());
+        assertEquals(ent2, entity.getValue());
         assertEquals(1, entity.getOccurrences());
         assertEquals(date, entity.getMentionTime());
     }

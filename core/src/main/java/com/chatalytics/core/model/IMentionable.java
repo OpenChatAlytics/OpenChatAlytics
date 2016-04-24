@@ -10,7 +10,9 @@ import java.io.Serializable;
  * @author giannis
  *
  */
-public interface IMentionable extends Serializable {
+public interface IMentionable<T extends Serializable> extends Serializable {
+
+    public T getValue();
 
     public String getUsername();
 

@@ -19,11 +19,10 @@ import javax.persistence.EntityManagerFactory;
  */
 public class EntityDAOImpl extends AbstractIdleService implements IEntityDAO {
 
-    private final IMentionableDAO<ChatEntity> occurrenceStatsDAO;
+    private final IMentionableDAO<String, ChatEntity> occurrenceStatsDAO;
 
     public EntityDAOImpl(EntityManagerFactory entityManagerFactory) {
-        this.occurrenceStatsDAO = new MentionableDAO<>(entityManagerFactory, ChatEntity.class,
-                                                       "entityValue");
+        this.occurrenceStatsDAO = new MentionableDAO<>(entityManagerFactory, ChatEntity.class);
     }
 
     /**
