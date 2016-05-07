@@ -1,5 +1,8 @@
 package com.chatalytics.compute.db.dao;
 
+import com.chatalytics.compute.matrix.GraphPartition;
+import com.chatalytics.compute.matrix.LabeledDenseMatrix;
+import com.chatalytics.compute.matrix.LabeledMatrix;
 import com.chatalytics.core.model.IMentionable;
 import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
@@ -13,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -146,6 +150,36 @@ public class MentionableDAO<K extends Serializable, T extends IMentionable<K>>
         return finalQuery.getResultList();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public LabeledDenseMatrix<String> getRoomSimilaritiesByValue(Interval interval) {
+        return internalGetSimilaritiesByValue(interval, mention -> mention.getRoomName());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public LabeledDenseMatrix<String> getUserSimilaritiesByValue(Interval interval) {
+        return internalGetSimilaritiesByValue(interval, mention -> mention.getUsername());
+    }
+
+    private <X extends Serializable> LabeledDenseMatrix<X>
+            internalGetSimilaritiesByValue(Interval interval, Function<T, X> funcX) {
+        List<T> mentions = getAllMentions(interval, Optional.absent(), Optional.absent());
+
+        if (mentions.isEmpty()) {
+            return LabeledDenseMatrix.of();
+        }
+
+        LabeledMatrix<X> M = GraphPartition.getMentionMatrix(mentions,
+                                                             funcX,
+                                                             mention -> mention.getValue());
+
+        return GraphPartition.getSimilarityMatrix(M);
+    }
     /**
      * {@inheritDoc}
      */

@@ -1,5 +1,8 @@
 package com.chatalytics.compute.db.dao;
 
+import com.chatalytics.compute.matrix.GraphPartition;
+import com.chatalytics.compute.matrix.LabeledDenseMatrix;
+import com.chatalytics.compute.matrix.LabeledMatrix;
 import com.chatalytics.core.model.IMentionable;
 import com.google.common.base.Optional;
 
@@ -112,6 +115,28 @@ public interface IMentionableDAO<K extends Serializable, T extends IMentionable<
                                     Optional<String> roomName,
                                     Optional<String> username,
                                     int resultSize);
+
+    /**
+     * Given a time interval this method will return a labeled room by room matrix with all the
+     * similar rooms clustered together. For more information see
+     * {@link GraphPartition#getSimilarityMatrix(LabeledMatrix)}
+     *
+     * @param interval
+     *            The interval to search in
+     * @return A labeled matrix
+     */
+    LabeledDenseMatrix<String> getRoomSimilaritiesByValue(Interval interval);
+
+    /**
+     * Given a time interval this method will return a labeled user by user matrix with all the
+     * similar users clustered together. For more information see
+     * {@link GraphPartition#getSimilarityMatrix(LabeledMatrix)}
+     *
+     * @param interval
+     *            The interval to search in
+     * @return A labeled matrix
+     */
+    LabeledDenseMatrix<String> getUserSimilaritiesByValue(Interval interval);
 
     /**
      * Gets the type this DAO is working with

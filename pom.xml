@@ -184,6 +184,11 @@
         <artifactId>javax-websocket-server-impl</artifactId>
         <version>9.3.8.v20160314</version>
       </dependency>
+      <dependency>
+        <groupId>com.googlecode.matrix-toolkits-java</groupId>
+        <artifactId>mtj</artifactId>
+        <version>1.0.4</version>
+      </dependency>
 
       <!-- End compute dependencies -->
 
