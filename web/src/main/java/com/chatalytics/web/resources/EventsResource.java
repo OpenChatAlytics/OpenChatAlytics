@@ -5,6 +5,7 @@ import com.chatalytics.core.realtime.ChatAlyticsEventDecoder;
 import com.chatalytics.core.realtime.ChatAlyticsEventEncoder;
 import com.chatalytics.core.realtime.ConnectionTypeEncoderDecoder;
 import com.chatalytics.web.constant.WebConstants;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Throwables;
 
 import org.apache.storm.shade.com.google.common.collect.Sets;
@@ -53,11 +54,12 @@ public class EventsResource {
             LOG.info("Got a new web subscription connection request with ID {}", session.getId());
             if (!connectedToCompute) {
                 try {
-                session.close(new CloseReason(CloseReason.CloseCodes.UNEXPECTED_CONDITION,
-                                              "WebServer not connected to Compute"));
+                    session.close(new CloseReason(CloseReason.CloseCodes.UNEXPECTED_CONDITION,
+                                                  "WebServer not connected to Compute"));
                 } catch (IOException e) {
                     LOG.warn("Couldn't close {}. Reason {}", session.getId(), e.getMessage());
                 }
+                return;
             }
             // cleanup sessions
             Set<Session> closedSessions = Sets.newHashSet();
@@ -88,8 +90,8 @@ public class EventsResource {
         if (session.getRequestURI().getPath().startsWith(RT_EVENT_ENDPOINT)) {
             LOG.info("Closing session {}. Reason {}", session.getId(), reason);
             try {
-                session.close();
                 sessions.remove(session);
+                session.close();
             } catch (IOException e) {
                 LOG.warn("Couldn't close {}", session.getId());
             }
@@ -109,6 +111,9 @@ public class EventsResource {
 
         LOG.debug("Got realtime event: {}", event);
 
+        // don't expose package info to client
+        event.setClazz(null);
+
         Set<Session> closedSessions = Sets.newHashSet();
         for (Session clientSession : sessions) {
             if (!clientSession.isOpen()) {
@@ -116,8 +121,6 @@ public class EventsResource {
                 continue;
             }
 
-            // don't expose package info to client
-            event.setClazz(null);
             clientSession.getAsyncRemote().sendObject(event);
         }
 
@@ -133,5 +136,14 @@ public class EventsResource {
     @OnError
     public void onError(Throwable t) {
         LOG.error(Throwables.getStackTraceAsString(t));
+    }
+
+    @VisibleForTesting
+    protected Set<Session> getSessions() {
+        return sessions;
+    }
+
+    protected boolean isConnectedToCompute() {
+        return connectedToCompute;
     }
 }
