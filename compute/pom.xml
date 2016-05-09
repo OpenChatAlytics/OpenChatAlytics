@@ -128,8 +128,12 @@
       <artifactId>jersey-core</artifactId>
     </dependency>
     <dependency>
-        <groupId>com.sun.jersey</groupId>
-        <artifactId>jersey-servlet</artifactId>
+      <groupId>com.sun.jersey</groupId>
+      <artifactId>jersey-servlet</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.googlecode.matrix-toolkits-java</groupId>
+      <artifactId>mtj</artifactId>
     </dependency>
   </dependencies>
 </project>
