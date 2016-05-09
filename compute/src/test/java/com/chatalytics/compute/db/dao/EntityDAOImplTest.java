@@ -1,5 +1,6 @@
 package com.chatalytics.compute.db.dao;
 
+import com.chatalytics.compute.matrix.LabeledDenseMatrix;
 import com.chatalytics.core.config.ChatAlyticsConfig;
 import com.chatalytics.core.model.ChatEntity;
 import com.google.common.base.Optional;
@@ -109,6 +110,14 @@ public class EntityDAOImplTest {
         assertEquals(2, result.size());
         assertEquals(1L, result.get("entity1").longValue());
         assertEquals(1L, result.get("entity2").longValue());
+    }
+
+    @Test
+    public void testGetRoomSimilaritiesByEntity() {
+        Interval timeInterval = new Interval(mentionDate, mentionDate.plusHours(3));
+        LabeledDenseMatrix<String> result = underTest.getRoomSimilaritiesByEntity(timeInterval);
+        assertEquals(2, result.getLabels().size());
+        assertEquals(2, result.getMatrix().length);
     }
 
     @After

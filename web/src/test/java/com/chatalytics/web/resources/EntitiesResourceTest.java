@@ -2,8 +2,10 @@ package com.chatalytics.web.resources;
 
 import com.chatalytics.compute.db.dao.ChatAlyticsDAOFactory;
 import com.chatalytics.compute.db.dao.IEntityDAO;
+import com.chatalytics.compute.matrix.LabeledDenseMatrix;
 import com.chatalytics.core.config.ChatAlyticsConfig;
 import com.chatalytics.core.model.ChatEntity;
+import com.chatalytics.core.similarity.SimilarityDimension;
 import com.chatalytics.web.utils.DateTimeUtils;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -29,7 +31,7 @@ import static org.junit.Assert.assertEquals;
 public class EntitiesResourceTest {
 
     private IEntityDAO entityDao;
-    private EntitiesResource undertest;
+    private EntitiesResource underTest;
     private DateTimeZone dtZone;
     private DateTime mentionTime;
 
@@ -56,7 +58,7 @@ public class EntitiesResourceTest {
         entities.add(new ChatEntity("e3", 3, mentionTime.minusHours(2), "u3", "r1"));
         entities.add(new ChatEntity("e4", 3, mentionTime.minusHours(1), "u1", "r4"));
         storeTestEntities(entities);
-        undertest = new EntitiesResource(config);
+        underTest = new EntitiesResource(config);
     }
 
     private void storeTestEntities(List<ChatEntity> entities) {
@@ -73,27 +75,43 @@ public class EntitiesResourceTest {
         DateTimeFormatter dtf = DateTimeUtils.PARAMETER_WITH_DAY_DTF.withZone(dtZone);
         String startTimeStr = dtf.print(mentionTime.minusDays(1));
         String endTimeStr = dtf.print(mentionTime.plusDays(1));
-        Map<String, Long> response = undertest.getTrendingTopics(startTimeStr, endTimeStr, "u1",
+        Map<String, Long> response = underTest.getTrendingTopics(startTimeStr, endTimeStr, "u1",
                                                                  "r1", null);
         Map<String, Long> expected = Maps.newHashMap();
         expected.put("e1", 5L);
         expected.put("e2", 1L);
         assertEquals(expected, response);
 
-        response = undertest.getTrendingTopics(startTimeStr, endTimeStr, "u1", null, null);
+        response = underTest.getTrendingTopics(startTimeStr, endTimeStr, "u1", null, null);
         expected.clear();
         expected.put("e1", 5L);
         expected.put("e4", 3L);
         expected.put("e2", 1L);
         assertEquals(expected, response);
 
-        response = undertest.getTrendingTopics(startTimeStr, endTimeStr, null, null, null);
+        response = underTest.getTrendingTopics(startTimeStr, endTimeStr, null, null, null);
         expected.clear();
         expected.put("e2", 14L);
         expected.put("e1", 11L);
         expected.put("e3", 6L);
         expected.put("e4", 3L);
         assertEquals(expected, response);
+    }
+
+    /**
+     * Tests the similarities endpoint
+     */
+    @Test
+    public void testGetSimilarities_RoomByEntity() {
+        DateTimeFormatter dtf = DateTimeUtils.PARAMETER_WITH_DAY_DTF.withZone(dtZone);
+        String startTimeStr = dtf.print(mentionTime.minusDays(1));
+        String endTimeStr = dtf.print(mentionTime.plusDays(1));
+
+        LabeledDenseMatrix<String> ldm = underTest.getSimilarities(
+                startTimeStr, endTimeStr, SimilarityDimension.ROOM.getDimensionName(),
+                SimilarityDimension.ENTITY.getDimensionName());
+        assertEquals(4, ldm.getLabels().size());
+        assertEquals(4, ldm.getMatrix().length);
     }
 
     @After

@@ -4,6 +4,7 @@ import com.google.common.base.Preconditions;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
+import org.joda.time.Interval;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
@@ -53,6 +54,13 @@ public class DateTimeUtils {
 
         // convert to UTC since all the dates in the DB are stored with UTC
         return zoneAdjustedDtf.parseDateTime(dateTimeStr).toDateTime(DateTimeZone.UTC);
+    }
+
+    public static Interval getIntervalFromParameters(String startTimeStr, String endTimeStr,
+                                                     DateTimeZone dtZone) {
+        DateTime startTime = DateTimeUtils.getDateTimeFromParameter(startTimeStr, dtZone);
+        DateTime endTime = DateTimeUtils.getDateTimeFromParameter(endTimeStr, dtZone);
+        return new Interval(startTime, endTime);
     }
 
 }

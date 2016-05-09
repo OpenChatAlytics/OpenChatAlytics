@@ -11,7 +11,6 @@ import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.google.common.base.Optional;
 
-import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Interval;
 import org.slf4j.Logger;
@@ -48,11 +47,11 @@ public class EmojisResource {
     private static final Logger LOG = LoggerFactory.getLogger(EmojisResource.class);
 
     private final IEmojiDAO emojiDao;
-    private final DateTimeZone dtZone;
+    private final DateTimeZone dtz;
 
     public EmojisResource(ChatAlyticsConfig config) {
         emojiDao = ChatAlyticsDAOFactory.createEmojiDAO(config);
-        dtZone = DateTimeZone.forID(config.timeZone);
+        dtz = DateTimeZone.forID(config.timeZone);
     }
 
     @GET
@@ -72,9 +71,7 @@ public class EmojisResource {
         Optional<String> roomName = ResourceUtils.getOptionalForParameter(room);
         Optional<Integer> topN = ResourceUtils.getOptionalForParameterAsInt(topNStr);
 
-        DateTime startTime = DateTimeUtils.getDateTimeFromParameter(startTimeStr, dtZone);
-        DateTime endTime = DateTimeUtils.getDateTimeFromParameter(endTimeStr, dtZone);
-        Interval interval = new Interval(startTime, endTime);
+        Interval interval = DateTimeUtils.getIntervalFromParameters(startTimeStr, endTimeStr, dtz);
 
         return emojiDao.getTopEmojis(interval, roomName, username, topN.or(MAX_RESULTS));
     }
@@ -89,9 +86,7 @@ public class EmojisResource {
         Optional<String> username = ResourceUtils.getOptionalForParameter(user);
         Optional<String> roomName = ResourceUtils.getOptionalForParameter(room);
 
-        DateTime startTime = DateTimeUtils.getDateTimeFromParameter(startTimeStr, dtZone);
-        DateTime endTime = DateTimeUtils.getDateTimeFromParameter(endTimeStr, dtZone);
-        Interval interval = new Interval(startTime, endTime);
+        Interval interval = DateTimeUtils.getIntervalFromParameters(startTimeStr, endTimeStr, dtz);
 
         return emojiDao.getAllMentions(interval, roomName, username);
     }

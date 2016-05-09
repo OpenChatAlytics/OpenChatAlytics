@@ -2,8 +2,10 @@ package com.chatalytics.web.resources;
 
 import com.chatalytics.compute.db.dao.ChatAlyticsDAOFactory;
 import com.chatalytics.compute.db.dao.IEntityDAO;
+import com.chatalytics.compute.matrix.LabeledDenseMatrix;
 import com.chatalytics.core.config.ChatAlyticsConfig;
 import com.chatalytics.core.model.ChatEntity;
+import com.chatalytics.core.similarity.SimilarityDimension;
 import com.chatalytics.web.constant.WebConstants;
 import com.chatalytics.web.utils.DateTimeUtils;
 import com.chatalytics.web.utils.ResourceUtils;
@@ -42,16 +44,18 @@ public class EntitiesResource {
     public static final String USER_PARAM = "user";
     public static final String ROOM_PARAM = "room";
     public static final String TOP_N = "n";
+    public static final String FIRST_SIMILARITY_DIM_PARAM = "firstDim";
+    public static final String SECOND_SIMILARITY_DIM_PARAM = "secondDim";
 
     private static final int MAX_RESULTS = 10;
     private static final Logger LOG = LoggerFactory.getLogger(EntitiesResource.class);
 
     private final IEntityDAO entityDao;
-    private final DateTimeZone dtZone;
+    private final DateTimeZone dtz;
 
     public EntitiesResource(ChatAlyticsConfig config) {
         entityDao = ChatAlyticsDAOFactory.createEntityDAO(config);
-        dtZone = DateTimeZone.forID(config.timeZone);
+        dtz = DateTimeZone.forID(config.timeZone);
     }
 
     @GET
@@ -71,8 +75,8 @@ public class EntitiesResource {
         Optional<String> roomName = ResourceUtils.getOptionalForParameter(room);
         Optional<Integer> topN = ResourceUtils.getOptionalForParameterAsInt(topNStr);
 
-        DateTime startTime = DateTimeUtils.getDateTimeFromParameter(startTimeStr, dtZone);
-        DateTime endTime = DateTimeUtils.getDateTimeFromParameter(endTimeStr, dtZone);
+        DateTime startTime = DateTimeUtils.getDateTimeFromParameter(startTimeStr, dtz);
+        DateTime endTime = DateTimeUtils.getDateTimeFromParameter(endTimeStr, dtz);
         Interval interval = new Interval(startTime, endTime);
 
         return entityDao.getTopEntities(interval, roomName, username, topN.or(MAX_RESULTS));
@@ -91,10 +95,35 @@ public class EntitiesResource {
         Optional<String> username = ResourceUtils.getOptionalForParameter(user);
         Optional<String> roomName = ResourceUtils.getOptionalForParameter(room);
 
-        DateTime startTime = DateTimeUtils.getDateTimeFromParameter(startTimeStr, dtZone);
-        DateTime endTime = DateTimeUtils.getDateTimeFromParameter(endTimeStr, dtZone);
+        DateTime startTime = DateTimeUtils.getDateTimeFromParameter(startTimeStr, dtz);
+        DateTime endTime = DateTimeUtils.getDateTimeFromParameter(endTimeStr, dtz);
         Interval interval = new Interval(startTime, endTime);
 
         return entityDao.getAllMentions(interval, roomName, username);
+    }
+
+    @GET
+    @Path("similarities")
+    @Produces(MediaType.APPLICATION_JSON)
+    public LabeledDenseMatrix<String> getSimilarities(
+            @QueryParam(START_TIME_PARAM) String startTimeStr,
+            @QueryParam(END_TIME_PARAM) String endTimeStr,
+            @QueryParam(FIRST_SIMILARITY_DIM_PARAM) String firstDimStr,
+            @QueryParam(SECOND_SIMILARITY_DIM_PARAM) String secondDimStr) {
+
+        LOG.debug("Got a call for dimensions {} and {} with starttime={}, endtime={}",
+                  firstDimStr, secondDimStr, startTimeStr, endTimeStr);
+
+        SimilarityDimension firstDim = SimilarityDimension.fromDimensionName(firstDimStr);
+        SimilarityDimension secondDim = SimilarityDimension.fromDimensionName(secondDimStr);
+        Interval interval = DateTimeUtils.getIntervalFromParameters(startTimeStr, endTimeStr, dtz);
+
+        if (firstDim == SimilarityDimension.ROOM && secondDim == SimilarityDimension.ENTITY) {
+            return entityDao.getRoomSimilaritiesByEntity(interval);
+        } else {
+            String formatStr = "The dimension combination you specified (%s, %s) is not supported";
+            throw new UnsupportedOperationException(String.format(formatStr, firstDimStr,
+                                                                  secondDimStr));
+        }
     }
 }
