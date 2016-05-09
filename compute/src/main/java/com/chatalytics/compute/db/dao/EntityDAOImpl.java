@@ -1,5 +1,6 @@
 package com.chatalytics.compute.db.dao;
 
+import com.chatalytics.compute.matrix.LabeledDenseMatrix;
 import com.chatalytics.core.model.ChatEntity;
 import com.google.common.base.Optional;
 import com.google.common.util.concurrent.AbstractIdleService;
@@ -86,6 +87,14 @@ public class EntityDAOImpl extends AbstractIdleService implements IEntityDAO {
         return occurrenceStatsDAO.getTopValuesOfType(interval, roomName, username, resultSize);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public LabeledDenseMatrix<String> getRoomSimilaritiesByEntity(Interval interval) {
+        return occurrenceStatsDAO.getRoomSimilaritiesByValue(interval);
+    }
+
     @Override
     protected void startUp() throws Exception {
     }
@@ -97,4 +106,5 @@ public class EntityDAOImpl extends AbstractIdleService implements IEntityDAO {
     protected void shutDown() throws Exception {
         occurrenceStatsDAO.close();
     }
+
 }
