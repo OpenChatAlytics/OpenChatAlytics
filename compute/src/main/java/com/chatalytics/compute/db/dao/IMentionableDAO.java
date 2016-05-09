@@ -2,7 +2,7 @@ package com.chatalytics.compute.db.dao;
 
 import com.chatalytics.compute.matrix.GraphPartition;
 import com.chatalytics.compute.matrix.LabeledDenseMatrix;
-import com.chatalytics.compute.matrix.LabeledMatrix;
+import com.chatalytics.compute.matrix.LabeledMTJMatrix;
 import com.chatalytics.core.model.IMentionable;
 import com.google.common.base.Optional;
 
@@ -119,7 +119,7 @@ public interface IMentionableDAO<K extends Serializable, T extends IMentionable<
     /**
      * Given a time interval this method will return a labeled room by room matrix with all the
      * similar rooms clustered together. For more information see
-     * {@link GraphPartition#getSimilarityMatrix(LabeledMatrix)}
+     * {@link GraphPartition#getSimilarityMatrix(LabeledMTJMatrix)}
      *
      * @param interval
      *            The interval to search in
@@ -130,7 +130,7 @@ public interface IMentionableDAO<K extends Serializable, T extends IMentionable<
     /**
      * Given a time interval this method will return a labeled user by user matrix with all the
      * similar users clustered together. For more information see
-     * {@link GraphPartition#getSimilarityMatrix(LabeledMatrix)}
+     * {@link GraphPartition#getSimilarityMatrix(LabeledMTJMatrix)}
      *
      * @param interval
      *            The interval to search in

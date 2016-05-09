@@ -18,7 +18,7 @@ import java.util.List;
  * @param <L>
  *            The type of the labels
  */
-public class LabeledDenseMatrix<L extends Serializable> {
+public class LabeledDenseMatrix<L extends Serializable> implements LabeledMatrix<double[][], L> {
 
     private static LabeledDenseMatrix<Serializable> EMPTY = new LabeledDenseMatrix<>();
 
@@ -38,10 +38,12 @@ public class LabeledDenseMatrix<L extends Serializable> {
         this.labels = labels;
     }
 
+    @Override
     public double[][] getMatrix() {
         return M;
     }
 
+    @Override
     public List<L> getLabels() {
         return labels;
     }
@@ -70,7 +72,7 @@ public class LabeledDenseMatrix<L extends Serializable> {
      *            The matrix labels
      * @return A newly constructed {@link LabeledDenseMatrix}
      */
-    public static <T extends Serializable> LabeledDenseMatrix<T> of(LabeledMatrix<T> matrix) {
+    public static <T extends Serializable> LabeledDenseMatrix<T> of(LabeledMTJMatrix<T> matrix) {
         return of(matrix.getMatrix(), matrix.getLabels());
     }
 

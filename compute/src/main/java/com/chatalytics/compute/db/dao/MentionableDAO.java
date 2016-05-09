@@ -2,7 +2,7 @@ package com.chatalytics.compute.db.dao;
 
 import com.chatalytics.compute.matrix.GraphPartition;
 import com.chatalytics.compute.matrix.LabeledDenseMatrix;
-import com.chatalytics.compute.matrix.LabeledMatrix;
+import com.chatalytics.compute.matrix.LabeledMTJMatrix;
 import com.chatalytics.core.model.IMentionable;
 import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
@@ -174,9 +174,9 @@ public class MentionableDAO<K extends Serializable, T extends IMentionable<K>>
             return LabeledDenseMatrix.of();
         }
 
-        LabeledMatrix<X> M = GraphPartition.getMentionMatrix(mentions,
-                                                             funcX,
-                                                             mention -> mention.getValue());
+        LabeledMTJMatrix<X> M = GraphPartition.getMentionMatrix(mentions,
+                                                                funcX,
+                                                                mention -> mention.getValue());
 
         return GraphPartition.getSimilarityMatrix(M);
     }

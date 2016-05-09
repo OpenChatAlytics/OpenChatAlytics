@@ -36,7 +36,7 @@ public class GraphPartitionTest {
         mentions.add(new EmojiEntity("c", 1, DateTime.now(), "u1", "r2"));
         mentions.add(new EmojiEntity("c", 1, DateTime.now(), "u1", "r3"));
 
-        LabeledMatrix<String> result =
+        LabeledMTJMatrix<String> result =
                 GraphPartition.getMentionMatrix(mentions,
                                                 mention -> mention.getRoomName(),
                                                 mention -> mention.getValue());
@@ -70,7 +70,7 @@ public class GraphPartitionTest {
             labels.add("L" + i);
         }
 
-        LabeledMatrix<String> M_l = LabeledMatrix.of(M, labels);
+        LabeledMTJMatrix<String> M_l = LabeledMTJMatrix.of(M, labels);
         LabeledDenseMatrix<String> R = GraphPartition.getSimilarityMatrix(M_l);
         assertEquals(10, R.getMatrix().length);
         assertEquals(10, R.getMatrix()[0].length);

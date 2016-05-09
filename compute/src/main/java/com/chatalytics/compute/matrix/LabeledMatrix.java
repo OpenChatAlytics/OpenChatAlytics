@@ -1,51 +1,33 @@
 package com.chatalytics.compute.matrix;
 
-import org.apache.storm.shade.com.google.common.base.Preconditions;
-
-import no.uib.cipr.matrix.Matrix;
-
 import java.io.Serializable;
 import java.util.List;
 
 /**
- * A matrix that stores its elements by holding a reference to a passed in {@link Matrix}
+ *
+ * A matrix that's labeled
  *
  * @author giannis
  *
+ * @param <T>
+ *            The type of the matrix
  * @param <L>
  *            The type of the labels
  */
-public class LabeledMatrix<L extends Serializable> {
-
-    private final Matrix M;
-    private final List<L> labels;
-
-    public LabeledMatrix(Matrix M, List<L> labels) {
-        Preconditions.checkArgument(M.numRows() == labels.size()
-                                        || M.numRows() + M.numColumns() == labels.size(),
-                                    "The length of the labels is incorrect");
-        this.M = M;
-        this.labels = labels;
-    }
-
-    public Matrix getMatrix() {
-        return M;
-    }
-
-    public List<L> getLabels() {
-        return labels;
-    }
+public interface LabeledMatrix<T, L extends Serializable> {
 
     /**
-     * Returns a new {@link LabeledMatrix}
+     * Gets the list of labels
      *
-     * @param M
-     *            The Matrix. This matrix will not be copied or converted to an array representation
-     * @param labels
-     *            The matrix labels
-     * @return A newly constructed {@link LabeledMatrix}
+     * @return The list of labels
      */
-    public static <L extends Serializable> LabeledMatrix<L> of(Matrix M, List<L> labels) {
-        return new LabeledMatrix<>(M, labels);
-    }
+    List<L> getLabels();
+
+    /**
+     * Gets the matrix
+     *
+     * @return The matrix
+     */
+    T getMatrix();
+
 }

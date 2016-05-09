@@ -65,9 +65,10 @@ public class GraphPartition {
      */
     public static <T extends IMentionable<? extends Serializable>,
                    X extends Serializable,
-                   Y extends Serializable> LabeledMatrix<X> getMentionMatrix(List<T> data,
-                                                                             Function<T, X> funcX,
-                                                                             Function<T, Y> funcY) {
+                   Y extends Serializable> LabeledMTJMatrix<X>
+                           getMentionMatrix(List<T> data,
+                                            Function<T, X> funcX,
+                                            Function<T, Y> funcY) {
         // row
         List<Y> dimYOrd = data.stream()
                               .map(funcY)
@@ -106,7 +107,7 @@ public class GraphPartition {
             labels[entry.getValue()] = entry.getKey();
         }
 
-        return LabeledMatrix.of(A, Lists.newArrayList(labels));
+        return LabeledMTJMatrix.of(A, Lists.newArrayList(labels));
     }
 
     /**
@@ -121,7 +122,7 @@ public class GraphPartition {
      *         closely
      */
     public static <L extends Serializable> LabeledDenseMatrix<L> getSimilarityMatrix(
-            LabeledMatrix<L> labeledMatrix) {
+            LabeledMTJMatrix<L> labeledMatrix) {
         Matrix A = labeledMatrix.getMatrix();
         // Build diagonal matrix (D)
         SparseVector V = new SparseVector(A.numColumns());
