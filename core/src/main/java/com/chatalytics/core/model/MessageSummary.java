@@ -1,5 +1,7 @@
 package com.chatalytics.core.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import org.joda.time.DateTime;
 
 import lombok.AllArgsConstructor;
@@ -28,6 +30,7 @@ public class MessageSummary implements IMentionable<Integer> {
     private final int occurrences = 1;
 
     @Override
+    @JsonIgnore
     public Integer getValue() {
         return occurrences;
     }
