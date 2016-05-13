@@ -78,7 +78,7 @@ public class EntityExtractionBolt extends ChatAlyticsBaseBolt {
 
     @Override
     public void execute(Tuple input) {
-        LOG.info("Got tuple: {}", input);
+        LOG.debug("Got tuple: {}", input);
         FatMessage fatMessage = (FatMessage) input.getValue(0);
 
         List<ChatEntity> entities = extractEntities(fatMessage);

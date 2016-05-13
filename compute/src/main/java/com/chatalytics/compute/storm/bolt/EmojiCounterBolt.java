@@ -42,7 +42,7 @@ public class EmojiCounterBolt extends ChatAlyticsBaseBolt {
 
     @Override
     public void execute(Tuple input) {
-        LOG.info("Got tuple: {}", input);
+        LOG.debug("Got tuple: {}", input);
         FatMessage fatMessage = (FatMessage) input.getValue(0);
 
         List<EmojiEntity> emojis = getEmojisFromMessage(fatMessage);
