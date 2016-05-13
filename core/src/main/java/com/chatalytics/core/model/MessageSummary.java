@@ -1,7 +1,5 @@
 package com.chatalytics.core.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import org.joda.time.DateTime;
 
 import lombok.AllArgsConstructor;
@@ -24,14 +22,18 @@ public class MessageSummary implements IMentionable<Integer> {
     private final String username;
     private final String roomName;
     private final DateTime mentionTime;
+
     /**
      * Occurrences will always be 1. This field is here to make JSON serialization easier
      */
-    private final int occurrences = 1;
+    private final int occurrences;
+    private final Integer value;
 
-    @Override
-    @JsonIgnore
-    public Integer getValue() {
-        return occurrences;
+    public MessageSummary(String username, String roomName, DateTime mentionTime) {
+        this.username = username;
+        this.roomName = roomName;
+        this.mentionTime = mentionTime;
+        this.occurrences = 1;
+        this.value = occurrences;
     }
 }
