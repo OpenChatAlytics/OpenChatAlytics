@@ -10,12 +10,14 @@ import com.chatalytics.core.config.BackfillerConfig;
 import com.chatalytics.core.config.ChatAlyticsConfig;
 import com.chatalytics.core.model.FatMessage;
 import com.chatalytics.core.model.Message;
+import com.chatalytics.core.model.MessageType;
 import com.chatalytics.core.model.Room;
 import com.chatalytics.core.model.User;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Optional;
 
 import org.apache.storm.shade.com.google.common.base.Preconditions;
+import org.apache.storm.shade.com.google.common.collect.Sets;
 import org.apache.storm.spout.SpoutOutputCollector;
 import org.apache.storm.task.TopologyContext;
 import org.apache.storm.topology.OutputFieldsDeclarer;
@@ -30,6 +32,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Spout to be used for batching and/or back filling. Look at {@link BackfillerConfig} for
@@ -44,7 +47,6 @@ public class SlackBackfillSpout extends BaseRichSpout {
 
     public static final String SPOUT_ID = "SLACK_BACKFILL_MESSAGE_SPOUT_ID";
     public static final String BACKFILL_SLACK_MESSAGE_FIELD_STR = "slack-message";
-    private static final int MAX_BACKFILL_DAYS = 7;
 
     private IChatApiDAO slackDao;
     private DateTime initDate;
@@ -109,10 +111,12 @@ public class SlackBackfillSpout extends BaseRichSpout {
         Map<String, User> users = slackDao.getUsers();
         // get all the rooms and for each room get the messages
         Map<String, Room> rooms = slackDao.getRooms();
+        Set<String> skippedRoomNames = Sets.newHashSet();
+        int skippedUnknownMessages = 0;
         for (Room room : rooms.values()) {
-
             if (room.isArchived()) {
-                LOG.info("Skipping archived room {}", room.getName());
+                LOG.debug("Skipping archived room {}", room.getName());
+                skippedRoomNames.add(room.getName());
                 continue;
             }
 
@@ -121,6 +125,15 @@ public class SlackBackfillSpout extends BaseRichSpout {
                                                           room);
             for (Message message : messages) {
                 User user = users.get(message.getFromUserId());
+                if (message.getType() == MessageType.UNKNOWN) {
+                    LOG.debug("Skipping unkown message type. {}", message);
+                    skippedUnknownMessages++;
+                    continue;
+                } else if  (user == null && message.getType() == MessageType.BOT_MESSAGE) {
+                    user = new User(message.getFromUserId(), null, false, false, true,
+                                    message.getFromName(), message.getFromName(), null,
+                                    DateTime.now(), null, null, null, null, null);
+                }
                 if (user == null) {
                     LOG.warn("Can't find user with userId: {}. Skipping", message.getFromUserId());
                     continue;
@@ -129,7 +142,8 @@ public class SlackBackfillSpout extends BaseRichSpout {
                 collector.emit(new Values(fatMessage));
             }
         }
-        LOG.info("Finished backfilling...");
+        LOG.info("Finished backfilling. Skipped {} unknown msgs. Skipped {} rooms. They were: {}",
+                 skippedUnknownMessages, rooms.size(), rooms);
         dbDao.setLastMessagePullTime(runInterval.getEnd());
     }
 
@@ -154,11 +168,6 @@ public class SlackBackfillSpout extends BaseRichSpout {
         }
 
         Interval runInterval = new Interval(startDate, endDate);
-        if (runInterval.toDuration().getStandardDays() > MAX_BACKFILL_DAYS) {
-            startDate = endDate.minusDays(MAX_BACKFILL_DAYS);
-            runInterval = new Interval(startDate, endDate);
-        }
-
         return Optional.of(runInterval);
     }
 

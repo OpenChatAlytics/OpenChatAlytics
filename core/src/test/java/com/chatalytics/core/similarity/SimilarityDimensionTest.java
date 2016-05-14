@@ -13,17 +13,23 @@ public class SimilarityDimensionTest {
 
     @Test
     public void testFromDimensionName() {
-        SimilarityDimension simDim = SimilarityDimension.fromDimensionName("user");
+        String dimName = "user";
+        SimilarityDimension simDim = SimilarityDimension.fromDimensionName(dimName);
         assertEquals(SimilarityDimension.USER, simDim);
-        assertEquals("user", simDim.getDimensionName());
+        assertEquals(dimName, simDim.getDimensionName());
+        assertEquals(dimName, simDim.toString());
 
-        simDim = SimilarityDimension.fromDimensionName("entity");
+        dimName = "entity";
+        simDim = SimilarityDimension.fromDimensionName(dimName);
         assertEquals(SimilarityDimension.ENTITY, simDim);
-        assertEquals("entity", simDim.getDimensionName());
+        assertEquals(dimName, simDim.getDimensionName());
+        assertEquals(dimName, simDim.toString());
 
-        simDim = SimilarityDimension.fromDimensionName("room");
+        dimName = "room";
+        simDim = SimilarityDimension.fromDimensionName(dimName);
         assertEquals(SimilarityDimension.ROOM, simDim);
-        assertEquals("room", simDim.getDimensionName());
+        assertEquals(dimName, simDim.getDimensionName());
+        assertEquals(dimName, simDim.toString());
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -31,4 +37,8 @@ public class SimilarityDimensionTest {
         SimilarityDimension.fromDimensionName("bad name");
     }
 
+    @Test(expected = NullPointerException.class)
+    public void testFromDimensionName_withNullArg() {
+        SimilarityDimension.fromDimensionName(null);
+    }
 }

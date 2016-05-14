@@ -18,8 +18,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
+import javax.persistence.EntityExistsException;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.EntityTransaction;
 import javax.persistence.PersistenceException;
 import javax.persistence.Tuple;
 import javax.persistence.TypedQuery;
@@ -47,12 +49,12 @@ public class MentionableDAO<K extends Serializable, T extends IMentionable<K>>
     private static final Logger LOG = LoggerFactory.getLogger(MentionableDAO.class);
     private static final String TYPE_COLUMN_NAME = "value";
 
-    private final EntityManager entityManager;
     private final Class<T> type;
+    private final EntityManagerFactory entityManagerFactory;
 
     protected MentionableDAO(EntityManagerFactory entityManagerFactory, Class<T> type) {
-        this.entityManager = entityManagerFactory.createEntityManager();
         this.type = type;
+        this.entityManagerFactory = entityManagerFactory;
     }
 
     /**
@@ -60,16 +62,23 @@ public class MentionableDAO<K extends Serializable, T extends IMentionable<K>>
      */
     @Override
     public void persistValue(T value) {
-        entityManager.getTransaction().begin();
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
+        EntityTransaction transaction = entityManager.getTransaction();
+        transaction.begin();
         try {
             entityManager.persist(value);
-            entityManager.getTransaction().commit();
+            transaction.commit();
+        } catch (EntityExistsException e) {
+            LOG.error("Entity already exists. Ignoring... {}. {}", value, e.getMessage());
         } catch (PersistenceException e) {
             LOG.error("Cannot store {}. {}", value, e.getMessage());
-            if (entityManager.getTransaction().isActive()) {
-                entityManager.getTransaction().rollback();
-            }
         }
+
+        if (transaction.isActive() && transaction.getRollbackOnly()) {
+            transaction.rollback();
+        }
+
+        closeEntityManager(entityManager);
     }
 
     /**
@@ -77,7 +86,13 @@ public class MentionableDAO<K extends Serializable, T extends IMentionable<K>>
      */
     @Override
     public T getValue(T value) {
-        return entityManager.find(type, value);
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
+        try {
+            T result = entityManager.find(type, value);
+            return result;
+        } finally {
+            closeEntityManager(entityManager);
+        }
     }
 
     /**
@@ -102,6 +117,7 @@ public class MentionableDAO<K extends Serializable, T extends IMentionable<K>>
                                                   Interval interval,
                                                   Optional<String> roomName,
                                                   Optional<String> username) {
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
 
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<T> query = cb.createQuery(type);
@@ -134,7 +150,7 @@ public class MentionableDAO<K extends Serializable, T extends IMentionable<K>>
 
         query.where(wherePredicates.toArray(new Predicate[wherePredicates.size()]));
 
-        TypedQuery<T> finalQuery = entityManager.createQuery(query)
+        TypedQuery<T> finalQuery = entityManagerFactory.createEntityManager().createQuery(query)
                                                 .setParameter(startDateParam, interval.getStart())
                                                 .setParameter(endDateParam, interval.getEnd());
         if (roomName.isPresent()) {
@@ -147,7 +163,11 @@ public class MentionableDAO<K extends Serializable, T extends IMentionable<K>>
             finalQuery.setParameter(valueParam, value.get());
 
         }
-        return finalQuery.getResultList();
+        List<T> result = finalQuery.getResultList();
+
+        closeEntityManager(entityManager);
+
+        return result;
     }
 
     /**
@@ -186,6 +206,8 @@ public class MentionableDAO<K extends Serializable, T extends IMentionable<K>>
     @Override
     public int getTotalMentionsForType(K value, Interval interval, Optional<String> roomName,
                                        Optional<String> username) {
+
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
 
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Integer> query = cb.createQuery(Integer.class);
@@ -231,6 +253,8 @@ public class MentionableDAO<K extends Serializable, T extends IMentionable<K>>
 
         List<Integer> result = finalQuery.getResultList();
 
+        closeEntityManager(entityManager);
+
         if (result == null || result.isEmpty() || result.get(0) == null) {
             return 0;
         } else {
@@ -246,6 +270,8 @@ public class MentionableDAO<K extends Serializable, T extends IMentionable<K>>
                                            Optional<String> roomName,
                                            Optional<String> username,
                                            int resultSize) {
+
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
 
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Tuple> query = cb.createTupleQuery();
@@ -281,7 +307,7 @@ public class MentionableDAO<K extends Serializable, T extends IMentionable<K>>
         query.multiselect(typeValueAlias, occurrencesSumAlias);
         query.groupBy(typeValuePath);
         query.orderBy(cb.desc(occurrencesSum));
-        TypedQuery<Tuple> finalQuery = entityManager.createQuery(query)
+        TypedQuery<Tuple> finalQuery = entityManagerFactory.createEntityManager().createQuery(query)
                                                     .setMaxResults(resultSize)
                                                     .setParameter(startDateParam,
                                                                   interval.getStart())
@@ -293,6 +319,9 @@ public class MentionableDAO<K extends Serializable, T extends IMentionable<K>>
             finalQuery.setParameter(usernameParam, username.get());
         }
         List<Tuple> resultList = finalQuery.getResultList();
+
+        closeEntityManager(entityManager);
+
         // linked hashmap to preserve order
         Map<K, Long> result = Maps.newLinkedHashMap();
         for (Tuple tuple : resultList) {
@@ -309,12 +338,21 @@ public class MentionableDAO<K extends Serializable, T extends IMentionable<K>>
         return type;
     }
 
+    @Override
+    public void close() { }
+
     /**
      * Closes the entity manager
      */
-    @Override
-    public void close() {
-        entityManager.close();
+    private void closeEntityManager(EntityManager entityManager) {
+        try {
+            if (entityManager.isOpen() && entityManager.isJoinedToTransaction()) {
+                entityManager.flush();
+                entityManager.close();
+            }
+        } catch (RuntimeException e) {
+            LOG.warn("Couldn't close entity manager. Reason: {}", e.getMessage());
+        }
     }
 
 }

@@ -9,6 +9,7 @@ import com.chatalytics.core.model.Room;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Maps;
 
+import org.apache.storm.shade.com.google.common.collect.ImmutableList;
 import org.apache.storm.shade.com.google.common.collect.Lists;
 import org.apache.storm.task.OutputCollector;
 import org.apache.storm.task.TopologyContext;
@@ -56,6 +57,11 @@ public class EmojiCounterBolt extends ChatAlyticsBaseBolt {
     @VisibleForTesting
     protected List<EmojiEntity> getEmojisFromMessage(FatMessage fatMessage) {
         String message = fatMessage.getMessage().getMessage();
+
+        if (message == null) {
+            return ImmutableList.of();
+        }
+
         Map<String, EmojiEntity> emojis = Maps.newHashMap();
 
         OfInt charIterator = message.chars().iterator();
@@ -118,6 +124,12 @@ public class EmojiCounterBolt extends ChatAlyticsBaseBolt {
     @Override
     public void declareOutputFields(OutputFieldsDeclarer fields) {
         fields.declare(new Fields(EMOJI_ENTITY_FIELD_STR));
+    }
+
+    @Override
+    public void cleanup() {
+        LOG.debug("Cleaning up {}", this.getClass().getSimpleName());
+        emojiDao.stopAsync().awaitTerminated();
     }
 
 }

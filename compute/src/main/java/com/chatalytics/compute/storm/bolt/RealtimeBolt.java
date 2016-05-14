@@ -112,4 +112,14 @@ public class RealtimeBolt extends ChatAlyticsBaseBolt {
     public void declareOutputFields(OutputFieldsDeclarer fields) {
         // no output
     }
+
+    @Override
+    public void cleanup() {
+        LOG.debug("Cleaning up {}", this.getClass().getSimpleName());
+        try {
+            session.close();
+        } catch (IOException e) {
+            LOG.warn("Unable to close session. Reason: {}", e.getMessage());
+        }
+    }
 }

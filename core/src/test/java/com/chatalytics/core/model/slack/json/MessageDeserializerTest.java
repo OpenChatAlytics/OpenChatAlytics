@@ -44,7 +44,7 @@ public class MessageDeserializerTest {
     @Test
     public void testDeserialize_WithBotMessage() throws Exception {
         Message msg = objMapper.readValue(messageBotJsonStr, Message.class);
-        assertEquals("bot", msg.getFromUserId());
+        assertEquals("B0N8R69KR", msg.getFromUserId());
         assertEquals("a bot message", msg.getMessage());
         // the deserializer drops the nanoseconds
         assertEquals(new DateTime(1431719027010L), msg.getDate());

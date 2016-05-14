@@ -40,9 +40,9 @@ public class UserDeserializer extends JsonChatDeserializer<User> {
         String timezone = node.get("timezone").asText();
         String title = node.get("title").asText();
 
-        return new User(String.valueOf(userId), email, deleted, groupAdmin, name, mentionName,
-                        photoUrl, lastActiveDate, creationDate, status, statusMessage, timezone,
-                        title);
+        return new User(String.valueOf(userId), email, deleted, groupAdmin, false, name,
+                        mentionName, photoUrl, lastActiveDate, creationDate, status, statusMessage,
+                        timezone, title);
     }
 
 }

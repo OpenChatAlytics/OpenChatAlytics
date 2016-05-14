@@ -4,6 +4,7 @@ import com.google.common.base.MoreObjects;
 
 import org.joda.time.DateTime;
 
+import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
@@ -15,6 +16,7 @@ import java.io.Serializable;
  * @author giannis
  *
  */
+@AllArgsConstructor
 @EqualsAndHashCode
 @Getter
 public class Message implements Serializable {
@@ -24,27 +26,20 @@ public class Message implements Serializable {
     private final String fromUserId;
     private final String message;
     private final String roomId;
+    private final MessageType type;
 
     private static final long serialVersionUID = -4370348419961560257L;
-
-    public Message(DateTime date, String fromName, String fromUserId, String message,
-                   String roomId) {
-        this.date = date;
-        this.fromName = fromName;
-        this.fromUserId = fromUserId;
-        this.message = message;
-        this.roomId = roomId;
-    }
 
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this.getClass())
-            .add("date", date)
-            .add("fromName", fromName)
-            .add("fromUserId", fromUserId)
-            .add("message", message)
-            .add("roomId", roomId)
-            .toString();
+                          .add("date", date)
+                          .add("fromName", fromName)
+                          .add("fromUserId", fromUserId)
+                          .add("message", message)
+                          .add("roomId", roomId)
+                          .add("type", type)
+                          .toString();
     }
 
 }

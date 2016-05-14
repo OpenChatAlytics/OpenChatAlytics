@@ -4,6 +4,7 @@ import com.chatalytics.compute.config.ConfigurationConstants;
 import com.chatalytics.core.model.ChatEntity;
 import com.chatalytics.core.model.FatMessage;
 import com.chatalytics.core.model.Message;
+import com.chatalytics.core.model.MessageType;
 import com.chatalytics.core.model.Room;
 import com.chatalytics.core.model.User;
 import com.google.common.collect.Maps;
@@ -57,7 +58,7 @@ public class EntityExtractionBoltTest {
         String ent2 = "Mount Everest";
         Message msg = new Message(date, mentionName, userId,
                                   String.format("Today, %s is going to climb %s", ent1, ent2),
-                                  roomId);
+                                  roomId, MessageType.MESSAGE);
         User mockUser = mock(User.class);
         when(mockUser.getMentionName()).thenReturn("jane");
         Room mockRoom = mock(Room.class);

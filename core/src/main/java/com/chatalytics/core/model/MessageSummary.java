@@ -22,6 +22,7 @@ public class MessageSummary implements IMentionable<Integer> {
     private final String username;
     private final String roomName;
     private final DateTime mentionTime;
+    private final MessageType type;
 
     /**
      * Occurrences will always be 1. This field is here to make JSON serialization easier
@@ -29,10 +30,12 @@ public class MessageSummary implements IMentionable<Integer> {
     private final int occurrences;
     private final Integer value;
 
-    public MessageSummary(String username, String roomName, DateTime mentionTime) {
+    public MessageSummary(String username, String roomName, DateTime mentionTime,
+                          MessageType type) {
         this.username = username;
         this.roomName = roomName;
         this.mentionTime = mentionTime;
+        this.type = type;
         this.occurrences = 1;
         this.value = occurrences;
     }

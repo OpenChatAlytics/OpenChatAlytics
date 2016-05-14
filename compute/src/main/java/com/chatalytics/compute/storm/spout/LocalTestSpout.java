@@ -7,6 +7,7 @@ import com.chatalytics.core.config.ChatAlyticsConfig;
 import com.chatalytics.core.config.LocalTestConfig;
 import com.chatalytics.core.model.FatMessage;
 import com.chatalytics.core.model.Message;
+import com.chatalytics.core.model.MessageType;
 import com.chatalytics.core.model.Room;
 import com.chatalytics.core.model.User;
 import com.google.common.collect.Lists;
@@ -61,7 +62,8 @@ public class LocalTestSpout extends BaseRichSpout {
         String messageStr = sentences.get(rand.nextInt(sentences.size()));
 
         Message message = new Message(DateTime.now(dtZone), fromUser.getName(),
-                                      fromUser.getUserId(), messageStr, room.getRoomId());
+                                      fromUser.getUserId(), messageStr, room.getRoomId(),
+                                      MessageType.MESSAGE);
 
         FatMessage fatMessage = new FatMessage(message, fromUser, room);
 
@@ -132,7 +134,7 @@ public class LocalTestSpout extends BaseRichSpout {
             String name = String.format("name-%s", namePostfix);
             String mentionName = RandomStringUtils.generateRandomAlphaNumericString(6, rand);
 
-            User randomUser = new User(userId, email, false, false, name, mentionName, null,
+            User randomUser = new User(userId, email, false, false, false, name, mentionName, null,
                                        DateTime.now(DateTimeZone.UTC),
                                        DateTime.now(DateTimeZone.UTC), null, null, "UTC", null);
 

@@ -38,8 +38,8 @@ public class UserDeserializer extends JsonChatDeserializer<User> {
         String email = getAsTextOrNull(profileNode.get("email"));
         String photoUrl = profileNode.get("image_32").asText();
 
-        return new User(userId, email, deleted, groupAdmin, name, mentionName, photoUrl, null,
-                        null, null, statusMessage, timezone, title);
+        return new User(userId, email, deleted, groupAdmin, false, name, mentionName, photoUrl,
+                        null, null, null, statusMessage, timezone, title);
     }
 
 }

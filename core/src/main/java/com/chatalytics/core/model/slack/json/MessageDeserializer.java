@@ -1,6 +1,7 @@
 package com.chatalytics.core.model.slack.json;
 
 import com.chatalytics.core.model.Message;
+import com.chatalytics.core.model.MessageType;
 import com.chatalytics.core.model.json.JsonChatDeserializer;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -35,21 +36,24 @@ public class MessageDeserializer extends JsonChatDeserializer<Message> {
         long timeInMillis = seconds * 1000 + nanos / 1000;
         DateTime date = new DateTime(timeInMillis);
 
-        JsonNode subtype = node.get("subtype");
-        if (subtype != null) {
-            if ("message_changed".equals(subtype.asText())) {
-                node = node.get("message");
-            } else if ("bot_message".equals(subtype.asText())) {
-                JsonNode attachmentNode = node.get("attachments");
-                if (attachmentNode != null) {
-                    node = attachmentNode;
-                }
+        MessageType messageType = getMessageType(node);
+        JsonNode fromUserIdNode = null;
+        if (messageType == MessageType.MESSAGE_CHANGED) {
+            node = node.get("message");
+        } else if (messageType == MessageType.BOT_MESSAGE) {
+            fromUserIdNode = node.get("bot_id");
+
+            JsonNode attachmentNode = node.get("attachments");
+            if (attachmentNode != null) {
+                node = attachmentNode;
             }
         }
 
         String fromName = getAsTextOrNull(node.get("username"));
 
-        JsonNode fromUserIdNode = node.get("user");
+        if (messageType != MessageType.BOT_MESSAGE) {
+            fromUserIdNode = node.get("user");
+        }
         String fromUserId;
         if (fromUserIdNode == null) {
             fromUserId = fromName;
@@ -67,7 +71,39 @@ public class MessageDeserializer extends JsonChatDeserializer<Message> {
             throw new RuntimeException(node.toString(), e);
         }
 
-        return new Message(date, fromName, fromUserId, message, channelId);
+        return new Message(date, fromName, fromUserId, message, channelId, messageType);
+    }
+
+    /**
+     * Tries to identify the {@link MessageType} by starting from subtype and moving to type. If it
+     * can't be identified it returns {@link MessageType#UNKNOWN}.
+     *
+     * @param node
+     *            The node which may contain type and/or subtype
+     * @return A {@link MessageType}
+     */
+    private MessageType getMessageType(JsonNode node) {
+
+        String type = getAsTextOrNull(node.get("type"));
+        String subtype = getAsTextOrNull(node.get("subtype"));
+
+        if (subtype != null) {
+
+            try {
+                return MessageType.fromType(subtype);
+            } catch (IllegalArgumentException e) {
+                if (type != null) {
+                    return MessageType.fromTypeOrUnknown(type);
+                }
+            }
+
+            return MessageType.UNKNOWN;
+
+        } else if (type != null) {
+            return MessageType.fromTypeOrUnknown(type);
+        } else {
+            return MessageType.UNKNOWN;
+        }
     }
 
 }
