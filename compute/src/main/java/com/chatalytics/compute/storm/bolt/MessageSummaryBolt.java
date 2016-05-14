@@ -3,6 +3,7 @@ package com.chatalytics.compute.storm.bolt;
 import com.chatalytics.core.config.ChatAlyticsConfig;
 import com.chatalytics.core.model.FatMessage;
 import com.chatalytics.core.model.MessageSummary;
+import com.chatalytics.core.model.MessageType;
 
 import org.apache.storm.task.OutputCollector;
 import org.apache.storm.task.TopologyContext;
@@ -46,7 +47,8 @@ public class MessageSummaryBolt extends ChatAlyticsBaseBolt {
             roomName = fatMessage.getRoom().getName();
         }
         DateTime messageDate = fatMessage.getMessage().getDate();
-        MessageSummary chatSummary = new MessageSummary(username, roomName, messageDate);
+        MessageType type = fatMessage.getMessage().getType();
+        MessageSummary chatSummary = new MessageSummary(username, roomName, messageDate, type);
         collector.emit(new Values(chatSummary));
     }
 

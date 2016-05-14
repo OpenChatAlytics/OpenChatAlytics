@@ -8,6 +8,7 @@ import com.chatalytics.compute.util.YamlUtils;
 import com.chatalytics.core.config.ChatAlyticsConfig;
 import com.chatalytics.core.model.FatMessage;
 import com.chatalytics.core.model.Message;
+import com.chatalytics.core.model.MessageType;
 import com.chatalytics.core.model.Room;
 import com.chatalytics.core.model.User;
 import com.google.common.annotations.VisibleForTesting;
@@ -20,6 +21,7 @@ import org.apache.storm.topology.base.BaseRichSpout;
 import org.apache.storm.tuple.Fields;
 import org.apache.storm.tuple.Values;
 import org.glassfish.tyrus.container.jdk.client.JdkContainerProvider;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -141,6 +143,11 @@ public class SlackMessageSpout extends BaseRichSpout {
         Map<String, Room> rooms = slackDao.getRooms();
 
         User fromUser = users.get(message.getFromUserId());
+        if (fromUser == null && message.getType() == MessageType.BOT_MESSAGE) {
+            fromUser = new User(message.getFromUserId(), null, false, false, true,
+                                message.getFromName(), message.getFromName(), null, DateTime.now(),
+                                null, null, null, null, null);
+        }
         Room room = rooms.get(message.getRoomId());
 
         FatMessage fatMessage = new FatMessage(message, fromUser, room);

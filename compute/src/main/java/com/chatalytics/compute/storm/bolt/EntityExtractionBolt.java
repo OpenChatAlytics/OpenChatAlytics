@@ -12,6 +12,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.io.Resources;
 
+import org.apache.storm.shade.com.google.common.collect.ImmutableList;
 import org.apache.storm.task.OutputCollector;
 import org.apache.storm.task.TopologyContext;
 import org.apache.storm.topology.OutputFieldsDeclarer;
@@ -102,6 +103,10 @@ public class EntityExtractionBolt extends ChatAlyticsBaseBolt {
         Message message = fatMessage.getMessage();
         String messageStr = message.getMessage();
 
+        if (messageStr == null) {
+            return ImmutableList.of();
+        }
+
         List<Triple<String,Integer,Integer>> classification =
                 classifier.classifyToCharacterOffsets(messageStr);
         Map<String, ChatEntity> entities = Maps.newHashMapWithExpectedSize(classification.size());
@@ -145,6 +150,7 @@ public class EntityExtractionBolt extends ChatAlyticsBaseBolt {
 
     @Override
     public void cleanup() {
+        LOG.debug("Cleaning up {}", this.getClass().getSimpleName());
         entityDao.stopAsync().awaitTerminated();
     }
 

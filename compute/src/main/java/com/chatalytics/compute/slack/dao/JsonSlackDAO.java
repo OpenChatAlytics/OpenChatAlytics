@@ -7,10 +7,12 @@ import com.chatalytics.core.json.JsonObjectMapperFactory;
 import com.chatalytics.core.model.Message;
 import com.chatalytics.core.model.Room;
 import com.chatalytics.core.model.User;
+import com.chatalytics.core.model.slack.HistoryResult;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.CollectionType;
 import com.fasterxml.jackson.databind.type.TypeFactory;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.sun.jersey.api.client.Client;
@@ -23,6 +25,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -116,29 +119,41 @@ public class JsonSlackDAO extends AbstractJSONChatApiDAO {
 
     @Override
     public List<Message> getMessages(DateTime start, DateTime end, Room room) {
-        long startMillis = start.getMillis();
-        String startMillisStr = String.format("%s.%s",
-                                              String.valueOf(startMillis / 1000),
-                                              startMillis % 1000);
+        WebResource historyResource = resource.path("channels.history");
+        List<Message> result = Lists.newArrayList();
+        boolean hasNext = true;
 
-        // get smallest time unit for slack API and subtract one because latest is inclusive in the
-        // Slack API
-        long endNanos = end.getMillis() * 1000 - 1;
-        String endMillisStr = String.format("%s.%s",
-                                            String.valueOf(endNanos / 1000 / 1000),
-                                            endNanos % (1000 * 1000));
+        String startMillisStr = formatDateTime(start);
 
-        WebResource roomResource = resource.path("channels.history");
-        roomResource = roomResource.queryParam("channel", room.getRoomId())
-                                   .queryParam("latest", endMillisStr)
-                                   .queryParam("oldest", startMillisStr)
-                                   .queryParam("inclusive", "1")
-                                   .queryParam("count", "1000");
+        String endMillisStr = formatDateTime(end);
 
-        String jsonStr = getJsonResultWithRetries(roomResource, apiRetries);
-        Collection<Message> messagesCol = deserializeJsonStr(jsonStr, "messages", Message.class,
-                                                             objMapper);
-        return Lists.newArrayList(messagesCol);
+        while (hasNext) {
+
+            historyResource = historyResource.queryParam("channel", room.getRoomId())
+                                             .queryParam("latest", endMillisStr)
+                                             .queryParam("oldest", startMillisStr)
+                                             .queryParam("inclusive", "0")
+                                             .queryParam("count", "1000");
+
+            String jsonStr = getJsonResultWithRetries(historyResource, apiRetries);
+            try {
+                HistoryResult history = objMapper.readValue(jsonStr, HistoryResult.class);
+                if (history.getMessages().isEmpty()) {
+                    break;
+                }
+                result.addAll(history.getMessages());
+
+                Comparator<Message> comp = (msg1, msg2) -> msg1.getDate().compareTo(msg2.getDate());
+                DateTime earliestDate = history.getMessages().stream().min(comp).get().getDate();
+
+                hasNext = history.isHas_more();
+                endMillisStr = formatDateTime(earliestDate);
+            } catch (IOException e) {
+                LOG.error("Can't deserialize history", e);
+                return ImmutableList.of();
+            }
+        }
+        return result;
     }
 
     /**
@@ -206,13 +221,18 @@ public class JsonSlackDAO extends AbstractJSONChatApiDAO {
             for (String jsonEl : listElements) {
                 jsonNode = jsonNode.get(jsonEl);
                 if (jsonNode == null) {
-                    return Lists.newArrayListWithCapacity(0);
+                    return ImmutableList.of();
                 }
             }
             return objMapper.readValue(jsonNode.toString(), type);
         } catch (IOException e) {
             LOG.error("Got exception when trying to deserialize list of {}", clazz, e);
-            return Lists.newArrayListWithExpectedSize(0);
+            return ImmutableList.of();
         }
+    }
+
+    private String formatDateTime(DateTime date) {
+        long millis = date.getMillis();
+        return String.format("%s.%s", String.valueOf(millis / 1000), millis % 1000);
     }
 }

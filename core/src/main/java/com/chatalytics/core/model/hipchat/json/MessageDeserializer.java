@@ -1,6 +1,7 @@
 package com.chatalytics.core.model.hipchat.json;
 
 import com.chatalytics.core.model.Message;
+import com.chatalytics.core.model.MessageType;
 import com.chatalytics.core.model.json.JsonChatDeserializer;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -38,7 +39,7 @@ public class MessageDeserializer extends JsonChatDeserializer<Message> {
         String userIdStr = fromStruct.get("user_id").asText();
         String message = node.get("message").asText();
 
-        return new Message(date, fromName, userIdStr, message, null);
+        return new Message(date, fromName, userIdStr, message, null, MessageType.MESSAGE);
     }
 
 }

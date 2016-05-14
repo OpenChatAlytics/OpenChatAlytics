@@ -3,6 +3,7 @@ package com.chatalytics.compute.storm.bolt;
 import com.chatalytics.core.model.EmojiEntity;
 import com.chatalytics.core.model.FatMessage;
 import com.chatalytics.core.model.Message;
+import com.chatalytics.core.model.MessageType;
 import com.chatalytics.core.model.Room;
 import com.chatalytics.core.model.User;
 
@@ -35,7 +36,7 @@ public class EmojiCounterBoltTest {
         this.mentionTime = DateTime.now();
         this.emoji = "emoji";
 
-        this.user = new User("randomUserId", "email", false, false, null, username, null, null,
+        this.user = new User("randomUserId", "email", false, false, false, null, username, null, null,
                              null, null, null, null, null);
         this.room = new Room("randomRoomId", roomName, null, null, null, null, false, false, null,
                              null);
@@ -46,7 +47,7 @@ public class EmojiCounterBoltTest {
     public void testGetEmojisFromMessage() {
         Message message = new Message(mentionTime, "randomFrom", "randomUserId",
                                       String.format("test message with :%s:", emoji),
-                                      "randomRoomId");
+                                      "randomRoomId", MessageType.MESSAGE);
 
         FatMessage fatMessage = new FatMessage(message, user, room);
 
@@ -70,7 +71,7 @@ public class EmojiCounterBoltTest {
         Message message = new Message(mentionTime, "randomFrom", "randomUserId",
                                       String.format("test message with :%s::%s: test :%s:",
                                                     emoji, emoji, emoji),
-                                      "randomRoomId");
+                                      "randomRoomId", MessageType.MESSAGE);
 
         FatMessage fatMessage = new FatMessage(message, user, room);
 
@@ -90,7 +91,7 @@ public class EmojiCounterBoltTest {
         Message message = new Message(mentionTime, "randomFrom", "randomUserId",
                                       String.format("test http:// message :     testwith :%s::%s: "
                                           + "test :%s:", emoji, emoji, emoji),
-                                      "randomRoomId");
+                                      "randomRoomId", MessageType.MESSAGE);
 
         FatMessage fatMessage = new FatMessage(message, user, room);
 

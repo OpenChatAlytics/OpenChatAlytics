@@ -5,7 +5,6 @@ import com.chatalytics.core.realtime.ChatAlyticsEventDecoder;
 import com.chatalytics.core.realtime.ChatAlyticsEventEncoder;
 import com.chatalytics.core.realtime.ConnectionType;
 import com.chatalytics.core.realtime.ConnectionTypeEncoderDecoder;
-import com.google.common.base.Throwables;
 import com.google.common.collect.Sets;
 
 import org.slf4j.Logger;
@@ -71,6 +70,7 @@ public class RealtimeResource {
 
             sessions.add(session);
         } else {
+//            session.setMaxIdleTimeout(Long.MAX_VALUE);
             LOG.info("Got a new publisher connection request with ID {}", session.getId());
         }
     }
@@ -116,7 +116,7 @@ public class RealtimeResource {
      */
     @OnError
     public void onError(Throwable t) {
-        LOG.error(Throwables.getStackTraceAsString(t));
+        LOG.error("Uncought exception in realtime resource", t);
     }
 
 }

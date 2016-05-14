@@ -1,5 +1,7 @@
 package com.chatalytics.core.similarity;
 
+import com.google.common.base.Preconditions;
+
 import java.util.Arrays;
 
 /**
@@ -8,7 +10,10 @@ import java.util.Arrays;
  * @author giannis
  */
 public enum SimilarityDimension {
-    USER("user"), ROOM("room"), ENTITY("entity");
+
+    USER("user"),
+    ROOM("room"),
+    ENTITY("entity");
 
     private String dimensionName;
 
@@ -31,19 +36,24 @@ public enum SimilarityDimension {
      * @param dimensionName
      *            The string representation of a {@link SimilarityDimension}
      * @return A {@link SimilarityDimension}
+     * @throws IllegalArgumentException
+     *             if <code>dimensionName</code> a <code>SimilarityDimension</code> can't be
+     *             determined
+     * @throws NullPointerException if <code>dimensionName</code> is null
      */
     public static SimilarityDimension fromDimensionName(String dimensionName) {
-        if (USER.getDimensionName().equals(dimensionName)) {
-            return USER;
-        } else if (ENTITY.getDimensionName().equals(dimensionName)) {
-            return ENTITY;
-        } else if (ROOM.getDimensionName().equals(dimensionName)) {
-            return ROOM;
-        } else {
-            String msg = String.format("Can't construct similarity dimension from %s. "
-                                       + "Supported values are %s", dimensionName,
-                                       Arrays.deepToString(SimilarityDimension.values()));
-            throw new IllegalArgumentException(msg);
+        Preconditions.checkNotNull(dimensionName,
+                                   "Can't construct a similarity dimension from a null value");
+
+        for (SimilarityDimension simDim : SimilarityDimension.values()) {
+            if (dimensionName.equals(simDim.getDimensionName())) {
+                return simDim;
+            }
         }
+
+        String msg = String.format("Can't construct similarity dimension from %s. "
+                                   + "Supported values are %s", dimensionName,
+                                   Arrays.deepToString(SimilarityDimension.values()));
+        throw new IllegalArgumentException(msg);
     }
 }

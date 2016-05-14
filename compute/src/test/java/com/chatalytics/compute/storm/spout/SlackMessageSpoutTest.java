@@ -5,6 +5,7 @@ import com.chatalytics.compute.config.ConfigurationConstants;
 import com.chatalytics.compute.util.YamlUtils;
 import com.chatalytics.core.config.ChatAlyticsConfig;
 import com.chatalytics.core.model.Message;
+import com.chatalytics.core.model.MessageType;
 import com.google.common.collect.Maps;
 
 import org.apache.storm.spout.SpoutOutputCollector;
@@ -115,7 +116,7 @@ public class SlackMessageSpoutTest {
 
         // trigger with this test message
         Message triggerMessage = new Message(DateTime.now(), "Test User", "U03AFSSD", "test msg",
-                                             "C09ADF43");
+                                             "C09ADF43", MessageType.MESSAGE);
         underTest.onMessageEvent(triggerMessage, mock(Session.class));
         verify(mockSlackApiDao).getUsers();
         verify(mockSlackApiDao).getRooms();

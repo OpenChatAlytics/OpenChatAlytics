@@ -6,6 +6,7 @@ import com.chatalytics.core.model.hipchat.json.HipChatJsonModule;
 import com.chatalytics.core.model.slack.json.SlackJsonModule;
 import com.chatalytics.core.realtime.json.ChatAlyticsEventDeserializer;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.module.SimpleModule;
@@ -53,6 +54,7 @@ public class JsonObjectMapperFactory {
 
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.setPropertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE);
+        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         objectMapper.setSerializationInclusion(Include.NON_NULL);
         objectMapper.registerModule(new JodaModule());
         objectMapper.registerModule(commonModule);
