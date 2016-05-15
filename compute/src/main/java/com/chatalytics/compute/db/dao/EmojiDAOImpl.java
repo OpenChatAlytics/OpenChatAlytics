@@ -9,6 +9,7 @@ import org.joda.time.Interval;
 import java.util.List;
 import java.util.Map;
 
+import javax.persistence.EntityExistsException;
 import javax.persistence.EntityManagerFactory;
 
 /**
@@ -30,7 +31,16 @@ public class EmojiDAOImpl extends AbstractIdleService implements IEmojiDAO {
      */
     @Override
     public void persistEmoji(EmojiEntity emoji) {
-        occurrenceStatsDAO.persistValue(emoji);
+        try {
+            occurrenceStatsDAO.persistValue(emoji);
+        } catch (EntityExistsException e) {
+            EmojiEntity existingValue = occurrenceStatsDAO.getValue(emoji);
+            int newOccurrences = emoji.getOccurrences() + existingValue.getOccurrences();
+            EmojiEntity mergedEmoji = new EmojiEntity(emoji.getValue(), newOccurrences,
+                                                      emoji.getMentionTime(), emoji.getUsername(),
+                                                      emoji.getRoomName());
+            occurrenceStatsDAO.mergeValue(mergedEmoji);
+        }
     }
 
     /**

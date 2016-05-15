@@ -68,10 +68,30 @@ public class MentionableDAO<K extends Serializable, T extends IMentionable<K>>
         try {
             entityManager.persist(value);
             transaction.commit();
-        } catch (EntityExistsException e) {
-            LOG.error("Entity already exists. Ignoring... {}. {}", value, e.getMessage());
         } catch (PersistenceException e) {
+            if (isEntityAlreadyExists(value)) {
+                throw new EntityExistsException(e.getCause());
+            }
             LOG.error("Cannot store {}. {}", value, e.getMessage());
+        }
+
+        if (transaction.isActive() && transaction.getRollbackOnly()) {
+            transaction.rollback();
+        }
+
+        closeEntityManager(entityManager);
+    }
+
+    @Override
+    public void mergeValue(T value) {
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
+        EntityTransaction transaction = entityManager.getTransaction();
+        transaction.begin();
+        try {
+            entityManager.merge(value);
+            transaction.commit();
+        } catch (PersistenceException e) {
+            LOG.error("Cannot merge {}. {}", value, e.getMessage());
         }
 
         if (transaction.isActive() && transaction.getRollbackOnly()) {
@@ -353,6 +373,18 @@ public class MentionableDAO<K extends Serializable, T extends IMentionable<K>>
         } catch (RuntimeException e) {
             LOG.warn("Couldn't close entity manager. Reason: {}", e.getMessage());
         }
+    }
+
+    /**
+     * Helper method that determines whether the exception thrown indicates that the value tried to
+     * be stored was an already existing one
+     *
+     * @param value
+     *            The value to check if duplicate
+     * @return True if the value already exists, false otherwise
+     */
+    private boolean isEntityAlreadyExists(T value) {
+        return getValue(value) != null;
     }
 
 }
