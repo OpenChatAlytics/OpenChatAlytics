@@ -70,6 +70,7 @@ public class MentionableDAO<K extends Serializable, T extends IMentionable<K>>
             transaction.commit();
         } catch (PersistenceException e) {
             if (isEntityAlreadyExists(value)) {
+                closeEntityManager(entityManager);
                 throw new EntityExistsException(e.getCause());
             }
             LOG.error("Cannot store {}. {}", value, e.getMessage());
