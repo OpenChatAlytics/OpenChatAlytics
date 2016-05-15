@@ -13,6 +13,8 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
+import javax.persistence.EntityExistsException;
+
 /**
  * A general DAO for doing occurrence statistics on any type T. The type could be any arbitrary
  * entity that implements {@link IMentionable}
@@ -29,8 +31,17 @@ public interface IMentionableDAO<K extends Serializable, T extends IMentionable<
      *
      * @param value
      *            The value to be persisted
+     *
+     * @throws EntityExistsException if the value already exists
      */
     void persistValue(T value);
+
+    /**
+     * Merges the existing value with the new value
+     *
+     * @param value The new value to replace the existing one
+     */
+    void mergeValue(T value);
 
     /**
      * Gets a type <code>T</code> from the database. Note that all fields need to be set.

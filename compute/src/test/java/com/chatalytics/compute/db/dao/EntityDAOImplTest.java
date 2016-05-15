@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * Tests {@link IEntityDAO}
@@ -41,6 +42,20 @@ public class EntityDAOImplTest {
         underTest.persistEntity(new ChatEntity("entity2", 1, mentionDate, "giannis", "room1"));
         underTest.persistEntity(new ChatEntity("entity1", 1, mentionDate, "giannis", "room2"));
         underTest.persistEntity(new ChatEntity("entity1", 1, mentionDate, "jane", "room1"));
+    }
+
+    @Test
+    public void testPersistValue_withDuplicate() {
+        ChatEntity entity = new ChatEntity("test_value", 1, DateTime.now(), "user", "testroom");
+        underTest.persistEntity(entity);
+        ChatEntity existingEntity = underTest.getEntity(entity);
+        assertNotNull(existingEntity);
+        assertEquals(1, existingEntity.getOccurrences());
+
+        // insert it again
+        underTest.persistEntity(entity);
+        existingEntity = underTest.getEntity(entity);
+        assertEquals(2, existingEntity.getOccurrences());
     }
 
     /**
