@@ -106,7 +106,7 @@ public class EmojiCounterBolt extends ChatAlyticsBaseBolt {
             }
             if (capturingEmoji) {
 
-                if (ch == ' ' || ch == '\t') {
+                if (ch == ' ' || ch == '\t' || ch == '\n' || ch == '/') {
                     capturingEmoji = !capturingEmoji;
                     emojiStrBuilder = new StringBuilder();
                     continue;
