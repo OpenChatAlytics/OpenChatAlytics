@@ -111,9 +111,19 @@ public class SlackBackfillSpout extends BaseRichSpout {
         Map<String, User> users = slackDao.getUsers();
         // get all the rooms and for each room get the messages
         Map<String, Room> rooms = slackDao.getRooms();
+        backfillRooms(users, rooms, runInterval);
+        dbDao.setLastMessagePullTime(runInterval.getEnd());
+    }
+
+    private void backfillRooms(Map<String, User> users, Map<String, Room> rooms,
+                               Interval runInterval) {
         Set<String> skippedRoomNames = Sets.newHashSet();
         int skippedUnknownMessages = 0;
+        LOG.info("Backfilling {} rooms", rooms.size());
+        int roomNum = 0;
         for (Room room : rooms.values()) {
+            roomNum++;
+
             if (room.isArchived()) {
                 LOG.debug("Skipping archived room {}", room.getName());
                 skippedRoomNames.add(room.getName());
@@ -141,13 +151,23 @@ public class SlackBackfillSpout extends BaseRichSpout {
                 FatMessage fatMessage = new FatMessage(message, user, room);
                 collector.emit(new Values(fatMessage));
             }
+            logProgress(roomNum, rooms.size());
+
         }
         LOG.info("Finished backfilling. Skipped {} unknown msgs. Skipped {} rooms. They were: {}",
-                 skippedUnknownMessages, rooms.size(), rooms);
-        dbDao.setLastMessagePullTime(runInterval.getEnd());
+                 skippedUnknownMessages, skippedRoomNames.size(), skippedRoomNames);
+    }
+
+    private void logProgress(int roomNum, int totalRooms) {
+        if (roomNum % 20 == 0) {
+            LOG.info("Successfully backfilled {}/{} rooms", roomNum, totalRooms);
+        }
     }
 
     /**
+     * Note that a call to this method may block up to a configurable amount of time if the next
+     * start time is after now
+     *
      * @return The next run interval to get messages for based on the last pull time, the
      *         granularity of batch gets and the initial start date set in the yaml config
      */
