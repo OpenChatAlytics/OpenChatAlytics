@@ -1,0 +1,12 @@
+inputType: LOCAL_TEST
+timeZone: America/New_York
+computeConfig:
+    apiDateFormat: YYYY-MM-dd
+    classifier: compute/classifiers/english.all.3class.distsim.crf.ser.gz
+    filesToRead:
+        'com.chatalytics.bolts.sentiment.words': files/sentiment_words.csv
+    chatConfig: !!com.chatalytics.core.config.LocalTestConfig
+        randomSeed: 0
+        messageCorpusFile: corpus/test_corpus.txt
+webConfig:
+    port: 8080

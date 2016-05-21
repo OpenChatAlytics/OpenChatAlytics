@@ -1,8 +1,8 @@
 package com.chatalytics.compute.storm.bolt;
 
 import com.chatalytics.compute.config.ConfigurationConstants;
-import com.chatalytics.compute.util.YamlUtils;
 import com.chatalytics.core.config.ChatAlyticsConfig;
+import com.chatalytics.core.util.YamlUtils;
 
 import org.apache.storm.task.OutputCollector;
 import org.apache.storm.task.TopologyContext;
@@ -22,9 +22,9 @@ public abstract class ChatAlyticsBaseBolt extends BaseRichBolt {
 
     @Override
     public void prepare(@SuppressWarnings("rawtypes") Map stormConf, TopologyContext context,
-            OutputCollector collector) {
+                        OutputCollector collector) {
         String configStr = (String) stormConf.get(ConfigurationConstants.CHATALYTICS_CONFIG.txt);
-        ChatAlyticsConfig config = YamlUtils.readYamlFromString(configStr, ChatAlyticsConfig.class);
+        ChatAlyticsConfig config = YamlUtils.readChatAlyticsConfigFromString(configStr);
         prepare(config, stormConf, context, collector);
     }
 
@@ -37,7 +37,8 @@ public abstract class ChatAlyticsBaseBolt extends BaseRichBolt {
      * @param collector The storm collector
      */
     public abstract void prepare(ChatAlyticsConfig config,
-            @SuppressWarnings("rawtypes") Map stormConf, TopologyContext context,
-            OutputCollector collector);
+                                 @SuppressWarnings("rawtypes") Map stormConf,
+                                 TopologyContext context,
+                                 OutputCollector collector);
 
 }

@@ -2,10 +2,11 @@ package com.chatalytics.compute.storm.spout;
 
 import com.chatalytics.compute.chat.dao.IChatApiDAO;
 import com.chatalytics.compute.config.ConfigurationConstants;
-import com.chatalytics.compute.util.YamlUtils;
 import com.chatalytics.core.config.ChatAlyticsConfig;
+import com.chatalytics.core.config.LocalTestConfig;
 import com.chatalytics.core.model.Message;
 import com.chatalytics.core.model.MessageType;
+import com.chatalytics.core.util.YamlUtils;
 import com.google.common.collect.Maps;
 
 import org.apache.storm.spout.SpoutOutputCollector;
@@ -57,7 +58,8 @@ public class SlackMessageSpoutTest {
         mockCollector = mock(SpoutOutputCollector.class);
         mockContext = mock(TopologyContext.class);
         stormConf = Maps.newHashMapWithExpectedSize(1);
-        config = YamlUtils.readYamlFromResource("chatalytics.yaml", ChatAlyticsConfig.class);
+        config = new ChatAlyticsConfig();
+        config.computeConfig.chatConfig = new LocalTestConfig();
 
         stormConf.put(ConfigurationConstants.CHATALYTICS_CONFIG.txt, YamlUtils.writeYaml(config));
     }

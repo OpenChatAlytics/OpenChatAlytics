@@ -50,8 +50,8 @@ public class JsonHipChatDAO extends AbstractJSONChatApiDAO {
     private final String timeZoneStr;
 
     public JsonHipChatDAO(ChatAlyticsConfig config, Client client) {
-        super(config.computeConfig.hipchatConfig.authTokens, AUTH_TOKEN_PARAM);
-        this.resource = client.resource(config.computeConfig.hipchatConfig.baseHipChatURL);
+        super(config.computeConfig.chatConfig.getAuthTokens(), AUTH_TOKEN_PARAM);
+        this.resource = client.resource(config.computeConfig.chatConfig.getBaseAPIURL());
         this.apiRetries = config.computeConfig.apiRetries;
         this.timeZoneStr = config.timeZone;
         this.dtz = DateTimeZone.forID(config.timeZone);

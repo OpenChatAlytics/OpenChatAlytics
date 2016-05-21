@@ -1,0 +1,12 @@
+inputType: SLACK
+timeZone: America/New_York
+computeConfig:
+    apiDateFormat: YYYY-MM-dd
+    classifier: classifiers/english.all.3class.distsim.crf.ser.gz
+    filesToRead:
+        'com.chatalytics.bolts.sentiment.words': files/sentiment_words.csv
+    chatConfig: !!com.chatalytics.core.config.SlackConfig
+        baseAPIURL: 'http://test/url/from/file'
+        authTokens: ['0']
+webConfig:
+    port: 8080
