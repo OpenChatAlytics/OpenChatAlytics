@@ -1,12 +1,14 @@
 package com.chatalytics.core.config;
 
-import java.io.Serializable;
+import com.google.common.collect.ImmutableList;
+
+import java.util.List;
 
 /**
  * Config file for testing with a local spout that can emit random messages
  *
  */
-public class LocalTestConfig implements Serializable {
+public class LocalTestConfig implements ChatConfig {
 
     private static final long serialVersionUID = -5527223071338609488L;
 
@@ -34,5 +36,29 @@ public class LocalTestConfig implements Serializable {
      * The filename to read senteces. Emitted messages will be based on these sentences
      */
     public String messageCorpusFile;
+
+    public char emojiStartChar = ':';
+
+    public char emojiEndChar = ':';
+
+    @Override
+    public List<String> getAuthTokens() {
+        return ImmutableList.of();
+    }
+
+    @Override
+    public String getBaseAPIURL() {
+        return "http://dummy";
+    }
+
+    @Override
+    public char getEmojiStartChar() {
+        return emojiStartChar;
+    }
+
+    @Override
+    public char getEmojiEndChar() {
+        return emojiEndChar;
+    }
 
 }

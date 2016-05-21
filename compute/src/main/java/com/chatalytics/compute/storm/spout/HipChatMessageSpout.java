@@ -5,12 +5,12 @@ import com.chatalytics.compute.config.ConfigurationConstants;
 import com.chatalytics.compute.db.dao.ChatAlyticsDAOFactory;
 import com.chatalytics.compute.db.dao.IChatAlyticsDAO;
 import com.chatalytics.compute.hipchat.dao.HipChatApiDAOFactory;
-import com.chatalytics.compute.util.YamlUtils;
 import com.chatalytics.core.config.ChatAlyticsConfig;
 import com.chatalytics.core.model.FatMessage;
 import com.chatalytics.core.model.Message;
 import com.chatalytics.core.model.Room;
 import com.chatalytics.core.model.User;
+import com.chatalytics.core.util.YamlUtils;
 import com.google.common.collect.Lists;
 
 import org.apache.storm.spout.SpoutOutputCollector;
@@ -48,8 +48,7 @@ public class HipChatMessageSpout extends BaseRichSpout {
     public void open(@SuppressWarnings("rawtypes") Map conf, TopologyContext context,
                      SpoutOutputCollector collector) {
         String configYaml = (String) conf.get(ConfigurationConstants.CHATALYTICS_CONFIG.txt);
-        ChatAlyticsConfig config = YamlUtils.readYamlFromString(configYaml,
-                                                                 ChatAlyticsConfig.class);
+        ChatAlyticsConfig config = YamlUtils.readChatAlyticsConfigFromString(configYaml);
         LOG.info("Loaded config...");
 
         hipchatDao = HipChatApiDAOFactory.getHipChatApiDao(config);

@@ -5,8 +5,14 @@ import com.chatalytics.compute.realtime.ComputeRealtimeServer;
 import com.chatalytics.compute.realtime.ComputeRealtimeServerFactory;
 import com.chatalytics.compute.storm.ChatAlyticsService;
 import com.chatalytics.compute.storm.ChatAlyticsStormTopology;
-import com.chatalytics.compute.util.YamlUtils;
+import com.chatalytics.core.CommonCLIBuilder;
 import com.chatalytics.core.config.ChatAlyticsConfig;
+import com.chatalytics.core.util.YamlUtils;
+
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.Options;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.FileNotFoundException;
 import java.net.URISyntaxException;
@@ -19,9 +25,16 @@ import java.net.URISyntaxException;
  */
 public class ChatAlyticsEngineMain {
 
+    private static final Logger LOG = LoggerFactory.getLogger(ChatAlyticsEngineMain.class);
+
     public static void main(String[] args) throws FileNotFoundException, URISyntaxException {
-        ChatAlyticsConfig config = YamlUtils.readYamlFromResource("chatalytics.yaml",
-                                                                  ChatAlyticsConfig.class);
+
+        Options opts = CommonCLIBuilder.getCommonOptions();
+        CommandLine cli = CommonCLIBuilder.parseOptions(ChatAlyticsEngineMain.class, args, opts);
+        String configName = CommonCLIBuilder.getConfigOption(cli);
+
+        LOG.info("Loading config {}", configName);
+        ChatAlyticsConfig config = YamlUtils.readChatAlyticsConfig(configName);
 
         ChatAlyticsStormTopology chatTopology = new ChatAlyticsStormTopology(config.inputType);
 

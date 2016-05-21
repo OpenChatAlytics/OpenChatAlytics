@@ -45,8 +45,8 @@ public class JsonSlackDAO extends AbstractJSONChatApiDAO {
     private final int apiRetries;
 
     public JsonSlackDAO(ChatAlyticsConfig config, Client client) {
-        super(config.computeConfig.slackConfig.authTokens, AUTH_TOKEN_PARAM);
-        this.resource = client.resource(config.computeConfig.slackConfig.baseSlackURL);
+        super(config.computeConfig.chatConfig.getAuthTokens(), AUTH_TOKEN_PARAM);
+        this.resource = client.resource(config.computeConfig.chatConfig.getBaseAPIURL());
         this.apiRetries = config.computeConfig.apiRetries;
         this.objMapper = JsonObjectMapperFactory.createObjectMapper(config.inputType);
     }

@@ -1,9 +1,10 @@
 package com.chatalytics.web;
 
 import com.chatalytics.compute.db.dao.ChatAlyticsDAOFactory;
-import com.chatalytics.compute.util.YamlUtils;
+import com.chatalytics.core.CommonCLIBuilder;
 import com.chatalytics.core.config.ChatAlyticsConfig;
 import com.chatalytics.core.json.JsonObjectMapperFactory;
+import com.chatalytics.core.util.YamlUtils;
 import com.chatalytics.web.resources.EmojisResource;
 import com.chatalytics.web.resources.EntitiesResource;
 import com.chatalytics.web.resources.EventsResource;
@@ -11,6 +12,8 @@ import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
 import com.google.common.collect.Sets;
 import com.sun.jersey.spi.container.servlet.ServletContainer;
 
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.Options;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
@@ -57,8 +60,11 @@ public class ServerMain extends Application {
     }
 
     public static void main(String[] args) throws Exception {
-        ChatAlyticsConfig config = YamlUtils.readYamlFromResource("chatalytics.yaml",
-                                                                  ChatAlyticsConfig.class);
+        Options opts = CommonCLIBuilder.getCommonOptions();
+        CommandLine cli = CommonCLIBuilder.parseOptions(ServerMain.class, args, opts);
+        String configName = CommonCLIBuilder.getConfigOption(cli);
+        LOG.info("Loading config {}", configName);
+        ChatAlyticsConfig config = YamlUtils.readChatAlyticsConfig(configName);
 
         EventsResource eventResource = new EventsResource();
         RealtimeComputeClient computeClient = new RealtimeComputeClient(config, eventResource);

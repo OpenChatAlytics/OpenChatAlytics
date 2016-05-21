@@ -17,13 +17,7 @@ public class ComputeConfig implements Serializable {
 
     public int rtComputePort = 9000;
 
-    public HipChatConfig hipchatConfig = new HipChatConfig();
-
-    public SlackConfig slackConfig = new SlackConfig();
-
-    public LocalTestConfig localTestConfig = new LocalTestConfig();
-
-    public BackfillerConfig backfillerConfig = new BackfillerConfig();
+    public ChatConfig chatConfig;
 
     /**
      * Map of property name to file to read

@@ -4,13 +4,13 @@ import com.chatalytics.compute.chat.dao.IChatApiDAO;
 import com.chatalytics.compute.config.ConfigurationConstants;
 import com.chatalytics.compute.slack.dao.JsonSlackDAO;
 import com.chatalytics.compute.slack.dao.SlackApiDAOFactory;
-import com.chatalytics.compute.util.YamlUtils;
 import com.chatalytics.core.config.ChatAlyticsConfig;
 import com.chatalytics.core.model.FatMessage;
 import com.chatalytics.core.model.Message;
 import com.chatalytics.core.model.MessageType;
 import com.chatalytics.core.model.Room;
 import com.chatalytics.core.model.User;
+import com.chatalytics.core.util.YamlUtils;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Throwables;
 
@@ -64,8 +64,7 @@ public class SlackMessageSpout extends BaseRichSpout {
     public void open(@SuppressWarnings("rawtypes") Map conf, TopologyContext context,
                      SpoutOutputCollector collector) {
         String configYaml = (String) conf.get(ConfigurationConstants.CHATALYTICS_CONFIG.txt);
-        ChatAlyticsConfig config = YamlUtils.readYamlFromString(configYaml,
-                                                                ChatAlyticsConfig.class);
+        ChatAlyticsConfig config = YamlUtils.readChatAlyticsConfigFromString(configYaml);
         LOG.info("Loaded config...");
 
         slackDao = getChatApiDao(config);

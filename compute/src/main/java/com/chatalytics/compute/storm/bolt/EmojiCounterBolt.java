@@ -37,7 +37,7 @@ public class EmojiCounterBolt extends ChatAlyticsBaseBolt {
     @Override
     public void prepare(ChatAlyticsConfig config, @SuppressWarnings("rawtypes") Map conf,
                         TopologyContext context, OutputCollector collector) {
-        emojiDao = ChatAlyticsDAOFactory.createEmojiDAO(config);
+        this.emojiDao = ChatAlyticsDAOFactory.createEmojiDAO(config);
         this.collector = collector;
     }
 

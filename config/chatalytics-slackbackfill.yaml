@@ -1,0 +1,14 @@
+inputType: SLACK_BACKFILL
+timeZone: America/New_York
+computeConfig:
+    apiDateFormat: YYYY-MM-dd
+    classifier: compute/classifiers/english.all.3class.distsim.crf.ser.gz
+    filesToRead:
+        'com.chatalytics.bolts.sentiment.words': files/sentiment_words.csv
+    chatConfig: !!com.chatalytics.core.config.SlackBackfillerConfig
+        baseAPIURL: https://slack.com/api/
+        authTokens: ['0']
+        granularityMins: 5
+        startDate: '2015-11-01T00:00:00Z'
+webConfig:
+    port: 8080

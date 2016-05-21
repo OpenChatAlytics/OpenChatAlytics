@@ -1,8 +1,8 @@
 package com.chatalytics.compute.slack.dao;
 
-import com.chatalytics.compute.util.YamlUtils;
 import com.chatalytics.core.InputSourceType;
 import com.chatalytics.core.config.ChatAlyticsConfig;
+import com.chatalytics.core.config.ChatConfig;
 import com.chatalytics.core.config.SlackConfig;
 import com.chatalytics.core.model.Message;
 import com.chatalytics.core.model.Room;
@@ -45,18 +45,19 @@ public class JsonSlackDAOTest {
     private JsonSlackDAO underTest;
     private WebResource mockResource;
     private ChatAlyticsConfig config;
-    private SlackConfig slackConfig;
+    private ChatConfig slackConfig;
     private int apiRetries;
 
     @Before
     public void setUp() throws Exception {
-        this.config = YamlUtils.readYamlFromResource("chatalytics.yaml", ChatAlyticsConfig.class);
+        this.config = new ChatAlyticsConfig();
         this.config.inputType = InputSourceType.SLACK;
-        this.slackConfig = config.computeConfig.slackConfig;
+        this.config.computeConfig.chatConfig = new SlackConfig();
+        this.slackConfig = config.computeConfig.chatConfig;
         this.apiRetries = config.computeConfig.apiRetries;
         Client mockClient = mock(Client.class);
         mockResource = mock(WebResource.class);
-        when(mockClient.resource(slackConfig.baseSlackURL)).thenReturn(mockResource);
+        when(mockClient.resource(slackConfig.getBaseAPIURL())).thenReturn(mockResource);
         underTest = spy(new JsonSlackDAO(config, mockClient));
     }
 

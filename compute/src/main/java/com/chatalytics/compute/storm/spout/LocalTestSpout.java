@@ -1,7 +1,6 @@
 package com.chatalytics.compute.storm.spout;
 
 import com.chatalytics.compute.config.ConfigurationConstants;
-import com.chatalytics.compute.util.YamlUtils;
 import com.chatalytics.core.RandomStringUtils;
 import com.chatalytics.core.config.ChatAlyticsConfig;
 import com.chatalytics.core.config.LocalTestConfig;
@@ -10,6 +9,7 @@ import com.chatalytics.core.model.Message;
 import com.chatalytics.core.model.MessageType;
 import com.chatalytics.core.model.Room;
 import com.chatalytics.core.model.User;
+import com.chatalytics.core.util.YamlUtils;
 import com.google.common.collect.Lists;
 
 import org.apache.storm.shade.com.google.common.collect.Maps;
@@ -81,12 +81,11 @@ public class LocalTestSpout extends BaseRichSpout {
             SpoutOutputCollector collector) {
 
         String configYaml = (String) conf.get(ConfigurationConstants.CHATALYTICS_CONFIG.txt);
-        ChatAlyticsConfig config = YamlUtils.readYamlFromString(configYaml,
-                                                                ChatAlyticsConfig.class);
+        ChatAlyticsConfig config = YamlUtils.readChatAlyticsConfigFromString(configYaml);
 
         LOG.info("Loaded config...");
 
-        LocalTestConfig localConfig = config.computeConfig.localTestConfig;
+        LocalTestConfig localConfig = (LocalTestConfig) config.computeConfig.chatConfig;
 
         this.sleepMs = localConfig.sleepMs;
         this.collector = collector;

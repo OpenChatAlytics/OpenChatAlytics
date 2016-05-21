@@ -5,14 +5,14 @@ import com.chatalytics.compute.config.ConfigurationConstants;
 import com.chatalytics.compute.db.dao.ChatAlyticsDAOFactory;
 import com.chatalytics.compute.db.dao.IChatAlyticsDAO;
 import com.chatalytics.compute.slack.dao.SlackApiDAOFactory;
-import com.chatalytics.compute.util.YamlUtils;
-import com.chatalytics.core.config.BackfillerConfig;
 import com.chatalytics.core.config.ChatAlyticsConfig;
+import com.chatalytics.core.config.SlackBackfillerConfig;
 import com.chatalytics.core.model.FatMessage;
 import com.chatalytics.core.model.Message;
 import com.chatalytics.core.model.MessageType;
 import com.chatalytics.core.model.Room;
 import com.chatalytics.core.model.User;
+import com.chatalytics.core.util.YamlUtils;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Optional;
 
@@ -35,7 +35,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Spout to be used for batching and/or back filling. Look at {@link BackfillerConfig} for
+ * Spout to be used for batching and/or back filling. Look at {@link SlackBackfillerConfig} for
  * configuration options. Note that this spout only supports {@link #MAX_BACKFILL_DAYS}
  *
  * @author giannis
@@ -59,10 +59,9 @@ public class SlackBackfillSpout extends BaseRichSpout {
                      SpoutOutputCollector collector) {
 
         String configYaml = (String) conf.get(ConfigurationConstants.CHATALYTICS_CONFIG.txt);
-        ChatAlyticsConfig config = YamlUtils.readYamlFromString(configYaml,
-                                                                ChatAlyticsConfig.class);
+        ChatAlyticsConfig config = YamlUtils.readChatAlyticsConfigFromString(configYaml);
 
-        BackfillerConfig backfillerConfig = config.computeConfig.backfillerConfig;
+        SlackBackfillerConfig backfillerConfig = (SlackBackfillerConfig) config.computeConfig.chatConfig;
         Preconditions.checkArgument(backfillerConfig.granularityMins > 0,
                 "The granularity needs to be > 0");
         this.granularityMins = backfillerConfig.granularityMins;
