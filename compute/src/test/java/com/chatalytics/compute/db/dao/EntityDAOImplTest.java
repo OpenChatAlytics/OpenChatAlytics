@@ -20,8 +20,8 @@ import static org.junit.Assert.assertNotNull;
 
 /**
  * Tests {@link IEntityDAO}
- * @author giannis
  *
+ * @author giannis
  */
 public class EntityDAOImplTest {
 

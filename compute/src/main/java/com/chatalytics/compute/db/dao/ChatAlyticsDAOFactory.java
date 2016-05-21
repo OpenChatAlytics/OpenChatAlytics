@@ -39,6 +39,11 @@ public class ChatAlyticsDAOFactory {
         return new EmojiDAOImpl(emf);
     }
 
+    public static IMessageSummaryDAO createMessageSummaryDAO(ChatAlyticsConfig config) {
+        EntityManagerFactory emf = getEntityManagerFactory(config);
+        return new MessageSummaryDAOImpl(emf);
+    }
+
     /**
      * Closes the entity manager factory. This will invalidate all open {@link EntityManager}s
      */

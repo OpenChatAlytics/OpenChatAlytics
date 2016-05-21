@@ -1,5 +1,7 @@
 package com.chatalytics.compute.storm.bolt;
 
+import com.chatalytics.compute.db.dao.ChatAlyticsDAOFactory;
+import com.chatalytics.compute.db.dao.IMessageSummaryDAO;
 import com.chatalytics.core.config.ChatAlyticsConfig;
 import com.chatalytics.core.model.FatMessage;
 import com.chatalytics.core.model.MessageSummary;
@@ -28,11 +30,13 @@ public class MessageSummaryBolt extends ChatAlyticsBaseBolt {
     private static final String MESSAGE_SUMMARY_FIELD_STR = "message-summary";
 
     private OutputCollector collector;
+    private IMessageSummaryDAO messageSummaryDao;
 
     @Override
     public void prepare(ChatAlyticsConfig config, @SuppressWarnings("rawtypes") Map stormConf,
                         TopologyContext context, OutputCollector collector) {
         this.collector = collector;
+        this.messageSummaryDao = ChatAlyticsDAOFactory.createMessageSummaryDAO(config);
     }
 
     @Override
@@ -48,8 +52,9 @@ public class MessageSummaryBolt extends ChatAlyticsBaseBolt {
         }
         DateTime messageDate = fatMessage.getMessage().getDate();
         MessageType type = fatMessage.getMessage().getType();
-        MessageSummary chatSummary = new MessageSummary(username, roomName, messageDate, type);
+        MessageSummary chatSummary = new MessageSummary(username, roomName, messageDate, type, 1);
         collector.emit(new Values(chatSummary));
+        messageSummaryDao.persistMessageSummary(chatSummary);
     }
 
     @Override

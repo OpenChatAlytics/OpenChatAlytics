@@ -10,6 +10,7 @@
         <class>com.chatalytics.core.model.EmojiEntity</class>
         <class>com.chatalytics.core.model.ChatEntity</class>
         <class>com.chatalytics.core.model.LastPullTime</class>
+        <class>com.chatalytics.core.model.MessageSummary</class>
         <properties>
             <!-- if this is true, hibernate will print (to stdout) the SQL
                 it executes, so you can check it to ensure it's not doing anything crazy -->
