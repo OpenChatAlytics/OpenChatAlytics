@@ -171,9 +171,12 @@ public class MentionableDAO<K extends Serializable, T extends IMentionable<K>>
 
         query.where(wherePredicates.toArray(new Predicate[wherePredicates.size()]));
 
-        TypedQuery<T> finalQuery = entityManagerFactory.createEntityManager().createQuery(query)
-                                                .setParameter(startDateParam, interval.getStart())
-                                                .setParameter(endDateParam, interval.getEnd());
+        TypedQuery<T> finalQuery = entityManagerFactory.createEntityManager()
+                                                       .createQuery(query)
+                                                       .setParameter(startDateParam,
+                                                                     interval.getStart())
+                                                       .setParameter(endDateParam,
+                                                                     interval.getEnd());
         if (roomName.isPresent()) {
             finalQuery.setParameter(roomNameParam, roomName.get());
         }
@@ -221,20 +224,35 @@ public class MentionableDAO<K extends Serializable, T extends IMentionable<K>>
 
         return GraphPartition.getSimilarityMatrix(M);
     }
+
     /**
      * {@inheritDoc}
      */
     @Override
     public int getTotalMentionsForType(K value, Interval interval, Optional<String> roomName,
                                        Optional<String> username) {
+        return internalGetTotalMentions(interval, Optional.of(value), roomName, username);
+    }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int getTotalMentionsOfType(Interval interval,
+                                      Optional<String> roomName,
+                                      Optional<String> username) {
+        return internalGetTotalMentions(interval, Optional.absent(), roomName, username);
+    }
+
+    private int internalGetTotalMentions(Interval interval,
+                                        Optional<K> value,
+                                        Optional<String> roomName,
+                                        Optional<String> username) {
         EntityManager entityManager = entityManagerFactory.createEntityManager();
 
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Integer> query = cb.createQuery(Integer.class);
         Root<T> from = query.from(type);
-        @SuppressWarnings("unchecked")
-        ParameterExpression<K> valueParam = (ParameterExpression<K>) cb.parameter(value.getClass());
         ParameterExpression<DateTime> startDateParam = cb.parameter(DateTime.class);
         ParameterExpression<DateTime> endDateParam = cb.parameter(DateTime.class);
         Expression<Integer> sum = cb.sum(from.get("occurrences"));
@@ -242,7 +260,15 @@ public class MentionableDAO<K extends Serializable, T extends IMentionable<K>>
         query.select(sum.alias("occurrences"));
 
         List<Predicate> wherePredicates = Lists.newArrayListWithCapacity(4);
-        wherePredicates.add(cb.equal(from.get(TYPE_COLUMN_NAME), valueParam));
+
+        ParameterExpression<K> valueParam = null;
+        if (value.isPresent()) {
+            @SuppressWarnings("unchecked")
+            Class<K> clazz = (Class<K>) value.get().getClass();
+            valueParam = cb.parameter(clazz);
+            wherePredicates.add(cb.equal(from.get(TYPE_COLUMN_NAME), valueParam));
+        }
+
         wherePredicates.add(cb.between(from.get("mentionTime"), startDateParam, endDateParam));
 
         // Add the optional parameters
@@ -260,11 +286,13 @@ public class MentionableDAO<K extends Serializable, T extends IMentionable<K>>
         query.where(wherePredicates.toArray(new Predicate[wherePredicates.size()]));
 
         TypedQuery<Integer> finalQuery = entityManager.createQuery(query)
-                                                      .setParameter(valueParam, value)
                                                       .setParameter(startDateParam,
                                                                     interval.getStart())
                                                       .setParameter(endDateParam,
                                                                     interval.getEnd());
+        if (value.isPresent()) {
+            finalQuery.setParameter(valueParam, value.get());
+        }
         if (roomName.isPresent()) {
             finalQuery.setParameter(roomNameParam, roomName.get());
         }

@@ -105,12 +105,15 @@ public class EntityDAOImpl extends AbstractIdleService implements IEntityDAO {
         return occurrenceStatsDAO.getRoomSimilaritiesByValue(interval);
     }
 
+    /**
+     * Does nothing
+     */
     @Override
     protected void startUp() throws Exception {
     }
 
     /**
-     * Closes the entity manager and the entity manager factory
+     * Closes the underlying {@link MentionableDAO}.
      */
     @Override
     protected void shutDown() throws Exception {

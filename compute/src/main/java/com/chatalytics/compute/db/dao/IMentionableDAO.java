@@ -17,7 +17,7 @@ import javax.persistence.EntityExistsException;
 
 /**
  * A general DAO for doing occurrence statistics on any type T. The type could be any arbitrary
- * entity that implements {@link IMentionable}
+ * value that implements {@link IMentionable}
  *
  * @author giannis
  *
@@ -46,8 +46,8 @@ public interface IMentionableDAO<K extends Serializable, T extends IMentionable<
     /**
      * Gets a type <code>T</code> from the database. Note that all fields need to be set.
      *
-     * @param entity
-     *            Entity to be retrieved
+     * @param value
+     *            Value to be retrieved
      */
     T getValue(T value);
 
@@ -64,7 +64,7 @@ public interface IMentionableDAO<K extends Serializable, T extends IMentionable<
      *            Optionally supply a room name
      * @param username
      *            Optionally supply a user name
-     * @return A list of <code>T</code> representing all the times this entity was mentioned
+     * @return A list of <code>T</code> representing all the times this value was mentioned
      *         in the given time period
      */
     List<T> getAllMentionsForValue(K value,
@@ -83,7 +83,7 @@ public interface IMentionableDAO<K extends Serializable, T extends IMentionable<
      *            Optionally supply a room name
      * @param username
      *            Optionally supply a user name
-     * @return A list of <code>T</code> representing all the times this entity was mentioned
+     * @return A list of <code>T</code> representing all the times this value was mentioned
      *         in the given time period
      */
     List<T> getAllMentions(Interval interval, Optional<String> roomName, Optional<String> username);
@@ -92,7 +92,7 @@ public interface IMentionableDAO<K extends Serializable, T extends IMentionable<
      * Returns the total number of times a type <code>T</code> was mentioned in the given
      * <code>interval</code>.
      *
-     * @param entity
+     * @param value
      *            The value of interest
      * @param interval
      *            The interval of interest. Note that the query is inclusive of the start time and
@@ -101,12 +101,27 @@ public interface IMentionableDAO<K extends Serializable, T extends IMentionable<
      *            Optionally supply a room name
      * @param username
      *            Optionally supply a user name
-     * @return The total number of times the entity was mentioned in the given time interval
+     * @return The total number of times the value was mentioned in the given time interval
      */
     int getTotalMentionsForType(K value,
                                 Interval interval,
                                 Optional<String> roomName,
                                 Optional<String> username);
+
+    /**
+     * Returns the total number of mentions of a particular type this DAO represents
+     *
+     * @param interval
+     *            The interval to search in
+     * @param roomName
+     *            Optional room name
+     * @param username
+     *            Optional username
+     * @return The total number of mentions based on the given parameters
+     */
+    int getTotalMentionsOfType(Interval interval,
+                               Optional<String> roomName,
+                               Optional<String> username);
 
     /**
      * Returns back the top mentioned values of a type in the given time <code>interval</code>, and

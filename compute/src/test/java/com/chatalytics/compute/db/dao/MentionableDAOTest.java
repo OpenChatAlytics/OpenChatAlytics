@@ -3,15 +3,18 @@ package com.chatalytics.compute.db.dao;
 import com.chatalytics.compute.matrix.LabeledDenseMatrix;
 import com.chatalytics.core.config.ChatAlyticsConfig;
 import com.chatalytics.core.model.EmojiEntity;
+import com.google.common.base.Optional;
 
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import javax.persistence.EntityExistsException;
+import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 
 import static org.junit.Assert.assertEquals;
@@ -33,6 +36,7 @@ public class MentionableDAOTest {
     @Before
     public void setUp() {
         ChatAlyticsConfig config = new ChatAlyticsConfig();
+        config.persistenceUnitName = "chatalytics-db-test";
         entityManagerFactory = ChatAlyticsDAOFactory.getEntityManagerFactory(config);
         underTest = new MentionableDAO<>(entityManagerFactory, EmojiEntity.class);
     }
@@ -87,4 +91,64 @@ public class MentionableDAOTest {
         // store it again and make sure an exception is not thrown
         underTest.persistValue(emoji);
     }
+
+    @Test
+    public void testGetTotalMentionsOfType() {
+        DateTime end = DateTime.now();
+        DateTime start = end.minusDays(1);
+        Interval interval = new Interval(start, end);
+        underTest.persistValue(new EmojiEntity("a", 1, start, "u1", "r1"));
+        underTest.persistValue(new EmojiEntity("a", 1, start.plusMillis(1), "u1", "r2"));
+        underTest.persistValue(new EmojiEntity("a", 1, start.plusMillis(2), "u2", "r1"));
+        underTest.persistValue(new EmojiEntity("b", 1, start.plusMillis(3), "u1", "r2"));
+        underTest.persistValue(new EmojiEntity("b", 1, start.plusMillis(4), "u2", "r3"));
+        underTest.persistValue(new EmojiEntity("c", 1, start.plusMillis(5), "u1", "r3"));
+
+        int result = underTest.getTotalMentionsOfType(interval, Optional.absent(),
+                                                      Optional.absent());
+        assertEquals(6, result);
+
+        result = underTest.getTotalMentionsOfType(interval, Optional.of("r1"), Optional.absent());
+        assertEquals(2, result);
+
+        result = underTest.getTotalMentionsOfType(interval, Optional.absent(), Optional.of("u1"));
+        assertEquals(4, result);
+
+        result = underTest.getTotalMentionsOfType(interval, Optional.of("r1"), Optional.of("u1"));
+        assertEquals(1, result);
+    }
+
+    @Test
+    public void testGetTotalMentionsForType() {
+        DateTime end = DateTime.now();
+        DateTime start = end.minusDays(1);
+        Interval interval = new Interval(start, end);
+        underTest.persistValue(new EmojiEntity("a", 1, start, "u1", "r1"));
+        underTest.persistValue(new EmojiEntity("a", 1, start.plusMillis(1), "u1", "r2"));
+        underTest.persistValue(new EmojiEntity("a", 1, start.plusMillis(2), "u2", "r3"));
+        underTest.persistValue(new EmojiEntity("b", 1, start.plusMillis(3), "u1", "r2"));
+        underTest.persistValue(new EmojiEntity("c", 1, start.plusMillis(5), "u1", "r3"));
+
+        int result = underTest.getTotalMentionsForType("a", interval, Optional.absent(),
+                                                       Optional.absent());
+        assertEquals(3, result);
+
+        result = underTest.getTotalMentionsForType("a", interval, Optional.of("r1"),
+                                                   Optional.absent());
+        assertEquals(1, result);
+
+        result = underTest.getTotalMentionsForType("a", interval, Optional.absent(),
+                                                   Optional.of("u1"));
+        assertEquals(2, result);
+    }
+
+    @After
+    public void tearDown() {
+        EntityManager em = entityManagerFactory.createEntityManager();
+        em.getTransaction().begin();
+        em.createNativeQuery("DELETE FROM " + EmojiEntity.EMOJI_TABLE_NAME).executeUpdate();
+        em.getTransaction().commit();
+        underTest.close();
+    }
+
 }

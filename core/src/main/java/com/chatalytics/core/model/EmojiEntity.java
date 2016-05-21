@@ -6,6 +6,7 @@ import org.hibernate.annotations.Type;
 import org.joda.time.DateTime;
 
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Setter;
 
@@ -17,6 +18,7 @@ import javax.persistence.Table;
 @Entity
 @Table(name = EmojiEntity.EMOJI_TABLE_NAME)
 @EqualsAndHashCode
+@AllArgsConstructor
 @Setter(value = AccessLevel.PROTECTED) // for hibernate
 public class EmojiEntity implements IMentionable<String> {
 
@@ -39,15 +41,6 @@ public class EmojiEntity implements IMentionable<String> {
     private String roomName;
 
     protected EmojiEntity() {} // for jackson
-
-    public EmojiEntity(String value, int occurrences, DateTime mentionTime, String username,
-                       String roomName) {
-        this.value = value;
-        this.occurrences = occurrences;
-        this.mentionTime = mentionTime;
-        this.username = username;
-        this.roomName = roomName;
-    }
 
     @Override
     @Id
