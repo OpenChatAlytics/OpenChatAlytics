@@ -120,4 +120,14 @@ public class EntityDAOImpl extends AbstractIdleService implements IEntityDAO {
         occurrenceStatsDAO.close();
     }
 
+    @Override
+    public Map<String, Double> getTopUsersByEoTV(Interval interval, int resultSize) {
+        return occurrenceStatsDAO.getTopColumnsByToTV("username", interval, resultSize);
+    }
+
+    @Override
+    public Map<String, Double> getTopRoomsByEoTV(Interval interval, int resultSize) {
+        return occurrenceStatsDAO.getTopColumnsByToTV("roomName", interval, resultSize);
+    }
+
 }

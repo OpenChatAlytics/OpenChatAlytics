@@ -118,4 +118,30 @@ public interface IEntityDAO extends Service {
       * @return A labeled matrix
       */
      LabeledDenseMatrix<String> getRoomSimilaritiesByEntity(Interval interval);
+
+     /**
+      * Returns a sorted map of user to a ratio, where the ratio is the entity volume over the total
+      * volume of all entities in a time range. We call this metric EoTV (entity over total volume)
+      *
+      * @param interval
+      *            The interval to get the top values in. Note that the start is inclusive and the
+      *            end is exclusive
+      * @param resultSize
+      *            The result size
+      * @return A sorted map of top users to ratio
+      */
+     Map<String, Double> getTopUsersByEoTV(Interval interval, int resultSize);
+
+     /**
+      * Returns a sorted map of rooms to a ratio, where the ratio is the entity volume over the
+      * total entity volume. We call this metric EoTV (entity over total volume)
+      *
+      * @param interval
+      *            The interval to get the top values in. Note that the start is inclusive and the
+      *            end is exclusive
+      * @param resultSize
+      *            The result size
+      * @return A sorted map of top room to ratio
+      */
+     Map<String, Double> getTopRoomsByEoTV(Interval interval, int resultSize);
 }

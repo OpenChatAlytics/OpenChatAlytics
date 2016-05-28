@@ -135,6 +135,26 @@ public class EntityDAOImplTest {
         assertEquals(2, result.getMatrix().length);
     }
 
+    @Test
+    public void testGetTopRoomsByToTV() {
+        Interval interval = new Interval(mentionDate.minusMillis(1), mentionDate.plusMillis(1));
+
+        Map<String, Double> result = underTest.getTopRoomsByEoTV(interval, 10);
+        assertEquals(2, result.size());
+        assertEquals(0.75, result.get("room1"), 0);
+        assertEquals(0.25, result.get("room2"), 0);
+    }
+
+    @Test
+    public void testGetTopUsersByToTV() {
+        Interval interval = new Interval(mentionDate.minusMillis(1), mentionDate.plusMillis(1));
+
+        Map<String, Double> result = underTest.getTopUsersByEoTV(interval, 10);
+        assertEquals(2, result.size());
+        assertEquals(0.75, result.get("giannis"), 0);
+        assertEquals(0.25, result.get("jane"), 0);
+    }
+
     @After
     public void tearDown() throws Exception {
         underTest.stopAsync().awaitTerminated();

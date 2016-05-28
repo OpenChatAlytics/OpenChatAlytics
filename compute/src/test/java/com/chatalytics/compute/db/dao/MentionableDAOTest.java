@@ -13,6 +13,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import java.util.Map;
+
 import javax.persistence.EntityExistsException;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -20,6 +22,7 @@ import javax.persistence.EntityManagerFactory;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Tests {@link MentionableDAO}
@@ -140,6 +143,45 @@ public class MentionableDAOTest {
         result = underTest.getTotalMentionsForType("a", interval, Optional.absent(),
                                                    Optional.of("u1"));
         assertEquals(2, result);
+    }
+
+    @Test
+    public void testGetTopRoomsByToTV() {
+        DateTime end = DateTime.now();
+        DateTime start = end.minusDays(1);
+
+        underTest.persistValue(new EmojiEntity("a", 1, start.plusMillis(1), "u1", "r1"));
+        underTest.persistValue(new EmojiEntity("b", 1, start.plusMillis(2), "u1", "r2"));
+        underTest.persistValue(new EmojiEntity("c", 1, start.plusMillis(3), "u2", "r3"));
+        underTest.persistValue(new EmojiEntity("d", 1, start.plusMillis(4), "u1", "r4"));
+        underTest.persistValue(new EmojiEntity("e", 1, start.plusMillis(5), "u1", "r4"));
+        underTest.persistValue(new EmojiEntity("f", 1, start.plusMillis(6), "u1", "r5"));
+        underTest.persistValue(new EmojiEntity("g", 1, start.plusMillis(7), "u1", "r5"));
+        underTest.persistValue(new EmojiEntity("h", 1, start.plusMillis(8), "u1", "r5"));
+
+        Interval interval = new Interval(start, end);
+
+        Map<String, Double> result = underTest.getTopColumnsByToTV("roomName", interval, 100);
+        assertEquals(5, result.size());
+        assertEquals(0.375, result.get("r5").doubleValue(), 0);
+        assertEquals(0.25, result.get("r4").doubleValue(), 0);
+        assertEquals(0.125, result.get("r3").doubleValue(), 0);
+        assertEquals(0.125, result.get("r2").doubleValue(), 0);
+        assertEquals(0.125, result.get("r1").doubleValue(), 0);
+
+        // check that they're in descending order
+        double previousValue = Double.MIN_VALUE;
+        for (double value : result.values()) {
+            assertTrue(Double.compare(value, previousValue) > 0);
+        }
+
+        // check with a smaller interval
+        interval = new Interval(start.plusMillis(2), start.plusMillis(6));
+        result = underTest.getTopColumnsByToTV("roomName", interval, 100);
+        assertEquals(3, result.size());
+        Map.Entry<String, Double> firstEntry = result.entrySet().iterator().next();
+        assertEquals("r4", firstEntry.getKey());
+        assertEquals(0.5, firstEntry.getValue().doubleValue(), 0);
     }
 
     @After
