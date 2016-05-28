@@ -95,6 +95,22 @@ public class EmojiDAOImpl extends AbstractIdleService implements IEmojiDAO {
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Map<String, Double> getTopUsersByEoTV(Interval interval, int resultSize) {
+        return occurrenceStatsDAO.getTopColumnsByToTV("username", interval, resultSize);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Map<String, Double> getTopRoomsByEoTV(Interval interval, int resultSize) {
+        return occurrenceStatsDAO.getTopColumnsByToTV("roomName", interval, resultSize);
+    }
+
+    /**
      * Does nothing
      */
     @Override

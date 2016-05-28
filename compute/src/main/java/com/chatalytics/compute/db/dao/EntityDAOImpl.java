@@ -105,6 +105,16 @@ public class EntityDAOImpl extends AbstractIdleService implements IEntityDAO {
         return occurrenceStatsDAO.getRoomSimilaritiesByValue(interval);
     }
 
+    @Override
+    public Map<String, Double> getTopUsersByEoTV(Interval interval, int resultSize) {
+        return occurrenceStatsDAO.getTopColumnsByToTV("username", interval, resultSize);
+    }
+
+    @Override
+    public Map<String, Double> getTopRoomsByEoTV(Interval interval, int resultSize) {
+        return occurrenceStatsDAO.getTopColumnsByToTV("roomName", interval, resultSize);
+    }
+
     /**
      * Does nothing
      */
@@ -118,16 +128,6 @@ public class EntityDAOImpl extends AbstractIdleService implements IEntityDAO {
     @Override
     protected void shutDown() throws Exception {
         occurrenceStatsDAO.close();
-    }
-
-    @Override
-    public Map<String, Double> getTopUsersByEoTV(Interval interval, int resultSize) {
-        return occurrenceStatsDAO.getTopColumnsByToTV("username", interval, resultSize);
-    }
-
-    @Override
-    public Map<String, Double> getTopRoomsByEoTV(Interval interval, int resultSize) {
-        return occurrenceStatsDAO.getTopColumnsByToTV("roomName", interval, resultSize);
     }
 
 }

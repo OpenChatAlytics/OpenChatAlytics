@@ -94,12 +94,38 @@ public interface IEmojiDAO extends Service {
      * @param username
      *            Optional user name to filter by
      * @param resultSize
-     *            The number of top entities to return back
+     *            The number of top emojis to return back
      * @return Returns back a map of emoji to number of occurrences.
      */
      Map<String, Long> getTopEmojis(Interval interval,
                                     Optional<String> roomName,
                                     Optional<String> username,
                                     int resultSize);
+
+     /**
+      * Returns a sorted map of user to a ratio, where the ratio is the emoji volume over the total
+      * volume of all emojis in a time range. We call this metric EoTV (emoji over total volume)
+      *
+      * @param interval
+      *            The interval to get the top values in. Note that the start is inclusive and the
+      *            end is exclusive
+      * @param resultSize
+      *            The result size
+      * @return A sorted map of top users to ratio
+      */
+     Map<String, Double> getTopUsersByEoTV(Interval interval, int resultSize);
+
+     /**
+      * Returns a sorted map of rooms to a ratio, where the ratio is the emoji volume over the
+      * total emoji volume. We call this metric EoTV (emoji over total volume)
+      *
+      * @param interval
+      *            The interval to get the top values in. Note that the start is inclusive and the
+      *            end is exclusive
+      * @param resultSize
+      *            The result size
+      * @return A sorted map of top room to ratio
+      */
+     Map<String, Double> getTopRoomsByEoTV(Interval interval, int resultSize);
 
 }
