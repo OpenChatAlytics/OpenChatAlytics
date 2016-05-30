@@ -26,6 +26,8 @@
             <property name="hibernate.connection.username" value="" />
             <property name="hibernate.connection.password" value="" />
             <property name="jadira.usertype.autoRegisterUserTypes" value="true" />
+            <property name="jadira.usertype.javaZone" value="UTC" />
+            <property name="jadira.usertype.databaseZone" value="UTC" />
             <property name="hibernate.connection.CharSet" value="utf-8" />
             <property name="hibernate.connection.characterEncoding" value="utf-8" />
             <property name="hibernate.connection.useUnicode" value="true" />

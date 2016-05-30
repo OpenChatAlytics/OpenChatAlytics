@@ -1,7 +1,6 @@
 package com.chatalytics.compute.db.dao;
 
 import com.chatalytics.core.config.ChatAlyticsConfig;
-import com.google.common.annotations.VisibleForTesting;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -53,8 +52,7 @@ public class ChatAlyticsDAOFactory {
         }
     }
 
-    @VisibleForTesting
-    protected static EntityManagerFactory getEntityManagerFactory(ChatAlyticsConfig config) {
+    public static EntityManagerFactory getEntityManagerFactory(ChatAlyticsConfig config) {
         if (entityManagerFactory == null) {
             String persistenceName = config.persistenceUnitName;
             entityManagerFactory = Persistence.createEntityManagerFactory(persistenceName);
