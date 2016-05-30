@@ -15,6 +15,8 @@ import org.junit.Test;
 import java.util.List;
 import java.util.Map;
 
+import javax.persistence.EntityManager;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
@@ -27,15 +29,16 @@ public class EntityDAOImplTest {
 
     private IEntityDAO underTest;
     private DateTime mentionDate;
+    private ChatAlyticsConfig config;
 
     @Before
     public void setUp() throws Exception {
-        ChatAlyticsConfig config = new ChatAlyticsConfig();
+        config = new ChatAlyticsConfig();
         config.persistenceUnitName = "chatalytics-db-test";
         underTest = ChatAlyticsDAOFactory.createEntityDAO(config);
         underTest.startAsync().awaitRunning();
 
-        mentionDate = new DateTime().withZone(DateTimeZone.UTC);
+        mentionDate = DateTime.now(DateTimeZone.UTC);
 
         // Insert a bunch of test values
         underTest.persistEntity(new ChatEntity("entity1", 1, mentionDate, "giannis", "room1"));
@@ -157,6 +160,11 @@ public class EntityDAOImplTest {
 
     @After
     public void tearDown() throws Exception {
+        EntityManager em = ChatAlyticsDAOFactory.getEntityManagerFactory(config)
+                                                .createEntityManager();
+        em.getTransaction().begin();
+        em.createNativeQuery("DELETE FROM " + ChatEntity.ENTITY_TABLE_NAME).executeUpdate();
+        em.getTransaction().commit();
         underTest.stopAsync().awaitTerminated();
     }
 }
