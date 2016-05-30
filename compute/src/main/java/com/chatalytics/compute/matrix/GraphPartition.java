@@ -1,6 +1,6 @@
 package com.chatalytics.compute.matrix;
 
-import com.chatalytics.core.model.IMentionable;
+import com.chatalytics.core.model.data.IMentionable;
 
 import org.apache.storm.shade.com.google.common.base.Preconditions;
 import org.apache.storm.shade.com.google.common.collect.Lists;

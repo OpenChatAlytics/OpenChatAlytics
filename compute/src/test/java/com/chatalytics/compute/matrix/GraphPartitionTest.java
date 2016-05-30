@@ -1,6 +1,6 @@
 package com.chatalytics.compute.matrix;
 
-import com.chatalytics.core.model.EmojiEntity;
+import com.chatalytics.core.model.data.EmojiEntity;
 import com.google.common.collect.ImmutableList;
 
 import org.apache.storm.shade.com.google.common.collect.Lists;

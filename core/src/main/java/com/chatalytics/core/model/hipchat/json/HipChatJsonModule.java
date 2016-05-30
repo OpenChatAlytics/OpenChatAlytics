@@ -1,8 +1,8 @@
 package com.chatalytics.core.model.hipchat.json;
 
-import com.chatalytics.core.model.Message;
-import com.chatalytics.core.model.Room;
-import com.chatalytics.core.model.User;
+import com.chatalytics.core.model.data.Message;
+import com.chatalytics.core.model.data.Room;
+import com.chatalytics.core.model.data.User;
 import com.fasterxml.jackson.core.Version;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 

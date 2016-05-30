@@ -1,6 +1,6 @@
 package com.chatalytics.core.model.slack.json;
 
-import com.chatalytics.core.model.Room;
+import com.chatalytics.core.model.data.Room;
 import com.chatalytics.core.model.json.JsonChatDeserializer;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;

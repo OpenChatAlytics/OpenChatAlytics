@@ -1,7 +1,7 @@
 package com.chatalytics.core.json;
 
 import com.chatalytics.core.InputSourceType;
-import com.chatalytics.core.model.ChatAlyticsEvent;
+import com.chatalytics.core.model.data.ChatAlyticsEvent;
 import com.chatalytics.core.model.hipchat.json.HipChatJsonModule;
 import com.chatalytics.core.model.slack.json.SlackJsonModule;
 import com.chatalytics.core.realtime.json.ChatAlyticsEventDeserializer;

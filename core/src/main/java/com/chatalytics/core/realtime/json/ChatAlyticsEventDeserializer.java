@@ -1,6 +1,6 @@
 package com.chatalytics.core.realtime.json;
 
-import com.chatalytics.core.model.ChatAlyticsEvent;
+import com.chatalytics.core.model.data.ChatAlyticsEvent;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.ObjectCodec;

@@ -1,8 +1,8 @@
 package com.chatalytics.compute.db.dao;
 
 import com.chatalytics.core.config.ChatAlyticsConfig;
-import com.chatalytics.core.model.MessageSummary;
-import com.chatalytics.core.model.MessageType;
+import com.chatalytics.core.model.data.MessageSummary;
+import com.chatalytics.core.model.data.MessageType;
 import com.google.common.base.Optional;
 
 import org.joda.time.DateTime;

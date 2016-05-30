@@ -1,7 +1,7 @@
 package com.chatalytics.core.model.hipchat.json;
 
-import com.chatalytics.core.model.Message;
-import com.chatalytics.core.model.MessageType;
+import com.chatalytics.core.model.data.Message;
+import com.chatalytics.core.model.data.MessageType;
 import com.chatalytics.core.model.json.JsonChatDeserializer;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;

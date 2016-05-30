@@ -1,4 +1,4 @@
-package com.chatalytics.core.model;
+package com.chatalytics.core.model.data;
 
 import com.google.common.base.MoreObjects;
 
@@ -6,7 +6,6 @@ import org.hibernate.annotations.Type;
 import org.joda.time.DateTime;
 
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Setter;
 
@@ -15,36 +14,47 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+/**
+ * Represents an entity extracted from a chat message. This is also persisted in the database.
+ *
+ * @author giannis
+ *
+ */
 @Entity
-@Table(name = EmojiEntity.EMOJI_TABLE_NAME)
+@Table(name = ChatEntity.ENTITY_TABLE_NAME)
 @EqualsAndHashCode
-@AllArgsConstructor
 @Setter(value = AccessLevel.PROTECTED) // for hibernate
-public class EmojiEntity implements IMentionable<String> {
+public class ChatEntity implements IMentionable<String> {
 
-    private static final long serialVersionUID = 7180644692083145759L;
-
-    public static final String EMOJI_TABLE_NAME = "EMOJI";
-    public static final String EMOJI_COLUMN = "VALUE";
+    public static final String ENTITY_TABLE_NAME = "ENTITIES";
+    public static final String ENTITY_VALUE_COLUMN = "VALUE";
     public static final String OCCURENCES_COLUMN = "OCCURRENCES";
     public static final String MENTION_TIME_COLUMN = "MENTION_TIME";
     public static final String ROOM_NAME_COLUMN = "ROOM_NAME";
     public static final String USER_NAME_COLUMN = "USER_NAME";
 
-    /**
-     * Emoji alias without ':'
-     */
+    public static final long serialVersionUID = -4845804080646234255L;
+
     private String value;
     private int occurrences;
     private DateTime mentionTime;
     private String username;
     private String roomName;
 
-    protected EmojiEntity() {} // for jackson
+    protected ChatEntity() {} // for jackson
+
+    public ChatEntity(String value, int occurrences, DateTime mentionTime,
+                      String username, String roomName) {
+        this.value = value;
+        this.occurrences = occurrences;
+        this.mentionTime = mentionTime;
+        this.username = username;
+        this.roomName = roomName;
+    }
 
     @Override
     @Id
-    @Column(name = EMOJI_COLUMN)
+    @Column(name = ENTITY_VALUE_COLUMN)
     public String getValue() {
         return value;
     }
@@ -87,4 +97,5 @@ public class EmojiEntity implements IMentionable<String> {
                           .add("roomName", roomName)
                           .toString();
     }
+
 }

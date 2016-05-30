@@ -1,6 +1,6 @@
 package com.chatalytics.compute.db.dao;
 
-import com.chatalytics.core.model.LastPullTime;
+import com.chatalytics.core.model.data.LastPullTime;
 import com.google.common.util.concurrent.AbstractIdleService;
 
 import org.joda.time.DateTime;

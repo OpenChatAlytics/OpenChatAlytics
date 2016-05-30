@@ -1,7 +1,7 @@
 package com.chatalytics.compute.storm.bolt;
 
 import com.chatalytics.core.config.ChatAlyticsConfig;
-import com.chatalytics.core.model.ChatAlyticsEvent;
+import com.chatalytics.core.model.data.ChatAlyticsEvent;
 import com.chatalytics.core.realtime.ChatAlyticsEventEncoder;
 import com.chatalytics.core.realtime.ConnectionType;
 import com.chatalytics.core.realtime.ConnectionTypeEncoderDecoder;

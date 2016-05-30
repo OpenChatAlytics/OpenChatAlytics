@@ -4,9 +4,9 @@ import com.chatalytics.compute.chat.dao.IChatApiDAO;
 import com.chatalytics.compute.config.ConfigurationConstants;
 import com.chatalytics.core.config.ChatAlyticsConfig;
 import com.chatalytics.core.config.LocalTestConfig;
-import com.chatalytics.core.model.Message;
-import com.chatalytics.core.model.MessageType;
-import com.chatalytics.core.model.User;
+import com.chatalytics.core.model.data.Message;
+import com.chatalytics.core.model.data.MessageType;
+import com.chatalytics.core.model.data.User;
 import com.chatalytics.core.util.YamlUtils;
 import com.google.common.collect.Maps;
 

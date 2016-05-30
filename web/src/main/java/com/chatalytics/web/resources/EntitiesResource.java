@@ -4,7 +4,7 @@ import com.chatalytics.compute.db.dao.ChatAlyticsDAOFactory;
 import com.chatalytics.compute.db.dao.IEntityDAO;
 import com.chatalytics.compute.matrix.LabeledDenseMatrix;
 import com.chatalytics.core.config.ChatAlyticsConfig;
-import com.chatalytics.core.model.ChatEntity;
+import com.chatalytics.core.model.data.ChatEntity;
 import com.chatalytics.core.similarity.SimilarityDimension;
 import com.chatalytics.web.constant.WebConstants;
 import com.chatalytics.web.utils.DateTimeUtils;

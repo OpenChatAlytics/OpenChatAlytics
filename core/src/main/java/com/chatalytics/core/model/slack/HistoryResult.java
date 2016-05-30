@@ -1,6 +1,6 @@
 package com.chatalytics.core.model.slack;
 
-import com.chatalytics.core.model.Message;
+import com.chatalytics.core.model.data.Message;
 
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;

@@ -1,7 +1,7 @@
 package com.chatalytics.compute.db.dao;
 
 import com.chatalytics.compute.matrix.LabeledDenseMatrix;
-import com.chatalytics.core.model.ChatEntity;
+import com.chatalytics.core.model.data.ChatEntity;
 import com.google.common.base.Optional;
 import com.google.common.util.concurrent.AbstractIdleService;
 

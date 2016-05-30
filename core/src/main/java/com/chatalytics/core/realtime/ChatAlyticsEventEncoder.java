@@ -1,7 +1,7 @@
 package com.chatalytics.core.realtime;
 
 import com.chatalytics.core.json.JsonObjectMapperFactory;
-import com.chatalytics.core.model.ChatAlyticsEvent;
+import com.chatalytics.core.model.data.ChatAlyticsEvent;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
