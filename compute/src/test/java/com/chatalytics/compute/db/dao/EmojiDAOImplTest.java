@@ -12,6 +12,8 @@ import org.junit.Test;
 
 import java.util.Map;
 
+import javax.persistence.EntityManager;
+
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -24,15 +26,16 @@ public class EmojiDAOImplTest {
 
     private IEmojiDAO underTest;
     private DateTime mentionDate;
+    private ChatAlyticsConfig config;
 
     @Before
     public void setUp() throws Exception {
-        ChatAlyticsConfig config = new ChatAlyticsConfig();
+        config = new ChatAlyticsConfig();
         config.persistenceUnitName = "chatalytics-db-test";
         underTest = ChatAlyticsDAOFactory.createEmojiDAO(config);
         underTest.startAsync().awaitRunning();
 
-        mentionDate = new DateTime().withZone(DateTimeZone.UTC);
+        mentionDate = DateTime.now(DateTimeZone.UTC);
 
         // Insert a bunch of test values
         underTest.persistEmoji(new EmojiEntity("emoji1", 1, mentionDate, "giannis", "room1"));
@@ -63,6 +66,11 @@ public class EmojiDAOImplTest {
 
     @After
     public void tearDown() throws Exception {
+        EntityManager em = ChatAlyticsDAOFactory.getEntityManagerFactory(config)
+                                                .createEntityManager();
+        em.getTransaction().begin();
+        em.createNativeQuery("DELETE FROM " + EmojiEntity.EMOJI_TABLE_NAME).executeUpdate();
+        em.getTransaction().commit();
         underTest.stopAsync().awaitTerminated();
     }
 
