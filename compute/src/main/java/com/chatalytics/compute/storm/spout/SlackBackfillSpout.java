@@ -48,10 +48,10 @@ public class SlackBackfillSpout extends BaseRichSpout {
     public static final String SPOUT_ID = "SLACK_BACKFILL_MESSAGE_SPOUT_ID";
     public static final String BACKFILL_SLACK_MESSAGE_FIELD_STR = "slack-message";
 
-    private IChatApiDAO slackDao;
     private DateTime initDate;
     private SpoutOutputCollector collector;
     private int granularityMins;
+    private IChatApiDAO slackDao;
     private IChatAlyticsDAO dbDao;
 
     @Override
@@ -60,31 +60,31 @@ public class SlackBackfillSpout extends BaseRichSpout {
 
         String configYaml = (String) conf.get(ConfigurationConstants.CHATALYTICS_CONFIG.txt);
         ChatAlyticsConfig config = YamlUtils.readChatAlyticsConfigFromString(configYaml);
+        SlackBackfillerConfig chatConfig = (SlackBackfillerConfig) config.computeConfig.chatConfig;
+        Preconditions.checkArgument(chatConfig.granularityMins >= 0, "Granularity has to be >= 0");
 
-        SlackBackfillerConfig backfillerConfig = (SlackBackfillerConfig) config.computeConfig.chatConfig;
-        Preconditions.checkArgument(backfillerConfig.granularityMins > 0,
-                "The granularity needs to be > 0");
-        this.granularityMins = backfillerConfig.granularityMins;
-        this.slackDao = getChatApiDao(config);
+        open(chatConfig, SlackApiDAOFactory.getSlackApiDao(config),
+             ChatAlyticsDAOFactory.createChatAlyticsDao(config), context, collector);
+
+    }
+
+    @VisibleForTesting
+    protected void open(SlackBackfillerConfig chatConfig, IChatApiDAO slackApiDao,
+                      IChatAlyticsDAO dbDao, TopologyContext context,
+                      SpoutOutputCollector collector) {
+        this.granularityMins = chatConfig.granularityMins;
         this.collector = collector;
-        if (backfillerConfig.startDate == null) {
+        this.slackDao = slackApiDao;
+        this.dbDao = dbDao;
+
+        if (chatConfig.startDate == null) {
             // go back a day
             this.initDate = new DateTime(DateTimeZone.UTC).withHourOfDay(0)
                                                            .withMinuteOfHour(0)
                                                            .minusDays(1);
         } else {
-            this.initDate = DateTime.parse(backfillerConfig.startDate);
+            this.initDate = DateTime.parse(chatConfig.startDate);
         }
-
-        this.dbDao = ChatAlyticsDAOFactory.createChatAlyticsDao(config);
-    }
-
-    /**
-     * @return The slack API DAO
-     */
-    @VisibleForTesting
-    protected IChatApiDAO getChatApiDao(ChatAlyticsConfig  config) {
-        return SlackApiDAOFactory.getSlackApiDao(config);
     }
 
     /**
@@ -97,6 +97,8 @@ public class SlackBackfillSpout extends BaseRichSpout {
         Optional<Interval> optionalInterval = getRunInterval();
         if (!optionalInterval.isPresent()) {
             try {
+                LOG.info("Waiting for a few more minutes to go by. Granularity is {}",
+                         granularityMins);
                 Thread.sleep(granularityMins * 60 * 1000);
             } catch (InterruptedException e) {
                 LOG.warn("Interrupted while sleeping...");
@@ -114,8 +116,9 @@ public class SlackBackfillSpout extends BaseRichSpout {
         dbDao.setLastMessagePullTime(runInterval.getEnd());
     }
 
-    private void backfillRooms(Map<String, User> users, Map<String, Room> rooms,
-                               Interval runInterval) {
+    @VisibleForTesting
+    protected void backfillRooms(Map<String, User> users, Map<String, Room> rooms,
+                                 Interval runInterval) {
         Set<String> skippedRoomNames = Sets.newHashSet();
         int skippedUnknownMessages = 0;
         LOG.info("Backfilling {} rooms", rooms.size());
@@ -170,7 +173,8 @@ public class SlackBackfillSpout extends BaseRichSpout {
      * @return The next run interval to get messages for based on the last pull time, the
      *         granularity of batch gets and the initial start date set in the yaml config
      */
-    private Optional<Interval> getRunInterval() {
+    @VisibleForTesting
+    protected Optional<Interval> getRunInterval() {
         DateTime startDate;
         DateTime endDate = new DateTime(System.currentTimeMillis(), DateTimeZone.UTC);
         DateTime lastRunDate = dbDao.getLastMessagePullTime();
@@ -182,7 +186,6 @@ public class SlackBackfillSpout extends BaseRichSpout {
         }
 
         if (startDate.plusMinutes(granularityMins).isAfter(endDate)) {
-            LOG.info("Waiting for a few more minutes to go by. Granularity is {}", granularityMins);
             return Optional.absent();
         }
 
