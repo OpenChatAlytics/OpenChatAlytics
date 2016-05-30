@@ -54,6 +54,46 @@ public class LocalTestSpout extends BaseRichSpout {
     private List<String> sentences;
 
     @Override
+    public void open(@SuppressWarnings("rawtypes") Map conf, TopologyContext context,
+                     SpoutOutputCollector collector) {
+
+        String configYaml = (String) conf.get(ConfigurationConstants.CHATALYTICS_CONFIG.txt);
+        ChatAlyticsConfig config = YamlUtils.readChatAlyticsConfigFromString(configYaml);
+
+        LOG.info("Loaded config...");
+
+        LocalTestConfig localConfig = (LocalTestConfig) config.computeConfig.chatConfig;
+
+        this.sleepMs = localConfig.sleepMs;
+        this.collector = collector;
+        this.dtZone = DateTimeZone.forID(config.timeZone);
+
+        String filename = localConfig.messageCorpusFile;
+
+        URL corpusURL = ClassLoader.getSystemResource(filename);
+        if (corpusURL == null) {
+            throw new IllegalArgumentException("Can't find corpus. Specified: " + filename);
+        }
+        try {
+            this.sentences = Files.readAllLines(Paths.get(corpusURL.toURI()));
+        } catch (IOException | URISyntaxException e) {
+            throw new IllegalArgumentException("Can't read corpus. Specified: " + filename, e);
+        }
+
+        // create the number generator
+        long seed;
+        if (localConfig.randomSeed == null) {
+            seed = System.currentTimeMillis();
+        } else {
+            seed = localConfig.randomSeed;
+        }
+        this.rand = new Random(seed);
+
+        this.users = createRandomUsers(localConfig.numUsers, rand);
+        this.rooms = createRandomRooms(localConfig.numRooms, rand);
+    }
+
+    @Override
     public void nextTuple() {
 
         User fromUser = users.get(rand.nextInt(users.size()));
@@ -74,45 +114,6 @@ public class LocalTestSpout extends BaseRichSpout {
         } catch (InterruptedException e) {
             LOG.warn("Interrupted. Ignoring and moving on...");
         }
-    }
-
-    @Override
-    public void open(@SuppressWarnings("rawtypes") Map conf, TopologyContext context,
-            SpoutOutputCollector collector) {
-
-        String configYaml = (String) conf.get(ConfigurationConstants.CHATALYTICS_CONFIG.txt);
-        ChatAlyticsConfig config = YamlUtils.readChatAlyticsConfigFromString(configYaml);
-
-        LOG.info("Loaded config...");
-
-        LocalTestConfig localConfig = (LocalTestConfig) config.computeConfig.chatConfig;
-
-        this.sleepMs = localConfig.sleepMs;
-        this.collector = collector;
-        this.dtZone = DateTimeZone.forID(config.timeZone);
-
-        String filename = localConfig.messageCorpusFile;
-        try {
-            URL corpusURL = ClassLoader.getSystemResource(filename);
-            if (corpusURL == null) {
-                throw new IllegalArgumentException("Can't find corpus. Specified: " + filename);
-            }
-            this.sentences = Files.readAllLines(Paths.get(corpusURL.toURI()));
-        } catch (IOException | URISyntaxException e) {
-            throw new IllegalArgumentException("Can't read corpus. Specified: " + filename, e);
-        }
-
-        // create the number generator
-        long seed;
-        if (localConfig.randomSeed == null) {
-            seed = System.currentTimeMillis();
-        } else {
-            seed = localConfig.randomSeed;
-        }
-        this.rand = new Random(seed);
-
-        this.users = createRandomUsers(localConfig.numUsers, rand);
-        this.rooms = createRandomRooms(localConfig.numRooms, rand);
     }
 
     /**
@@ -172,6 +173,14 @@ public class LocalTestSpout extends BaseRichSpout {
     @Override
     public void declareOutputFields(OutputFieldsDeclarer fields) {
         fields.declare(new Fields(LOCAL_TEST_MESSAGE_FIELD_STR));
+    }
+
+    protected List<Room> getRooms() {
+        return rooms;
+    }
+
+    protected List<User> getUsers() {
+        return users;
     }
 
 }
