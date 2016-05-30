@@ -1,6 +1,6 @@
 package com.chatalytics.core.model.slack.json;
 
-import com.chatalytics.core.model.User;
+import com.chatalytics.core.model.data.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.junit.Before;

@@ -1,6 +1,6 @@
 package com.chatalytics.compute.db.dao;
 
-import com.chatalytics.core.model.EmojiEntity;
+import com.chatalytics.core.model.data.EmojiEntity;
 import com.google.common.base.Optional;
 import com.google.common.util.concurrent.AbstractIdleService;
 

@@ -1,4 +1,4 @@
-package com.chatalytics.core.model;
+package com.chatalytics.core.model.data;
 
 import com.google.common.base.MoreObjects;
 

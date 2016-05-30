@@ -3,9 +3,9 @@ package com.chatalytics.compute.storm.bolt;
 import com.chatalytics.compute.db.dao.ChatAlyticsDAOFactory;
 import com.chatalytics.compute.db.dao.IEmojiDAO;
 import com.chatalytics.core.config.ChatAlyticsConfig;
-import com.chatalytics.core.model.EmojiEntity;
-import com.chatalytics.core.model.FatMessage;
-import com.chatalytics.core.model.Room;
+import com.chatalytics.core.model.data.EmojiEntity;
+import com.chatalytics.core.model.data.FatMessage;
+import com.chatalytics.core.model.data.Room;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Maps;
 

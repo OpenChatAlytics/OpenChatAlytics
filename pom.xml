@@ -340,6 +340,7 @@
         <configuration>
           <excludes>
             <exclude>com/chatalytics/core/config/*</exclude>
+            <exclude>com/chatalytics/core/model/data/*</exclude>
           </excludes>
         </configuration>
       </plugin>

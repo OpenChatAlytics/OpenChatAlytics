@@ -1,6 +1,6 @@
 package com.chatalytics.web.resources;
 
-import com.chatalytics.core.model.ChatAlyticsEvent;
+import com.chatalytics.core.model.data.ChatAlyticsEvent;
 import com.chatalytics.core.realtime.ChatAlyticsEventDecoder;
 import com.chatalytics.core.realtime.ChatAlyticsEventEncoder;
 import com.chatalytics.core.realtime.ConnectionTypeEncoderDecoder;

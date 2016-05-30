@@ -1,6 +1,6 @@
 package com.chatalytics.core.model.slack.json;
 
-import com.chatalytics.core.model.Message;
+import com.chatalytics.core.model.data.Message;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.joda.time.DateTime;

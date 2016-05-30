@@ -1,6 +1,6 @@
 package com.chatalytics.web.resources;
 
-import com.chatalytics.core.model.ChatAlyticsEvent;
+import com.chatalytics.core.model.data.ChatAlyticsEvent;
 
 import org.junit.Before;
 import org.junit.Test;

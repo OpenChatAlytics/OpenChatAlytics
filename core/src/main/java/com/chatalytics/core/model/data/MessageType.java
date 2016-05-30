@@ -1,4 +1,4 @@
-package com.chatalytics.core.model;
+package com.chatalytics.core.model.data;
 
 import com.chatalytics.core.similarity.SimilarityDimension;
 import com.google.common.base.Preconditions;

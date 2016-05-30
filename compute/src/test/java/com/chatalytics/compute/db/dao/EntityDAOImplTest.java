@@ -2,7 +2,7 @@ package com.chatalytics.compute.db.dao;
 
 import com.chatalytics.compute.matrix.LabeledDenseMatrix;
 import com.chatalytics.core.config.ChatAlyticsConfig;
-import com.chatalytics.core.model.ChatEntity;
+import com.chatalytics.core.model.data.ChatEntity;
 import com.google.common.base.Optional;
 
 import org.joda.time.DateTime;

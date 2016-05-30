@@ -1,6 +1,6 @@
 package com.chatalytics.compute.storm.spout;
 
-import com.chatalytics.core.model.Message;
+import com.chatalytics.core.model.data.Message;
 
 import org.junit.After;
 import org.junit.Before;

@@ -3,9 +3,9 @@ package com.chatalytics.compute.storm.bolt;
 import com.chatalytics.compute.db.dao.ChatAlyticsDAOFactory;
 import com.chatalytics.compute.db.dao.IMessageSummaryDAO;
 import com.chatalytics.core.config.ChatAlyticsConfig;
-import com.chatalytics.core.model.FatMessage;
-import com.chatalytics.core.model.MessageSummary;
-import com.chatalytics.core.model.MessageType;
+import com.chatalytics.core.model.data.FatMessage;
+import com.chatalytics.core.model.data.MessageSummary;
+import com.chatalytics.core.model.data.MessageType;
 
 import org.apache.storm.task.OutputCollector;
 import org.apache.storm.task.TopologyContext;

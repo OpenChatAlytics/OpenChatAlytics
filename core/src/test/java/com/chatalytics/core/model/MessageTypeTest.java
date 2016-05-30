@@ -1,5 +1,7 @@
 package com.chatalytics.core.model;
 
+import com.chatalytics.core.model.data.MessageType;
+
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

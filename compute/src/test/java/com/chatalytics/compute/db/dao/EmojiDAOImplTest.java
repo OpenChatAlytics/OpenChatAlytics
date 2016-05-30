@@ -1,7 +1,7 @@
 package com.chatalytics.compute.db.dao;
 
 import com.chatalytics.core.config.ChatAlyticsConfig;
-import com.chatalytics.core.model.EmojiEntity;
+import com.chatalytics.core.model.data.EmojiEntity;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;

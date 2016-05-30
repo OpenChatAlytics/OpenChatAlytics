@@ -1,8 +1,8 @@
 package com.chatalytics.compute.chat.dao;
 
-import com.chatalytics.core.model.Message;
-import com.chatalytics.core.model.Room;
-import com.chatalytics.core.model.User;
+import com.chatalytics.core.model.data.Message;
+import com.chatalytics.core.model.data.Room;
+import com.chatalytics.core.model.data.User;
 
 import org.joda.time.DateTime;
 
