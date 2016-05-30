@@ -119,11 +119,7 @@ public class SlackMessageSpout extends BaseRichSpout {
      * @return The web socket URI to connect to the realtime slack message stream
      */
     protected URI getRealtimeWebSocketURI() {
-        if (slackDao instanceof JsonSlackDAO) {
-            return ((JsonSlackDAO) slackDao).getRealtimeWebSocketURI();
-        } else {
-            throw new RuntimeException("Current Slack API DAO implementation cannot be used");
-        }
+        return ((JsonSlackDAO) slackDao).getRealtimeWebSocketURI();
     }
 
     /**

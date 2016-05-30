@@ -6,9 +6,11 @@ import com.chatalytics.core.config.ChatAlyticsConfig;
 import com.chatalytics.core.config.LocalTestConfig;
 import com.chatalytics.core.model.Message;
 import com.chatalytics.core.model.MessageType;
+import com.chatalytics.core.model.User;
 import com.chatalytics.core.util.YamlUtils;
 import com.google.common.collect.Maps;
 
+import org.apache.storm.shade.com.google.common.collect.ImmutableMap;
 import org.apache.storm.spout.SpoutOutputCollector;
 import org.apache.storm.task.TopologyContext;
 import org.apache.storm.topology.OutputFieldsDeclarer;
@@ -21,6 +23,7 @@ import org.junit.Test;
 
 import java.net.URI;
 import java.util.HashMap;
+import java.util.Map;
 
 import javax.websocket.DeploymentException;
 import javax.websocket.Session;
@@ -29,6 +32,7 @@ import javax.websocket.WebSocketContainer;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -117,15 +121,37 @@ public class SlackMessageSpoutTest {
         underTest.open(stormConf, mockContext, mockCollector);
 
         // trigger with this test message
-        Message triggerMessage = new Message(DateTime.now(), "Test User", "U03AFSSD", "test msg",
+        String userId = "U03AFSSD";
+        Message triggerMessage = new Message(DateTime.now(), "Test User", userId, "test msg",
                                              "C09ADF43", MessageType.MESSAGE);
         underTest.onMessageEvent(triggerMessage, mock(Session.class));
         verify(mockSlackApiDao).getUsers();
         verify(mockSlackApiDao).getRooms();
+        verifyNoMoreInteractions(mockSlackApiDao);
 
         underTest.nextTuple();
         verify(mockCollector).emit(any(Values.class));
+        verifyNoMoreInteractions(mockCollector);
 
+        // make the chat API DAO return a map of users
+        reset(mockSlackApiDao);
+        reset(mockCollector);
+
+        Map<String, User> users = ImmutableMap.of(userId,
+                                                  new User(userId, null, false, false,  false,
+                                                           "name", "mention_name", null,
+                                                           DateTime.now(), DateTime.now(), null,
+                                                           null, null, null));
+        when(mockSlackApiDao.getUsers()).thenReturn(users);
+        underTest.onMessageEvent(triggerMessage, mock(Session.class));
+        verify(mockSlackApiDao).getUsers();
+        verify(mockSlackApiDao).getRooms();
+        verifyNoMoreInteractions(mockSlackApiDao);
+        underTest.nextTuple();
+        verify(mockCollector).emit(any(Values.class));
+        verifyNoMoreInteractions(mockCollector);
+
+        // make sure nothing got emitted
         underTest.nextTuple();
         verifyNoMoreInteractions(mockCollector);
     }
@@ -135,6 +161,11 @@ public class SlackMessageSpoutTest {
         OutputFieldsDeclarer mockFields = mock(OutputFieldsDeclarer.class);
         underTest.declareOutputFields(mockFields);
         verify(mockFields).declare(any(Fields.class));
+    }
+
+    @Test
+    public void testOnError() {
+        underTest.onError(new RuntimeException("test"));
     }
 
     @After
