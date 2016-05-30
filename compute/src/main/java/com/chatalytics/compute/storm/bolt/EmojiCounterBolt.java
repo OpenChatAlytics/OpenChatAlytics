@@ -67,10 +67,8 @@ public class EmojiCounterBolt extends ChatAlyticsBaseBolt {
         OfInt charIterator = message.chars().iterator();
 
         Room room = fatMessage.getRoom();
-        String roomName;
-        if (room == null) {
-            roomName = "";
-        } else {
+        String roomName = null;
+        if (room != null) {
             roomName = room.getName();
         }
 
@@ -129,7 +127,9 @@ public class EmojiCounterBolt extends ChatAlyticsBaseBolt {
     @Override
     public void cleanup() {
         LOG.debug("Cleaning up {}", this.getClass().getSimpleName());
-        emojiDao.stopAsync().awaitTerminated();
+        if (emojiDao != null && emojiDao.isRunning()) {
+            emojiDao.stopAsync().awaitTerminated();
+        }
     }
 
 }

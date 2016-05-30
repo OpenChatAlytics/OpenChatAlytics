@@ -124,10 +124,8 @@ public class EntityExtractionBolt extends ChatAlyticsBaseBolt {
                 occurrences = existingEntity.getOccurrences() + 1;
             }
             Room room = fatMessage.getRoom();
-            String roomName;
-            if (room == null) {
-                roomName = "";
-            } else {
+            String roomName = null;
+            if (room != null) {
                 roomName = room.getName();
             }
             entities.put(entity, new ChatEntity(entity,
@@ -151,7 +149,9 @@ public class EntityExtractionBolt extends ChatAlyticsBaseBolt {
     @Override
     public void cleanup() {
         LOG.debug("Cleaning up {}", this.getClass().getSimpleName());
-        entityDao.stopAsync().awaitTerminated();
+        if (entityDao != null && entityDao.isRunning()) {
+            entityDao.stopAsync().awaitTerminated();
+        }
     }
 
 }
