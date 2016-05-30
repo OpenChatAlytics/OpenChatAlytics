@@ -1,4 +1,4 @@
-package com.chatalytics.core.model;
+package com.chatalytics.core.util;
 
 import com.chatalytics.core.InputSourceType;
 import com.chatalytics.core.config.ChatAlyticsConfig;

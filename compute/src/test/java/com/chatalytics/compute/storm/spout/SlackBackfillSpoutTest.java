@@ -23,6 +23,7 @@ import org.apache.storm.tuple.Values;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Interval;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -58,6 +59,7 @@ public class SlackBackfillSpoutTest {
         underTest = new SlackBackfillSpout();
         stormConf = Maps.newHashMapWithExpectedSize(1);
         config = new ChatAlyticsConfig();
+        config.persistenceUnitName = "chatalytics-db-test";
         chatConfig = new SlackBackfillerConfig();
         config.computeConfig.chatConfig = chatConfig;
         context = mock(TopologyContext.class);
@@ -314,5 +316,10 @@ public class SlackBackfillSpoutTest {
         OutputFieldsDeclarer fields = mock(OutputFieldsDeclarer.class);
         underTest.declareOutputFields(fields);
         verify(fields).declare(any(Fields.class));
+    }
+
+    @After
+    public void tearDown() {
+        underTest.close();
     }
 }

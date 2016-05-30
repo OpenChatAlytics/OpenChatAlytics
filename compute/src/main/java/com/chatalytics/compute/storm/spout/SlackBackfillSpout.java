@@ -198,4 +198,11 @@ public class SlackBackfillSpout extends BaseRichSpout {
         fields.declare(new Fields(BACKFILL_SLACK_MESSAGE_FIELD_STR));
     }
 
+    @Override
+    public void close() {
+        if (dbDao != null && dbDao.isRunning()) {
+            dbDao.stopAsync().awaitTerminated();
+        }
+    }
+
 }
