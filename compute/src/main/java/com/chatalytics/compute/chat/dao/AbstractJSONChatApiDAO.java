@@ -22,7 +22,7 @@ public abstract class AbstractJSONChatApiDAO implements IChatApiDAO {
     private final String authTokenParam;
     private final Random rand;
 
-    public AbstractJSONChatApiDAO(List<String> authTokens, String authTokenParam) {
+    protected AbstractJSONChatApiDAO(List<String> authTokens, String authTokenParam) {
         this.authTokens = authTokens;
         this.authTokenParam = authTokenParam;
         this.rand = new Random(System.currentTimeMillis());

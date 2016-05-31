@@ -61,6 +61,7 @@ public class SlackBackfillSpoutTest {
         config = new ChatAlyticsConfig();
         config.persistenceUnitName = "chatalytics-db-test";
         chatConfig = new SlackBackfillerConfig();
+        chatConfig.authTokens = Lists.newArrayList("0");
         config.computeConfig.chatConfig = chatConfig;
         context = mock(TopologyContext.class);
         collector = mock(SpoutOutputCollector.class);
