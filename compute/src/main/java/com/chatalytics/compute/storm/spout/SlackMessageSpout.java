@@ -65,30 +65,28 @@ public class SlackMessageSpout extends BaseRichSpout {
                      SpoutOutputCollector collector) {
         String configYaml = (String) conf.get(ConfigurationConstants.CHATALYTICS_CONFIG.txt);
         ChatAlyticsConfig config = YamlUtils.readChatAlyticsConfigFromString(configYaml);
+
         LOG.info("Loaded config...");
-
-        slackDao = getChatApiDao(config);
-        LOG.info("Got Slack API DAO...");
-
-        this.collector = collector;
-
-        WebSocketContainer webSocketContainer = getWebSocketContainer();
-        openRealtimeConnection(config, webSocketContainer);
+        WebSocketContainer webSocketContainer = JdkContainerProvider.getWebSocketContainer();
+        IChatApiDAO slackDao = getChatApiDao(config);
+        open(config, slackDao, webSocketContainer, context, collector);
     }
 
-    /**
-     * @return The websocket container.
-     */
     @VisibleForTesting
-    protected WebSocketContainer getWebSocketContainer() {
-        return JdkContainerProvider.getWebSocketContainer();
+    protected void open(ChatAlyticsConfig config, IChatApiDAO slackDao,
+                        WebSocketContainer webSocketContainer, TopologyContext context,
+                        SpoutOutputCollector collector) {
+        this.slackDao = slackDao;
+        this.collector = collector;
+        URI webSocketUri = getRealtimeWebSocketURI();
+        openRealtimeConnection(config, webSocketUri, webSocketContainer);
     }
 
     /**
      * @return The slack API DAO
      */
     @VisibleForTesting
-    protected IChatApiDAO getChatApiDao(ChatAlyticsConfig  config) {
+    protected IChatApiDAO getChatApiDao(ChatAlyticsConfig config) {
         return SlackApiDAOFactory.getSlackApiDao(config);
     }
 
@@ -97,11 +95,13 @@ public class SlackMessageSpout extends BaseRichSpout {
      *
      * @param config
      *            The application configuration
+     * @param webSocketUri
+     *            The URI to connect to
      * @param webSocket
      *            The websocket to be used for connecting
      */
-    protected void openRealtimeConnection(ChatAlyticsConfig config, WebSocketContainer webSocket) {
-        URI webSocketUri = getRealtimeWebSocketURI();
+    protected void openRealtimeConnection(ChatAlyticsConfig config, URI webSocketUri,
+                                          WebSocketContainer webSocket) {
         try {
             session = webSocket.connectToServer(this, webSocketUri);
             LOG.info("RTM session created with id {}", session.getId());
@@ -143,6 +143,12 @@ public class SlackMessageSpout extends BaseRichSpout {
                                 message.getFromName(), message.getFromName(), null, DateTime.now(),
                                 null, null, null, null, null);
         }
+
+        if (fromUser == null) {
+            LOG.warn("Can't find user with userId: {}. Skipping", message.getFromUserId());
+            return;
+        }
+
         Room room = rooms.get(message.getRoomId());
 
         FatMessage fatMessage = new FatMessage(message, fromUser, room);

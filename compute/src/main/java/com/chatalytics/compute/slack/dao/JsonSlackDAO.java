@@ -2,6 +2,7 @@ package com.chatalytics.compute.slack.dao;
 
 import com.chatalytics.compute.chat.dao.AbstractJSONChatApiDAO;
 import com.chatalytics.compute.chat.dao.IChatApiDAO;
+import com.chatalytics.compute.exception.NotConnectedException;
 import com.chatalytics.core.config.ChatAlyticsConfig;
 import com.chatalytics.core.json.JsonObjectMapperFactory;
 import com.chatalytics.core.model.data.Message;
@@ -108,13 +109,22 @@ public class JsonSlackDAO extends AbstractJSONChatApiDAO {
     public URI getRealtimeWebSocketURI() {
         WebResource rtmResource = resource.path("rtm.start");
         String jsonStr = getJsonResultWithRetries(rtmResource, apiRetries);
+
+        JsonNode tree;
         try {
-            String webSocketUrl = objMapper.readTree(jsonStr).get("url").asText();
-            return URI.create(webSocketUrl);
+            tree = objMapper.readTree(jsonStr);
         } catch (IOException e) {
             throw new RuntimeException("Unable to parse realtime resource response", e);
 
         }
+        boolean ok = tree.get("ok").asBoolean();
+        if (!ok) {
+            throw new NotConnectedException("Failed to connect to Slack API. Reason: "
+                + tree.get("error").asText());
+        }
+        String webSocketUrl = tree.get("url").asText();
+        return URI.create(webSocketUrl);
+
     }
 
     @Override

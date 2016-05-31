@@ -1,15 +1,17 @@
 package com.chatalytics.compute.slack.dao;
 
+import com.chatalytics.compute.exception.NotConnectedException;
 import com.chatalytics.core.InputSourceType;
 import com.chatalytics.core.config.ChatAlyticsConfig;
-import com.chatalytics.core.config.ChatConfig;
 import com.chatalytics.core.config.SlackConfig;
 import com.chatalytics.core.model.data.Message;
 import com.chatalytics.core.model.data.Room;
 import com.chatalytics.core.model.data.User;
+import com.google.common.collect.Lists;
 import com.google.common.io.Resources;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.WebResource;
+import com.sun.jersey.api.client.WebResource.Builder;
 
 import org.joda.time.DateTime;
 import org.junit.Before;
@@ -24,6 +26,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
+
+import javax.ws.rs.core.MediaType;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -45,19 +49,20 @@ public class JsonSlackDAOTest {
     private JsonSlackDAO underTest;
     private WebResource mockResource;
     private ChatAlyticsConfig config;
-    private ChatConfig slackConfig;
     private int apiRetries;
+    private SlackConfig chatConfig;
 
     @Before
     public void setUp() throws Exception {
         this.config = new ChatAlyticsConfig();
         this.config.inputType = InputSourceType.SLACK;
-        this.config.computeConfig.chatConfig = new SlackConfig();
-        this.slackConfig = config.computeConfig.chatConfig;
+        this.chatConfig = new SlackConfig();
+        chatConfig.authTokens = Lists.newArrayList("0");
+        this.config.computeConfig.chatConfig = chatConfig;
         this.apiRetries = config.computeConfig.apiRetries;
         Client mockClient = mock(Client.class);
         mockResource = mock(WebResource.class);
-        when(mockClient.resource(slackConfig.getBaseAPIURL())).thenReturn(mockResource);
+        when(mockClient.resource(chatConfig.getBaseAPIURL())).thenReturn(mockResource);
         underTest = spy(new JsonSlackDAO(config, mockClient));
     }
 
@@ -210,7 +215,19 @@ public class JsonSlackDAOTest {
         } catch (Exception e) {
             throw (Exception) e.getCause();
         }
+    }
 
+    @Test(expected = NotConnectedException.class)
+    public void testGetRealtimeWebSocketURI_withBadResponse() throws Exception {
+        WebResource mockRtmResrc = mock(WebResource.class);
+        when(mockResource.path("rtm.start")).thenReturn(mockRtmResrc);
+        when(mockRtmResrc.queryParam(anyString(), anyString())).thenReturn(mockRtmResrc);
+        Builder builder = mock(Builder.class);
+        String errorReason = "broken";
+        String jsonResult = String.format("{\"ok\":false, \"error\":\"%s\"}", errorReason);
+        when(builder.get(String.class)).thenReturn(jsonResult);
+        when(mockRtmResrc.accept(MediaType.APPLICATION_JSON)).thenReturn(builder);
+        underTest.getRealtimeWebSocketURI();
     }
 
 }
