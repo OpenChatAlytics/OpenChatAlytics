@@ -84,17 +84,11 @@ public class MessageDeserializer extends JsonChatDeserializer<Message> {
         String subtype = getAsTextOrNull(node.get("subtype"));
 
         if (subtype != null) {
-
             try {
                 return MessageType.fromType(subtype);
             } catch (IllegalArgumentException e) {
-                if (subtype != null) {
                     return MessageType.fromTypeOrUnknown(subtype);
-                }
             }
-
-            return MessageType.UNKNOWN;
-
         } else if (type != null) {
             return MessageType.fromTypeOrUnknown(type);
         } else {
