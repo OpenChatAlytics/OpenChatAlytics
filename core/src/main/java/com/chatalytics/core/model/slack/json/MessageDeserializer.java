@@ -45,7 +45,8 @@ public class MessageDeserializer extends JsonChatDeserializer<Message> {
 
             JsonNode attachmentNode = node.get("attachments");
             if (attachmentNode != null) {
-                node = attachmentNode;
+                // just get the first one
+                node = attachmentNode.iterator().next();
             }
         }
 
@@ -63,14 +64,9 @@ public class MessageDeserializer extends JsonChatDeserializer<Message> {
 
         String message = getAsTextOrNull(node.get("text"));
 
-        try {
-            if (message == null) {
-                message = getAsTextOrNull(node.get("pretext"));
-            }
-        } catch (Exception e) {
-            throw new RuntimeException(node.toString(), e);
+        if (message == null) {
+            message = getAsTextOrNull(node.get("pretext"));
         }
-
         return new Message(date, fromName, fromUserId, message, channelId, messageType);
     }
 

@@ -6,7 +6,7 @@ computeConfig:
     filesToRead:
         'com.chatalytics.bolts.sentiment.words': files/sentiment_words.csv
     chatConfig: !!com.chatalytics.core.config.SlackConfig
-        baseSlackURL: https://slack.com/api/
+        baseAPIURL: https://slack.com/api/
         authTokens: ['0']
 webConfig:
     port: 8080

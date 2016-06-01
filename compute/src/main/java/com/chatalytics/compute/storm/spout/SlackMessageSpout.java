@@ -22,6 +22,7 @@ import org.apache.storm.tuple.Fields;
 import org.apache.storm.tuple.Values;
 import org.glassfish.tyrus.container.jdk.client.JdkContainerProvider;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -150,7 +151,10 @@ public class SlackMessageSpout extends BaseRichSpout {
         }
 
         Room room = rooms.get(message.getRoomId());
-
+        if (room == null && message.getRoomId() != null) {
+            room = new Room(message.getRoomId(), message.getRoomId(), null,
+                            DateTime.now(DateTimeZone.UTC), null, null, false, true, null, null);
+        }
         FatMessage fatMessage = new FatMessage(message, fromUser, room);
         unemittedMessages.add(fatMessage);
     }

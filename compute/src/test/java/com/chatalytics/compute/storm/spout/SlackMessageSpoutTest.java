@@ -201,6 +201,41 @@ public class SlackMessageSpoutTest {
     }
 
     @Test
+    public void testOnMessageEvent_nullRoom() throws Exception {
+        JsonSlackDAO slackDao = mock(JsonSlackDAO.class);
+        Map<String, User> users = ImmutableMap.of("u1", new User("u1", "email", false, false, false,
+                                                                 "name", "mention_name", null,
+                                                                 DateTime.now(), DateTime.now(),
+                                                                 null, null, null, null));
+        Map<String, Room> rooms = ImmutableMap.of();
+        when(slackDao.getUsers()).thenReturn(users);
+        when(slackDao.getRooms()).thenReturn(rooms);
+        Session session = mock(Session.class);
+        when(session.getId()).thenReturn("id");
+        when(slackDao.getRealtimeWebSocketURI()).thenReturn(WEB_SOCKET_TEST_URI);
+        WebSocketContainer webSocket = mock(WebSocketContainer.class);
+        when(webSocket.connectToServer(underTest, WEB_SOCKET_TEST_URI)).thenReturn(session);
+        underTest.open(config, slackDao, webSocket, mockContext, mockCollector);
+
+        // this was a direct chat message
+        Message triggerMessage = new Message(DateTime.now(), "name", "u1", "test msg",
+                                             "D1R3CTM355", MessageType.MESSAGE);
+        underTest.onMessageEvent(triggerMessage, mock(Session.class));
+
+        verify(slackDao).getUsers();
+        verify(slackDao).getRooms();
+        verify(slackDao).getRealtimeWebSocketURI();
+        verifyNoMoreInteractions(slackDao);
+        underTest.nextTuple();
+        verify(mockCollector).emit(any(Values.class));
+        verifyNoMoreInteractions(mockCollector);
+
+        // make sure nothing got emitted
+        underTest.nextTuple();
+        verifyNoMoreInteractions(mockCollector);
+    }
+
+    @Test
     public void testDeclareOutputFields() {
         OutputFieldsDeclarer mockFields = mock(OutputFieldsDeclarer.class);
         underTest.declareOutputFields(mockFields);
