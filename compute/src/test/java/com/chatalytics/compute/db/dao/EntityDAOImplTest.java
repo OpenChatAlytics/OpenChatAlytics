@@ -48,7 +48,7 @@ public class EntityDAOImplTest {
     }
 
     @Test
-    public void testPersistValue_withDuplicate() {
+    public void testPersistEntity_withDuplicate() {
         ChatEntity entity = new ChatEntity("test_value", 1, DateTime.now(), "user", "testroom");
         underTest.persistEntity(entity);
         ChatEntity existingEntity = underTest.getEntity(entity);
@@ -107,6 +107,24 @@ public class EntityDAOImplTest {
         result = underTest.getAllMentionsForEntity("entity1", timeInterval, Optional.of("room1"),
                                                 Optional.of("giannis"));
         assertEquals(1, result.size());
+    }
+
+    /**
+     * Makes sure that the correct amount of all entity mentions are returned
+     */
+    @Test
+    public void testGetAllMentions() {
+        Interval timeInterval = new Interval(mentionDate, mentionDate.plusHours(3));
+        List<ChatEntity> result = underTest.getAllMentions(timeInterval, Optional.absent(),
+                                                           Optional.absent());
+        assertEquals(4, result.size());
+
+        result = underTest.getAllMentions(timeInterval, Optional.of("room1"), Optional.absent());
+        assertEquals(3, result.size());
+
+        result = underTest.getAllMentions(timeInterval, Optional.of("room1"),
+                                          Optional.of("giannis"));
+        assertEquals(2, result.size());
     }
 
     @Test

@@ -66,8 +66,9 @@ public class EmojiDAOImpl extends AbstractIdleService implements IEmojiDAO {
      * {@inheritDoc}
      */
     @Override
-    public List<EmojiEntity> getAllMentions(Interval interval, Optional<String> roomName,
-            Optional<String> username) {
+    public List<EmojiEntity> getAllMentions(Interval interval,
+                                            Optional<String> roomName,
+                                            Optional<String> username) {
         return occurrenceStatsDAO.getAllMentions(interval, roomName, username);
     }
 
