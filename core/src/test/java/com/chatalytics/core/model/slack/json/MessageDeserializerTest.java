@@ -54,6 +54,9 @@ public class MessageDeserializerTest {
         assertEquals(MessageType.BOT_MESSAGE, msg.getType());
     }
 
+    /**
+     * Tests deserialize with an attachment message type
+     */
     @Test
     public void testDeserialize_withAttachments() throws Exception {
         Message msg = objMapper.readValue(jiraStr, Message.class);
@@ -63,6 +66,48 @@ public class MessageDeserializerTest {
         assertEquals(new DateTime(1464723327000L), msg.getDate());
         assertEquals(null, msg.getFromName());
         assertEquals(MessageType.BOT_MESSAGE, msg.getType());
+    }
+
+    /**
+     * Tests deserialize with a message changed type
+     */
+    @Test
+    public void testDeserialize_withMsgChanged() throws Exception {
+        Message msg = objMapper.readValue(msgChangedStr, Message.class);
+        assertEquals("U8245DFYU", msg.getFromUserId());
+        assertEquals("tes", msg.getMessage());
+        // the deserializer drops the nanoseconds
+        assertEquals(new DateTime(1464743446000L), msg.getDate());
+        assertEquals(null, msg.getFromName());
+        assertEquals(MessageType.MESSAGE_CHANGED, msg.getType());
+    }
+
+    /**
+     * Tests deserialize with unknown type
+     */
+    @Test
+    public void testDeserialize_withUnknownType() throws Exception {
+        Message msg = objMapper.readValue(unknownMsgStr, Message.class);
+        assertEquals("U023BECGF", msg.getFromUserId());
+        assertEquals("test message", msg.getMessage());
+        // the deserializer drops the nanoseconds
+        assertEquals(new DateTime(1431708451000L), msg.getDate());
+        assertNull(msg.getFromName());
+        assertEquals(MessageType.UNKNOWN, msg.getType());
+    }
+
+    /**
+     * Tests deserialize with unknown subtype
+     */
+    @Test
+    public void testDeserialize_withUnknownSubtype() throws Exception {
+        Message msg = objMapper.readValue(unknownSubtypeMsgStr, Message.class);
+        assertEquals("U023BECGF", msg.getFromUserId());
+        assertEquals("test message", msg.getMessage());
+        // the deserializer drops the nanoseconds
+        assertEquals(new DateTime(1431708451000L), msg.getDate());
+        assertNull(msg.getFromName());
+        assertEquals(MessageType.UNKNOWN, msg.getType());
     }
 
     private final String messageJsonStr = "{" +
@@ -105,5 +150,45 @@ public class MessageDeserializerTest {
                                        "\"subtype\": \"bot_message\"," +
                                        "\"ts\": \"1464723327.000002\"" +
                                    "}";
+
+    private final String msgChangedStr = "{" +
+                                             "\"type\": \"message\"," +
+                                             "\"message\": {" +
+                                                 "\"type\": \"message\"," +
+                                                 "\"user\": \"U8245DFYU\"," +
+                                                 "\"text\": \"tes\"," +
+                                                 "\"edited\": {" +
+                                                     "\"user\": \"U8245DFYU\"," +
+                                                     "\"ts\": \"1464743446.000000\"" +
+                                                 "}," +
+                                                 "\"ts\": \"1464743441.000010\"" +
+                                             "}," +
+                                             "\"subtype\": \"message_changed\"," +
+                                             "\"hidden\": true," +
+                                             "\"channel\": \"D0WE24FDS\"," +
+                                             "\"previous_message\": {" +
+                                                 "\"type\": \"message\"," +
+                                                 "\"user\": \"U8245DFYU\"," +
+                                                 "\"text\": \"test\"," +
+                                                 "\"ts\": \"1464743441.000010\"" +
+                                             "}," +
+                                             "\"event_ts\": \"1464743446.987192\"," +
+                                             "\"ts\":\"1464743446.000011\"" +
+                                         "}";
+
+    private final String unknownMsgStr = "{" +
+                                             "\"type\": \"uncategorized\"," +
+                                             "\"user\": \"U023BECGF\"," +
+                                             "\"text\": \"test message\"," +
+                                             "\"ts\": \"1431708451.000186\"" +
+                                         "}";
+
+    private final String unknownSubtypeMsgStr = "{" +
+                                                    "\"type\": \"message\"," +
+                                                    "\"subtype\": \"uncategorized\"," +
+                                                    "\"user\": \"U023BECGF\"," +
+                                                    "\"text\": \"test message\"," +
+                                                    "\"ts\": \"1431708451.000186\"" +
+                                                "}";
 
 }
