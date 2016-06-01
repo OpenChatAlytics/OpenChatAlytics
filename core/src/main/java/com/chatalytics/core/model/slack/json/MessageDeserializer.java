@@ -88,8 +88,8 @@ public class MessageDeserializer extends JsonChatDeserializer<Message> {
             try {
                 return MessageType.fromType(subtype);
             } catch (IllegalArgumentException e) {
-                if (type != null) {
-                    return MessageType.fromTypeOrUnknown(type);
+                if (subtype != null) {
+                    return MessageType.fromTypeOrUnknown(subtype);
                 }
             }
 
