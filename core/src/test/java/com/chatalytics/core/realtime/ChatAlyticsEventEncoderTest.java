@@ -10,6 +10,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import javax.websocket.EncodeException;
 import javax.websocket.EndpointConfig;
 
 import static org.junit.Assert.assertEquals;
@@ -48,6 +49,11 @@ public class ChatAlyticsEventEncoderTest {
         String jsonStr = underTest.encode(event);
         ChatAlyticsEvent decodedEvent = new ChatAlyticsEventDecoder().decode(jsonStr);
         assertEquals(event, decodedEvent);
+    }
+
+    @Test(expected = EncodeException.class)
+    public void testEncode_badSerializable() throws Exception {
+        underTest.encode(new ChatAlyticsEvent(DateTime.now(), "type", mock(MessageSummary.class)));
     }
 
     @After
