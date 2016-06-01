@@ -44,4 +44,19 @@ public class DateTimeUtilsTest {
         assertEquals(DateTimeUtils.getDateTimeFromParameter(startTime, dtz), interval.getStart());
         assertEquals(DateTimeUtils.getDateTimeFromParameter(endTime, dtz), interval.getEnd());
     }
+
+    /**
+     * Checks to see if the interval is returned correctly
+     */
+    @Test
+    public void testGetIntervalFromParameters_withHours() {
+        String startTime = "2016-01-01_09";
+        String endTime = "2016-02-02_10";
+        DateTimeZone dtz = DateTimeZone.UTC;
+
+        Interval interval = DateTimeUtils.getIntervalFromParameters(startTime, endTime, dtz);
+
+        assertEquals(DateTimeUtils.getDateTimeFromParameter(startTime, dtz), interval.getStart());
+        assertEquals(DateTimeUtils.getDateTimeFromParameter(endTime, dtz), interval.getEnd());
+    }
 }
