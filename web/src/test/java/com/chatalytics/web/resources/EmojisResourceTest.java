@@ -7,6 +7,7 @@ import com.chatalytics.core.model.data.EmojiEntity;
 import com.chatalytics.web.utils.DateTimeUtils;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -17,8 +18,12 @@ import org.junit.Test;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+
+import javax.persistence.EntityManager;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Tests {@link EmojisResource}
@@ -26,16 +31,18 @@ import static org.junit.Assert.assertEquals;
  * @author giannis
  *
  */
-public class TopEmojisResourceTest {
+public class EmojisResourceTest {
 
     private IEmojiDAO entityDao;
     private EmojisResource undertest;
     private DateTimeZone dtZone;
     private DateTime mentionTime;
+    private List<EmojiEntity> emojis;
+    private ChatAlyticsConfig config;
 
     @Before
     public void setUp() throws Exception {
-        ChatAlyticsConfig config = new ChatAlyticsConfig();
+        config = new ChatAlyticsConfig();
         config.persistenceUnitName = "chatalytics-web-test";
         config.timeZone = "America/New_York";
         dtZone = DateTimeZone.forID(config.timeZone);
@@ -44,7 +51,7 @@ public class TopEmojisResourceTest {
         entityDao.startAsync().awaitRunning();
 
         mentionTime = DateTime.now().withZone(DateTimeZone.UTC);
-        List<EmojiEntity> emojis = Lists.newArrayListWithCapacity(10);
+        emojis = Lists.newArrayListWithCapacity(10);
         emojis.add(new EmojiEntity("e1", 5, mentionTime.minusHours(1), "u1", "r1"));
         emojis.add(new EmojiEntity("e1", 4, mentionTime.minusHours(1), "u2", "r1"));
         emojis.add(new EmojiEntity("e1", 1, mentionTime.minusHours(2), "u3", "r2"));
@@ -96,8 +103,27 @@ public class TopEmojisResourceTest {
         assertEquals(expected, response);
     }
 
+    @Test
+    public void testGetAllEmojis() throws Exception {
+        DateTimeFormatter dtf = DateTimeUtils.PARAMETER_WITH_DAY_DTF.withZone(dtZone);
+        String startTimeStr = dtf.print(mentionTime.minusDays(1));
+        String endTimeStr = dtf.print(mentionTime.plusDays(1));
+        List<EmojiEntity> result = undertest.getAllEmojis(startTimeStr, endTimeStr, null, null);
+        assertEquals(emojis.size(), result.size());
+
+        Set<EmojiEntity> resultEmojiSet = Sets.newHashSet(result);
+        for (EmojiEntity expectedEmoji : emojis) {
+            assertTrue(resultEmojiSet.contains(expectedEmoji));
+        }
+    }
+
     @After
     public void tearDown() throws Exception {
+        EntityManager em = ChatAlyticsDAOFactory.getEntityManagerFactory(config)
+            .createEntityManager();
+        em.getTransaction().begin();
+        em.createNativeQuery("DELETE FROM " + EmojiEntity.EMOJI_TABLE_NAME).executeUpdate();
+        em.getTransaction().commit();
         entityDao.stopAsync().awaitTerminated();
     }
 }
