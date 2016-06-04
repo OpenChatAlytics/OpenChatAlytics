@@ -2,10 +2,10 @@ package com.chatalytics.web.resources;
 
 import com.chatalytics.compute.db.dao.ChatAlyticsDAOFactory;
 import com.chatalytics.compute.db.dao.IEmojiDAO;
+import com.chatalytics.core.ActiveMethod;
 import com.chatalytics.core.DimensionType;
 import com.chatalytics.core.config.ChatAlyticsConfig;
 import com.chatalytics.core.model.data.EmojiEntity;
-import com.chatalytics.web.constant.ActiveMethod;
 import com.chatalytics.web.constant.WebConstants;
 import com.chatalytics.web.utils.DateTimeUtils;
 import com.chatalytics.web.utils.ResourceUtils;
@@ -109,18 +109,9 @@ public class EmojisResource {
         Optional<Integer> topN = ResourceUtils.getOptionalForParameterAsInt(topNStr);
 
         if (dimension == DimensionType.ROOM) {
-            if (method == ActiveMethod.ToTV) {
-                return emojiDao.getTopRoomsByEoTV(interval, topN.or(MAX_RESULTS));
-            } else {
-                throw new UnsupportedOperationException("Unrecognized method: " + method);
-            }
+            return emojiDao.getTopRoomsByMethod(interval, method, topN.or(MAX_RESULTS));
         } else if (dimension == DimensionType.USER) {
-            if (method == ActiveMethod.ToTV) {
-                return emojiDao.getTopUsersByEoTV(interval, topN.or(MAX_RESULTS));
-            } else {
-                throw new UnsupportedOperationException("Unrecognized method: " + method);
-            }
-
+            return emojiDao.getTopUsersByMethod(interval, method, topN.or(MAX_RESULTS));
         } else {
             String formatMsg = "The dimension %s you provided is not supported. Pass in %s or %s";
             throw new UnsupportedOperationException(String.format(formatMsg, dimensionStr,

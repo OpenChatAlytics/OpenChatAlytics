@@ -1,6 +1,6 @@
-package com.chatalytics.web.resources;
+package com.chatalytics.core;
 
-import com.chatalytics.web.constant.ActiveMethod;
+import com.chatalytics.core.ActiveMethod;
 
 import org.junit.Test;
 

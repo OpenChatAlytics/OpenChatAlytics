@@ -1,6 +1,7 @@
 package com.chatalytics.compute.db.dao;
 
 import com.chatalytics.compute.matrix.LabeledDenseMatrix;
+import com.chatalytics.core.ActiveMethod;
 import com.chatalytics.core.model.data.ChatEntity;
 import com.google.common.base.Optional;
 import com.google.common.util.concurrent.AbstractIdleService;
@@ -105,14 +106,38 @@ public class EntityDAOImpl extends AbstractIdleService implements IEntityDAO {
         return occurrenceStatsDAO.getRoomSimilaritiesByValue(interval);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public Map<String, Double> getTopUsersByEoTV(Interval interval, int resultSize) {
-        return occurrenceStatsDAO.getTopColumnsByToTV("username", interval, resultSize);
+    public Map<String, Double> getTopUsersByMethod(Interval interval,
+                                                   ActiveMethod method,
+                                                   int resultSize) {
+        if (method == ActiveMethod.ToTV) {
+            return occurrenceStatsDAO.getTopColumnsByToTV("username", interval, resultSize);
+        } else if (method == ActiveMethod.ToMV) {
+            return occurrenceStatsDAO.getTopColumnsByToMV("username", interval, resultSize);
+        } else {
+            throw new UnsupportedOperationException(String.format("Method %s not supported",
+                                                                  method));
+        }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public Map<String, Double> getTopRoomsByEoTV(Interval interval, int resultSize) {
-        return occurrenceStatsDAO.getTopColumnsByToTV("roomName", interval, resultSize);
+    public Map<String, Double> getTopRoomsByMethod(Interval interval,
+                                                   ActiveMethod method,
+                                                   int resultSize) {
+        if (method == ActiveMethod.ToTV) {
+            return occurrenceStatsDAO.getTopColumnsByToTV("roomName", interval, resultSize);
+        } else if (method == ActiveMethod.ToMV) {
+            return occurrenceStatsDAO.getTopColumnsByToMV("roomName", interval, resultSize);
+        } else {
+            throw new UnsupportedOperationException(String.format("Method %s not supported",
+                                                                  method));
+        }
     }
 
     /**

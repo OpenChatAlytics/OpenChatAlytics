@@ -2,10 +2,10 @@ package com.chatalytics.web.resources;
 
 import com.chatalytics.compute.db.dao.ChatAlyticsDAOFactory;
 import com.chatalytics.compute.db.dao.IEmojiDAO;
+import com.chatalytics.core.ActiveMethod;
 import com.chatalytics.core.DimensionType;
 import com.chatalytics.core.config.ChatAlyticsConfig;
 import com.chatalytics.core.model.data.EmojiEntity;
-import com.chatalytics.web.constant.ActiveMethod;
 import com.chatalytics.web.utils.DateTimeUtils;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -144,6 +144,28 @@ public class EmojisResourceTest {
         assertFalse(scores.isEmpty());
     }
 
+    @Test
+    public void testGetMostActive_userInvalidMethod() throws Exception {
+        DateTimeFormatter dtf = DateTimeUtils.PARAMETER_WITH_DAY_DTF.withZone(dtZone);
+        String startTimeStr = dtf.print(mentionTime.minusDays(1));
+        String endTimeStr = dtf.print(mentionTime.plusDays(1));
+        Map<String, Double> scores = underTest.getMostActive(startTimeStr, endTimeStr,
+                                                             DimensionType.USER.toString(),
+                                                             ActiveMethod.ToMV.toString(), "10");
+        assertFalse(scores.isEmpty());
+    }
+
+    @Test
+    public void testGetMostActive_roomInvalidMethod() throws Exception {
+        DateTimeFormatter dtf = DateTimeUtils.PARAMETER_WITH_DAY_DTF.withZone(dtZone);
+        String startTimeStr = dtf.print(mentionTime.minusDays(1));
+        String endTimeStr = dtf.print(mentionTime.plusDays(1));
+        Map<String, Double> scores =  underTest.getMostActive(startTimeStr, endTimeStr,
+                                                              DimensionType.ROOM.toString(),
+                                                              ActiveMethod.ToMV.toString(), "10");
+        assertFalse(scores.isEmpty());
+    }
+
     @Test(expected = UnsupportedOperationException.class)
     public void testGetMostActive_invalidDimension() throws Exception {
         DateTimeFormatter dtf = DateTimeUtils.PARAMETER_WITH_DAY_DTF.withZone(dtZone);
@@ -151,24 +173,6 @@ public class EmojisResourceTest {
         String endTimeStr = dtf.print(mentionTime.plusDays(1));
         underTest.getMostActive(startTimeStr, endTimeStr, DimensionType.EMOJI.toString(),
                                 ActiveMethod.ToTV.toString(), "10");
-    }
-
-    @Test(expected = UnsupportedOperationException.class)
-    public void testGetMostActive_userInvalidMethod() throws Exception {
-        DateTimeFormatter dtf = DateTimeUtils.PARAMETER_WITH_DAY_DTF.withZone(dtZone);
-        String startTimeStr = dtf.print(mentionTime.minusDays(1));
-        String endTimeStr = dtf.print(mentionTime.plusDays(1));
-        underTest.getMostActive(startTimeStr, endTimeStr, DimensionType.USER.toString(),
-                                ActiveMethod.ToMV.toString(), "10");
-    }
-
-    @Test(expected = UnsupportedOperationException.class)
-    public void testGetMostActive_roomInvalidMethod() throws Exception {
-        DateTimeFormatter dtf = DateTimeUtils.PARAMETER_WITH_DAY_DTF.withZone(dtZone);
-        String startTimeStr = dtf.print(mentionTime.minusDays(1));
-        String endTimeStr = dtf.print(mentionTime.plusDays(1));
-        underTest.getMostActive(startTimeStr, endTimeStr, DimensionType.ROOM.toString(),
-                                ActiveMethod.ToMV.toString(), "10");
     }
 
     @After
