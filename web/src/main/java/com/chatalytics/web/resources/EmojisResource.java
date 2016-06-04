@@ -2,8 +2,10 @@ package com.chatalytics.web.resources;
 
 import com.chatalytics.compute.db.dao.ChatAlyticsDAOFactory;
 import com.chatalytics.compute.db.dao.IEmojiDAO;
+import com.chatalytics.core.DimensionType;
 import com.chatalytics.core.config.ChatAlyticsConfig;
 import com.chatalytics.core.model.data.EmojiEntity;
+import com.chatalytics.web.constant.ActiveMethod;
 import com.chatalytics.web.constant.WebConstants;
 import com.chatalytics.web.utils.DateTimeUtils;
 import com.chatalytics.web.utils.ResourceUtils;
@@ -41,9 +43,10 @@ public class EmojisResource {
     public static final String USER_PARAM = "user";
     public static final String ROOM_PARAM = "room";
     public static final String TOP_N = "n";
+    public static final String DIM_PARAM = "dimension";
+    public static final String METHOD = "method";
 
     private static final int MAX_RESULTS = 20;
-
     private static final Logger LOG = LoggerFactory.getLogger(EmojisResource.class);
 
     private final IEmojiDAO emojiDao;
@@ -91,5 +94,39 @@ public class EmojisResource {
         return emojiDao.getAllMentions(interval, roomName, username);
     }
 
+    @GET
+    @Path("active")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Map<String, Double> getMostActive(@QueryParam(START_TIME_PARAM) String startTimeStr,
+                                             @QueryParam(END_TIME_PARAM) String endTimeStr,
+                                             @QueryParam(DIM_PARAM) String dimensionStr,
+                                             @QueryParam(METHOD) String methodStr,
+                                             @QueryParam(TOP_N) String topNStr) {
+
+        Interval interval = DateTimeUtils.getIntervalFromParameters(startTimeStr, endTimeStr, dtz);
+        DimensionType dimension = DimensionType.fromDimensionName(dimensionStr);
+        ActiveMethod method = ActiveMethod.fromMethodName(methodStr);
+        Optional<Integer> topN = ResourceUtils.getOptionalForParameterAsInt(topNStr);
+
+        if (dimension == DimensionType.ROOM) {
+            if (method == ActiveMethod.ToTV) {
+                return emojiDao.getTopRoomsByEoTV(interval, topN.or(MAX_RESULTS));
+            } else {
+                throw new UnsupportedOperationException("Unrecognized method: " + method);
+            }
+        } else if (dimension == DimensionType.USER) {
+            if (method == ActiveMethod.ToTV) {
+                return emojiDao.getTopUsersByEoTV(interval, topN.or(MAX_RESULTS));
+            } else {
+                throw new UnsupportedOperationException("Unrecognized method: " + method);
+            }
+
+        } else {
+            String formatMsg = "The dimension %s you provided is not supported. Pass in %s or %s";
+            throw new UnsupportedOperationException(String.format(formatMsg, dimensionStr,
+                                                                  DimensionType.ROOM,
+                                                                  DimensionType.USER));
+        }
+    }
 
 }
