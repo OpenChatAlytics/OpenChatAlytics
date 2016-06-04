@@ -155,7 +155,7 @@ public interface IMentionableDAO<K extends Serializable, T extends IMentionable<
      *            The result size
      * @return A sorted map of top column to ratio
      */
-    Map<String, Double> getTopColumnsByToTV(String columnName, Interval interval, int resultSize);
+    Map<String, Double> getActiveColumnsByToTV(String columnName, Interval interval, int resultSize);
 
     /**
      * Returns a sorted map of type to a ratio, where the ratio is the type volume over the total
@@ -170,7 +170,7 @@ public interface IMentionableDAO<K extends Serializable, T extends IMentionable<
      *            The result size
      * @return A sorted map of top column to ratio
      */
-    Map<String, Double> getTopColumnsByToMV(String columnName, Interval interval, int resultSize);
+    Map<String, Double> getActiveColumnsByToMV(String columnName, Interval interval, int resultSize);
 
     /**
      * Given a time interval this method will return a labeled room by room matrix with all the

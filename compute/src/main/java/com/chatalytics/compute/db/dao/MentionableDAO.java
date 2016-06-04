@@ -392,8 +392,8 @@ public class MentionableDAO<K extends Serializable, T extends IMentionable<K>>
      * {@inheritDoc}
      */
     @Override
-    public Map<String, Double> getTopColumnsByToTV(String columnName, Interval interval,
-                                                   int resultSize) {
+    public Map<String, Double> getActiveColumnsByToTV(String columnName, Interval interval,
+                                                      int resultSize) {
 
         EntityManager entityManager = entityManagerFactory.createEntityManager();
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
@@ -445,8 +445,8 @@ public class MentionableDAO<K extends Serializable, T extends IMentionable<K>>
      * {@inheritDoc}
      */
     @Override
-    public Map<String, Double> getTopColumnsByToMV(String columnName, Interval interval,
-                                                   int resultSize) {
+    public Map<String, Double> getActiveColumnsByToMV(String columnName, Interval interval,
+                                                      int resultSize) {
 
         EntityManager entityManager = entityManagerFactory.createEntityManager();
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
