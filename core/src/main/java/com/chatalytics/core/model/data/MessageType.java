@@ -1,6 +1,6 @@
 package com.chatalytics.core.model.data;
 
-import com.chatalytics.core.similarity.SimilarityDimension;
+import com.chatalytics.core.DimensionType;
 import com.google.common.base.Preconditions;
 
 import java.util.Arrays;
@@ -54,7 +54,7 @@ public enum MessageType {
         }
 
         String msg = String.format("Can't construct message type from %s. Supported values are %s",
-                                   type, Arrays.deepToString(SimilarityDimension.values()));
+                                   type, Arrays.deepToString(DimensionType.values()));
         throw new IllegalArgumentException(msg);
     }
 

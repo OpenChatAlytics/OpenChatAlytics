@@ -3,9 +3,10 @@ package com.chatalytics.web.resources;
 import com.chatalytics.compute.db.dao.ChatAlyticsDAOFactory;
 import com.chatalytics.compute.db.dao.IEntityDAO;
 import com.chatalytics.compute.matrix.LabeledDenseMatrix;
+import com.chatalytics.core.DimensionType;
 import com.chatalytics.core.config.ChatAlyticsConfig;
 import com.chatalytics.core.model.data.ChatEntity;
-import com.chatalytics.core.similarity.SimilarityDimension;
+import com.chatalytics.web.constant.ActiveMethod;
 import com.chatalytics.web.utils.DateTimeUtils;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -25,6 +26,7 @@ import java.util.Set;
 import javax.persistence.EntityManager;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -130,8 +132,8 @@ public class EntitiesResourceTest {
         String endTimeStr = dtf.print(mentionTime.plusDays(1));
 
         LabeledDenseMatrix<String> ldm = underTest.getSimilarities(
-                startTimeStr, endTimeStr, SimilarityDimension.ROOM.getDimensionName(),
-                SimilarityDimension.ENTITY.getDimensionName());
+                startTimeStr, endTimeStr, DimensionType.ROOM.getDimensionName(),
+                DimensionType.ENTITY.getDimensionName());
         assertEquals(4, ldm.getLabels().size());
         assertEquals(4, ldm.getMatrix().length);
     }
@@ -142,8 +144,59 @@ public class EntitiesResourceTest {
         String startTimeStr = dtf.print(mentionTime.minusDays(1));
         String endTimeStr = dtf.print(mentionTime.plusDays(1));
         underTest.getSimilarities(startTimeStr, endTimeStr,
-                                  SimilarityDimension.ROOM.getDimensionName(),
-                                  SimilarityDimension.ROOM.getDimensionName());
+                                  DimensionType.ROOM.getDimensionName(),
+                                  DimensionType.ROOM.getDimensionName());
+    }
+
+    @Test
+    public void testGetMostActive_userToTV() throws Exception {
+        DateTimeFormatter dtf = DateTimeUtils.PARAMETER_WITH_DAY_DTF.withZone(dtZone);
+        String startTimeStr = dtf.print(mentionTime.minusDays(1));
+        String endTimeStr = dtf.print(mentionTime.plusDays(1));
+        Map<String, Double> scores = underTest.getMostActive(startTimeStr, endTimeStr,
+                                                             DimensionType.USER.toString(),
+                                                             ActiveMethod.ToTV.toString(), "10");
+
+        assertFalse(scores.isEmpty());
+    }
+
+    @Test
+    public void testGetMostActive_roomToTV() throws Exception {
+        DateTimeFormatter dtf = DateTimeUtils.PARAMETER_WITH_DAY_DTF.withZone(dtZone);
+        String startTimeStr = dtf.print(mentionTime.minusDays(1));
+        String endTimeStr = dtf.print(mentionTime.plusDays(1));
+        Map<String, Double> scores = underTest.getMostActive(startTimeStr, endTimeStr,
+                                                             DimensionType.ROOM.toString(),
+                                                             ActiveMethod.ToTV.toString(), "10");
+
+        assertFalse(scores.isEmpty());
+    }
+
+    @Test(expected = UnsupportedOperationException.class)
+    public void testGetMostActive_invalidDimension() throws Exception {
+        DateTimeFormatter dtf = DateTimeUtils.PARAMETER_WITH_DAY_DTF.withZone(dtZone);
+        String startTimeStr = dtf.print(mentionTime.minusDays(1));
+        String endTimeStr = dtf.print(mentionTime.plusDays(1));
+        underTest.getMostActive(startTimeStr, endTimeStr, DimensionType.EMOJI.toString(),
+                                ActiveMethod.ToTV.toString(), "10");
+    }
+
+    @Test(expected = UnsupportedOperationException.class)
+    public void testGetMostActive_userInvalidMethod() throws Exception {
+        DateTimeFormatter dtf = DateTimeUtils.PARAMETER_WITH_DAY_DTF.withZone(dtZone);
+        String startTimeStr = dtf.print(mentionTime.minusDays(1));
+        String endTimeStr = dtf.print(mentionTime.plusDays(1));
+        underTest.getMostActive(startTimeStr, endTimeStr, DimensionType.USER.toString(),
+                                ActiveMethod.ToMV.toString(), "10");
+    }
+
+    @Test(expected = UnsupportedOperationException.class)
+    public void testGetMostActive_roomInvalidMethod() throws Exception {
+        DateTimeFormatter dtf = DateTimeUtils.PARAMETER_WITH_DAY_DTF.withZone(dtZone);
+        String startTimeStr = dtf.print(mentionTime.minusDays(1));
+        String endTimeStr = dtf.print(mentionTime.plusDays(1));
+        underTest.getMostActive(startTimeStr, endTimeStr, DimensionType.ROOM.toString(),
+                                ActiveMethod.ToMV.toString(), "10");
     }
 
     @After
