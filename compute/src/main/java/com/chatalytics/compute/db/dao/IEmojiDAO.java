@@ -115,7 +115,7 @@ public interface IEmojiDAO extends Service {
       *            The result size
       * @return A sorted map of top users to ratio
       */
-     Map<String, Double> getTopUsersByMethod(Interval interval,
+     Map<String, Double> getActiveUsersByMethod(Interval interval,
                                              ActiveMethod method,
                                              int resultSize);
 
@@ -131,7 +131,7 @@ public interface IEmojiDAO extends Service {
       *            The result size
       * @return A sorted map of top room to ratio
       */
-     Map<String, Double> getTopRoomsByMethod(Interval interval,
+     Map<String, Double> getActiveRoomsByMethod(Interval interval,
                                              ActiveMethod method,
                                              int resultSize);
 

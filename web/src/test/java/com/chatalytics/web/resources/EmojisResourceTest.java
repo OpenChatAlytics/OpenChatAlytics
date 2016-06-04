@@ -121,57 +121,57 @@ public class EmojisResourceTest {
     }
 
     @Test
-    public void testGetMostActive_userToTV() throws Exception {
+    public void testGetActive_userToTV() throws Exception {
         DateTimeFormatter dtf = DateTimeUtils.PARAMETER_WITH_DAY_DTF.withZone(dtZone);
         String startTimeStr = dtf.print(mentionTime.minusDays(1));
         String endTimeStr = dtf.print(mentionTime.plusDays(1));
-        Map<String, Double> scores = underTest.getMostActive(startTimeStr, endTimeStr,
-                                                             DimensionType.USER.toString(),
-                                                             ActiveMethod.ToTV.toString(), "10");
+        Map<String, Double> scores = underTest.getActive(startTimeStr, endTimeStr,
+                                                         DimensionType.USER.toString(),
+                                                         ActiveMethod.ToTV.toString(), "10");
 
         assertFalse(scores.isEmpty());
     }
 
     @Test
-    public void testGetMostActive_roomToTV() throws Exception {
+    public void testGetActive_roomToTV() throws Exception {
         DateTimeFormatter dtf = DateTimeUtils.PARAMETER_WITH_DAY_DTF.withZone(dtZone);
         String startTimeStr = dtf.print(mentionTime.minusDays(1));
         String endTimeStr = dtf.print(mentionTime.plusDays(1));
-        Map<String, Double> scores = underTest.getMostActive(startTimeStr, endTimeStr,
-                                                             DimensionType.ROOM.toString(),
-                                                             ActiveMethod.ToTV.toString(), "10");
+        Map<String, Double> scores = underTest.getActive(startTimeStr, endTimeStr,
+                                                         DimensionType.ROOM.toString(),
+                                                         ActiveMethod.ToTV.toString(), "10");
 
         assertFalse(scores.isEmpty());
     }
 
     @Test
-    public void testGetMostActive_userInvalidMethod() throws Exception {
+    public void testGetActive_userInvalidMethod() throws Exception {
         DateTimeFormatter dtf = DateTimeUtils.PARAMETER_WITH_DAY_DTF.withZone(dtZone);
         String startTimeStr = dtf.print(mentionTime.minusDays(1));
         String endTimeStr = dtf.print(mentionTime.plusDays(1));
-        Map<String, Double> scores = underTest.getMostActive(startTimeStr, endTimeStr,
-                                                             DimensionType.USER.toString(),
-                                                             ActiveMethod.ToMV.toString(), "10");
+        Map<String, Double> scores = underTest.getActive(startTimeStr, endTimeStr,
+                                                         DimensionType.USER.toString(),
+                                                         ActiveMethod.ToMV.toString(), "10");
         assertFalse(scores.isEmpty());
     }
 
     @Test
-    public void testGetMostActive_roomInvalidMethod() throws Exception {
+    public void testGetActive_roomInvalidMethod() throws Exception {
         DateTimeFormatter dtf = DateTimeUtils.PARAMETER_WITH_DAY_DTF.withZone(dtZone);
         String startTimeStr = dtf.print(mentionTime.minusDays(1));
         String endTimeStr = dtf.print(mentionTime.plusDays(1));
-        Map<String, Double> scores =  underTest.getMostActive(startTimeStr, endTimeStr,
-                                                              DimensionType.ROOM.toString(),
-                                                              ActiveMethod.ToMV.toString(), "10");
+        Map<String, Double> scores =  underTest.getActive(startTimeStr, endTimeStr,
+                                                          DimensionType.ROOM.toString(),
+                                                          ActiveMethod.ToMV.toString(), "10");
         assertFalse(scores.isEmpty());
     }
 
     @Test(expected = UnsupportedOperationException.class)
-    public void testGetMostActive_invalidDimension() throws Exception {
+    public void testGetActive_invalidDimension() throws Exception {
         DateTimeFormatter dtf = DateTimeUtils.PARAMETER_WITH_DAY_DTF.withZone(dtZone);
         String startTimeStr = dtf.print(mentionTime.minusDays(1));
         String endTimeStr = dtf.print(mentionTime.plusDays(1));
-        underTest.getMostActive(startTimeStr, endTimeStr, DimensionType.EMOJI.toString(),
+        underTest.getActive(startTimeStr, endTimeStr, DimensionType.EMOJI.toString(),
                                 ActiveMethod.ToTV.toString(), "10");
     }
 

@@ -158,30 +158,31 @@ public class EmojiDAOImplTest {
     }
 
     @Test
-    public void testGetTopRoomsByToTV() {
+    public void testGetActiveRoomsByMethod() {
         Interval interval = new Interval(mentionDate.minusMillis(1), mentionDate.plusMillis(1));
 
-        Map<String, Double> result = underTest.getTopRoomsByMethod(interval, ActiveMethod.ToTV, 10);
+        Map<String, Double> result = underTest.getActiveRoomsByMethod(interval, ActiveMethod.ToTV, 10);
         assertEquals(2, result.size());
         assertEquals(0.75, result.get("room1"), 0);
         assertEquals(0.25, result.get("room2"), 0);
 
-        result = underTest.getTopRoomsByMethod(interval, ActiveMethod.ToMV, 10);
+        result = underTest.getActiveRoomsByMethod(interval, ActiveMethod.ToMV, 10);
         assertEquals(2, result.size());
         assertEquals(0.15, result.get("room1"), 0);
         assertEquals(0.05, result.get("room2"), 0);
     }
 
     @Test
-    public void testGetTopUsersByToTV() {
+    public void testGetActiveUsersByMethod() {
         Interval interval = new Interval(mentionDate.minusMillis(1), mentionDate.plusMillis(1));
 
-        Map<String, Double> result = underTest.getTopUsersByMethod(interval, ActiveMethod.ToTV, 10);
+        Map<String, Double> result =
+                underTest.getActiveUsersByMethod(interval, ActiveMethod.ToTV, 10);
         assertEquals(2, result.size());
         assertEquals(0.75, result.get("giannis"), 0);
         assertEquals(0.25, result.get("jane"), 0);
 
-        result = underTest.getTopUsersByMethod(interval, ActiveMethod.ToMV, 10);
+        result = underTest.getActiveUsersByMethod(interval, ActiveMethod.ToMV, 10);
         assertEquals(2, result.size());
         assertEquals(0.15, result.get("giannis"), 0);
         assertEquals(0.05, result.get("jane"), 0);

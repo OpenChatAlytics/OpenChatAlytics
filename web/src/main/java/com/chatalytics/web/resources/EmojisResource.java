@@ -97,11 +97,11 @@ public class EmojisResource {
     @GET
     @Path("active")
     @Produces(MediaType.APPLICATION_JSON)
-    public Map<String, Double> getMostActive(@QueryParam(START_TIME_PARAM) String startTimeStr,
-                                             @QueryParam(END_TIME_PARAM) String endTimeStr,
-                                             @QueryParam(DIM_PARAM) String dimensionStr,
-                                             @QueryParam(METHOD) String methodStr,
-                                             @QueryParam(TOP_N) String topNStr) {
+    public Map<String, Double> getActive(@QueryParam(START_TIME_PARAM) String startTimeStr,
+                                         @QueryParam(END_TIME_PARAM) String endTimeStr,
+                                         @QueryParam(DIM_PARAM) String dimensionStr,
+                                         @QueryParam(METHOD) String methodStr,
+                                         @QueryParam(TOP_N) String topNStr) {
 
         Interval interval = DateTimeUtils.getIntervalFromParameters(startTimeStr, endTimeStr, dtz);
         DimensionType dimension = DimensionType.fromDimensionName(dimensionStr);
@@ -109,9 +109,9 @@ public class EmojisResource {
         Optional<Integer> topN = ResourceUtils.getOptionalForParameterAsInt(topNStr);
 
         if (dimension == DimensionType.ROOM) {
-            return emojiDao.getTopRoomsByMethod(interval, method, topN.or(MAX_RESULTS));
+            return emojiDao.getActiveRoomsByMethod(interval, method, topN.or(MAX_RESULTS));
         } else if (dimension == DimensionType.USER) {
-            return emojiDao.getTopUsersByMethod(interval, method, topN.or(MAX_RESULTS));
+            return emojiDao.getActiveUsersByMethod(interval, method, topN.or(MAX_RESULTS));
         } else {
             String formatMsg = "The dimension %s you provided is not supported. Pass in %s or %s";
             throw new UnsupportedOperationException(String.format(formatMsg, dimensionStr,

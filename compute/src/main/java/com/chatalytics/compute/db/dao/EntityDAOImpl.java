@@ -110,13 +110,13 @@ public class EntityDAOImpl extends AbstractIdleService implements IEntityDAO {
      * {@inheritDoc}
      */
     @Override
-    public Map<String, Double> getTopUsersByMethod(Interval interval,
+    public Map<String, Double> getActiveUsersByMethod(Interval interval,
                                                    ActiveMethod method,
                                                    int resultSize) {
         if (method == ActiveMethod.ToTV) {
-            return occurrenceStatsDAO.getTopColumnsByToTV("username", interval, resultSize);
+            return occurrenceStatsDAO.getActiveColumnsByToTV("username", interval, resultSize);
         } else if (method == ActiveMethod.ToMV) {
-            return occurrenceStatsDAO.getTopColumnsByToMV("username", interval, resultSize);
+            return occurrenceStatsDAO.getActiveColumnsByToMV("username", interval, resultSize);
         } else {
             throw new UnsupportedOperationException(String.format("Method %s not supported",
                                                                   method));
@@ -127,13 +127,13 @@ public class EntityDAOImpl extends AbstractIdleService implements IEntityDAO {
      * {@inheritDoc}
      */
     @Override
-    public Map<String, Double> getTopRoomsByMethod(Interval interval,
+    public Map<String, Double> getActiveRoomsByMethod(Interval interval,
                                                    ActiveMethod method,
                                                    int resultSize) {
         if (method == ActiveMethod.ToTV) {
-            return occurrenceStatsDAO.getTopColumnsByToTV("roomName", interval, resultSize);
+            return occurrenceStatsDAO.getActiveColumnsByToTV("roomName", interval, resultSize);
         } else if (method == ActiveMethod.ToMV) {
-            return occurrenceStatsDAO.getTopColumnsByToMV("roomName", interval, resultSize);
+            return occurrenceStatsDAO.getActiveColumnsByToMV("roomName", interval, resultSize);
         } else {
             throw new UnsupportedOperationException(String.format("Method %s not supported",
                                                                   method));

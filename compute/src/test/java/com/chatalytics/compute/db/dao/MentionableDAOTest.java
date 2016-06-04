@@ -149,7 +149,7 @@ public class MentionableDAOTest {
     }
 
     @Test
-    public void testGetTopColumnsByToTV() throws Exception {
+    public void testGetActiveColumnsByToTV() throws Exception {
         DateTime end = DateTime.now();
         DateTime start = end.minusDays(1);
 
@@ -164,7 +164,7 @@ public class MentionableDAOTest {
 
         Interval interval = new Interval(start, end);
 
-        Map<String, Double> result = underTest.getTopColumnsByToTV("roomName", interval, 100);
+        Map<String, Double> result = underTest.getActiveColumnsByToTV("roomName", interval, 100);
         assertEquals(5, result.size());
         assertEquals(0.375, result.get("r5").doubleValue(), 0);
         assertEquals(0.25, result.get("r4").doubleValue(), 0);
@@ -180,7 +180,7 @@ public class MentionableDAOTest {
 
         // check with a smaller interval
         interval = new Interval(start.plusMillis(2), start.plusMillis(6));
-        result = underTest.getTopColumnsByToTV("roomName", interval, 100);
+        result = underTest.getActiveColumnsByToTV("roomName", interval, 100);
         assertEquals(3, result.size());
         Map.Entry<String, Double> firstEntry = result.entrySet().iterator().next();
         assertEquals("r4", firstEntry.getKey());
@@ -188,7 +188,7 @@ public class MentionableDAOTest {
     }
 
     @Test
-    public void testGetTopColumnsByToMV() throws Exception {
+    public void testGetActiveColumnsByToMV() throws Exception {
         DateTime end = DateTime.now();
         DateTime start = end.minusDays(1);
         Interval interval = new Interval(start, end);
@@ -217,7 +217,7 @@ public class MentionableDAOTest {
         msgSummaryDao.persistMessageSummary(new MessageSummary("u1", "r2", start.plusMillis(1),
                                                                MessageType.MESSAGE_CHANGED, 1));
 
-        Map<String, Double> result = underTest.getTopColumnsByToMV("username", interval, 100);
+        Map<String, Double> result = underTest.getActiveColumnsByToMV("username", interval, 100);
         assertEquals(2, result.size());
         // u1 has 3 messages and 2 emojis. u2 has 2 messages and 1 emoji. Total message volume is 5
         // u1 should be 2/5 and u2 should be 1/5
@@ -232,7 +232,7 @@ public class MentionableDAOTest {
 
         // check with a smaller interval
         interval = new Interval(start.plusMillis(2), start.plusMillis(6));
-        result = underTest.getTopColumnsByToTV("username", interval, 100);
+        result = underTest.getActiveColumnsByToTV("username", interval, 100);
         assertEquals(2, result.size());
         assertEquals(0.5, result.get("u1").doubleValue(), 0);
         assertEquals(0.5, result.get("u2").doubleValue(), 0);
