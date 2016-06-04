@@ -42,7 +42,7 @@ public class EmojisResource {
     public static final String ROOM_PARAM = "room";
     public static final String TOP_N = "n";
 
-    private static final int MAX_RESULTS = 10;
+    private static final int MAX_RESULTS = 20;
 
     private static final Logger LOG = LoggerFactory.getLogger(EmojisResource.class);
 
