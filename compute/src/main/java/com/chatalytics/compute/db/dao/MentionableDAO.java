@@ -4,6 +4,8 @@ import com.chatalytics.compute.matrix.GraphPartition;
 import com.chatalytics.compute.matrix.LabeledDenseMatrix;
 import com.chatalytics.compute.matrix.LabeledMTJMatrix;
 import com.chatalytics.core.model.data.IMentionable;
+import com.chatalytics.core.model.data.MessageSummary;
+import com.chatalytics.core.model.data.MessageType;
 import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -410,6 +412,61 @@ public class MentionableDAO<K extends Serializable, T extends IMentionable<K>>
         Path<DateTime> totalMentionTime = totalFrom.get("mentionTime");
         totalQuery.where(cb.greaterThanOrEqualTo(totalMentionTime, startDateParam),
                          cb.lessThan(totalMentionTime, endDateParam));
+
+        // occurrences / total occurrences
+        Expression<Double> ratio = cb.quot(cb.sum(occurrences), totalQuery).as(Double.class);
+
+        Path<String> roomName = from.get(columnName);
+        query.multiselect(roomName, ratio);
+        Path<DateTime> mentionTime = from.get("mentionTime");
+        query.where(cb.greaterThanOrEqualTo(mentionTime, startDateParam),
+                    cb.lessThan(mentionTime, endDateParam));
+        query.groupBy(roomName);
+        query.orderBy(cb.desc(ratio));
+        List<Tuple> resultList =
+                entityManagerFactory.createEntityManager()
+                                    .createQuery(query)
+                                    .setMaxResults(resultSize)
+                                    .setParameter(startDateParam, interval.getStart())
+                                    .setParameter(endDateParam, interval.getEnd())
+                                    .getResultList();
+
+        closeEntityManager(entityManager);
+
+        // linked hashmap to preserve order
+        Map<String, Double> result = Maps.newLinkedHashMap();
+        for (Tuple tuple : resultList) {
+            result.put(tuple.get(roomName), tuple.get(ratio));
+        }
+        return result;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Map<String, Double> getTopColumnsByToMV(String columnName, Interval interval,
+                                                   int resultSize) {
+
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Tuple> query = cb.createTupleQuery();
+
+        Root<T> from = query.from(type);
+
+        ParameterExpression<DateTime> startDateParam = cb.parameter(DateTime.class);
+        ParameterExpression<DateTime> endDateParam = cb.parameter(DateTime.class);
+        Expression<Double> occurrences = from.get("occurrences").as(Double.class);
+
+        // create total query
+        Subquery<Long> totalQuery = query.subquery(Long.class);
+        Root<MessageSummary> totalFrom = totalQuery.from(MessageSummary.class);
+        totalQuery.select(cb.sum(totalFrom.get("occurrences")));
+        Path<DateTime> totalMentionTime = totalFrom.get("mentionTime");
+        Path<MessageType> messageType = totalFrom.get("value");
+        totalQuery.where(cb.greaterThanOrEqualTo(totalMentionTime, startDateParam),
+                         cb.lessThan(totalMentionTime, endDateParam),
+                         cb.equal(messageType, MessageType.MESSAGE));
 
         // occurrences / total occurrences
         Expression<Double> ratio = cb.quot(cb.sum(occurrences), totalQuery).as(Double.class);

@@ -3,6 +3,8 @@ package com.chatalytics.compute.db.dao;
 import com.chatalytics.compute.matrix.LabeledDenseMatrix;
 import com.chatalytics.core.config.ChatAlyticsConfig;
 import com.chatalytics.core.model.data.EmojiEntity;
+import com.chatalytics.core.model.data.MessageSummary;
+import com.chatalytics.core.model.data.MessageType;
 import com.google.common.base.Optional;
 
 import org.joda.time.DateTime;
@@ -35,10 +37,11 @@ public class MentionableDAOTest {
 
     private MentionableDAO<String, EmojiEntity> underTest;
     private EntityManagerFactory entityManagerFactory;
+    private ChatAlyticsConfig config;
 
     @Before
     public void setUp() {
-        ChatAlyticsConfig config = new ChatAlyticsConfig();
+        config = new ChatAlyticsConfig();
         config.persistenceUnitName = "chatalytics-db-test";
         entityManagerFactory = ChatAlyticsDAOFactory.getEntityManagerFactory(config);
         underTest = new MentionableDAO<>(entityManagerFactory, EmojiEntity.class);
@@ -146,7 +149,7 @@ public class MentionableDAOTest {
     }
 
     @Test
-    public void testGetTopRoomsByToTV() {
+    public void testGetTopColumnsByToTV() throws Exception {
         DateTime end = DateTime.now();
         DateTime start = end.minusDays(1);
 
@@ -184,11 +187,71 @@ public class MentionableDAOTest {
         assertEquals(0.5, firstEntry.getValue().doubleValue(), 0);
     }
 
+    @Test
+    public void testGetTopColumnsByToMV() throws Exception {
+        DateTime end = DateTime.now();
+        DateTime start = end.minusDays(1);
+        Interval interval = new Interval(start, end);
+
+        IMessageSummaryDAO msgSummaryDao =  ChatAlyticsDAOFactory.createMessageSummaryDAO(config);
+        msgSummaryDao.startAsync().awaitRunning();
+
+        underTest.persistValue(new EmojiEntity("a", 1, start.plusMillis(1), "u1", "r1"));
+        underTest.persistValue(new EmojiEntity("c", 1, start.plusMillis(3), "u2", "r1"));
+        underTest.persistValue(new EmojiEntity("a", 1, start.plusMillis(4), "u1", "r2"));
+
+        msgSummaryDao.persistMessageSummary(new MessageSummary("u1", "r1", start.plusMillis(1),
+                                                               MessageType.MESSAGE, 1));
+        msgSummaryDao.persistMessageSummary(new MessageSummary("u1", "r1", start.plusMillis(1),
+                                                               MessageType.MESSAGE, 1));
+        msgSummaryDao.persistMessageSummary(new MessageSummary("u1", "r1", start.plusMillis(1),
+                                                               MessageType.CHANNEL_JOIN, 1));
+        msgSummaryDao.persistMessageSummary(new MessageSummary("u2", "r1", start.plusMillis(1),
+                                                               MessageType.MESSAGE, 1));
+        msgSummaryDao.persistMessageSummary(new MessageSummary("u2", "r1", start.plusMillis(1),
+                                                               MessageType.CHANNEL_JOIN, 1));
+        msgSummaryDao.persistMessageSummary(new MessageSummary("u1", "r2", start.plusMillis(1),
+                                                               MessageType.MESSAGE, 1));
+        msgSummaryDao.persistMessageSummary(new MessageSummary("u3", "r2", start.plusMillis(1),
+                                                               MessageType.MESSAGE, 1));
+        msgSummaryDao.persistMessageSummary(new MessageSummary("u1", "r2", start.plusMillis(1),
+                                                               MessageType.MESSAGE_CHANGED, 1));
+
+        Map<String, Double> result = underTest.getTopColumnsByToMV("username", interval, 100);
+        assertEquals(2, result.size());
+        // u1 has 3 messages and 2 emojis. u2 has 2 messages and 1 emoji. Total message volume is 5
+        // u1 should be 2/5 and u2 should be 1/5
+        assertEquals(0.4, result.get("u1").doubleValue(), 0);
+        assertEquals(0.2, result.get("u2").doubleValue(), 0);
+
+        // check that they're in descending order
+        double previousValue = Double.MIN_VALUE;
+        for (double value : result.values()) {
+            assertTrue(Double.compare(value, previousValue) > 0);
+        }
+
+        // check with a smaller interval
+        interval = new Interval(start.plusMillis(2), start.plusMillis(6));
+        result = underTest.getTopColumnsByToTV("username", interval, 100);
+        assertEquals(2, result.size());
+        assertEquals(0.5, result.get("u1").doubleValue(), 0);
+        assertEquals(0.5, result.get("u2").doubleValue(), 0);
+        // check that they're in descending order
+        previousValue = Double.MIN_VALUE;
+        for (double value : result.values()) {
+            assertTrue(Double.compare(value, previousValue) > 0);
+        }
+
+        msgSummaryDao.stopAsync().awaitTerminated();
+    }
+
     @After
     public void tearDown() {
         EntityManager em = entityManagerFactory.createEntityManager();
         em.getTransaction().begin();
         em.createNativeQuery("DELETE FROM " + EmojiEntity.EMOJI_TABLE_NAME).executeUpdate();
+        em.createNativeQuery("DELETE FROM " + MessageSummary.MESSAGE_SUMMARY_TABLE_NAME)
+          .executeUpdate();
         em.getTransaction().commit();
         underTest.close();
     }

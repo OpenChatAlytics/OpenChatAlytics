@@ -1,8 +1,11 @@
 package com.chatalytics.compute.db.dao;
 
 import com.chatalytics.compute.matrix.LabeledDenseMatrix;
+import com.chatalytics.core.ActiveMethod;
 import com.chatalytics.core.config.ChatAlyticsConfig;
 import com.chatalytics.core.model.data.ChatEntity;
+import com.chatalytics.core.model.data.MessageSummary;
+import com.chatalytics.core.model.data.MessageType;
 import com.google.common.base.Optional;
 
 import org.joda.time.DateTime;
@@ -37,7 +40,8 @@ public class EntityDAOImplTest {
         config.persistenceUnitName = "chatalytics-db-test";
         underTest = ChatAlyticsDAOFactory.createEntityDAO(config);
         underTest.startAsync().awaitRunning();
-
+        IMessageSummaryDAO msgSummaryDao = ChatAlyticsDAOFactory.createMessageSummaryDAO(config);
+        msgSummaryDao.startAsync().awaitRunning();
         mentionDate = DateTime.now(DateTimeZone.UTC);
 
         // Insert a bunch of test values
@@ -45,6 +49,12 @@ public class EntityDAOImplTest {
         underTest.persistEntity(new ChatEntity("entity2", 1, mentionDate, "giannis", "room1"));
         underTest.persistEntity(new ChatEntity("entity1", 1, mentionDate, "giannis", "room2"));
         underTest.persistEntity(new ChatEntity("entity1", 1, mentionDate, "jane", "room1"));
+
+        msgSummaryDao.persistMessageSummary(new MessageSummary("giannis", "room1", mentionDate,
+                                                               MessageType.MESSAGE, 10));
+        msgSummaryDao.persistMessageSummary(new MessageSummary("jane", "room1", mentionDate,
+                                                               MessageType.MESSAGE, 10));
+        msgSummaryDao.stopAsync().awaitTerminated();
     }
 
     @Test
@@ -157,23 +167,33 @@ public class EntityDAOImplTest {
     }
 
     @Test
-    public void testGetTopRoomsByToTV() {
+    public void testGetTopRoomsByMethod() {
         Interval interval = new Interval(mentionDate.minusMillis(1), mentionDate.plusMillis(1));
 
-        Map<String, Double> result = underTest.getTopRoomsByEoTV(interval, 10);
+        Map<String, Double> result = underTest.getTopRoomsByMethod(interval, ActiveMethod.ToTV, 10);
         assertEquals(2, result.size());
         assertEquals(0.75, result.get("room1"), 0);
         assertEquals(0.25, result.get("room2"), 0);
+
+        result = underTest.getTopRoomsByMethod(interval, ActiveMethod.ToMV, 10);
+        assertEquals(2, result.size());
+        assertEquals(0.15, result.get("room1"), 0);
+        assertEquals(0.05, result.get("room2"), 0);
     }
 
     @Test
-    public void testGetTopUsersByToTV() {
+    public void testGetTopUsersByMethod() {
         Interval interval = new Interval(mentionDate.minusMillis(1), mentionDate.plusMillis(1));
 
-        Map<String, Double> result = underTest.getTopUsersByEoTV(interval, 10);
+        Map<String, Double> result = underTest.getTopUsersByMethod(interval, ActiveMethod.ToTV, 10);
         assertEquals(2, result.size());
         assertEquals(0.75, result.get("giannis"), 0);
         assertEquals(0.25, result.get("jane"), 0);
+
+        result = underTest.getTopUsersByMethod(interval, ActiveMethod.ToMV, 10);
+        assertEquals(2, result.size());
+        assertEquals(0.15, result.get("giannis"), 0);
+        assertEquals(0.05, result.get("jane"), 0);
     }
 
     @After
@@ -182,6 +202,8 @@ public class EntityDAOImplTest {
                                                 .createEntityManager();
         em.getTransaction().begin();
         em.createNativeQuery("DELETE FROM " + ChatEntity.ENTITY_TABLE_NAME).executeUpdate();
+        em.createNativeQuery("DELETE FROM " + MessageSummary.MESSAGE_SUMMARY_TABLE_NAME)
+          .executeUpdate();
         em.getTransaction().commit();
         underTest.stopAsync().awaitTerminated();
     }

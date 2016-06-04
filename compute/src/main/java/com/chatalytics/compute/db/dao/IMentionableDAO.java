@@ -158,6 +158,21 @@ public interface IMentionableDAO<K extends Serializable, T extends IMentionable<
     Map<String, Double> getTopColumnsByToTV(String columnName, Interval interval, int resultSize);
 
     /**
+     * Returns a sorted map of type to a ratio, where the ratio is the type volume over the total
+     * message volume. We call this metric ToMV (type over message volume)
+     *
+     * @param columnName
+     *            The column to get the top values for. eg Room or User
+     * @param interval
+     *            The interval to get the top values in. Note that the start is inclusive and the
+     *            end is exclusive
+     * @param resultSize
+     *            The result size
+     * @return A sorted map of top column to ratio
+     */
+    Map<String, Double> getTopColumnsByToMV(String columnName, Interval interval, int resultSize);
+
+    /**
      * Given a time interval this method will return a labeled room by room matrix with all the
      * similar rooms clustered together. For more information see
      * {@link GraphPartition#getSimilarityMatrix(LabeledMTJMatrix)}

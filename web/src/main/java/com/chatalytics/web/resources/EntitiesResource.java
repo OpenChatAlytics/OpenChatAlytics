@@ -3,10 +3,10 @@ package com.chatalytics.web.resources;
 import com.chatalytics.compute.db.dao.ChatAlyticsDAOFactory;
 import com.chatalytics.compute.db.dao.IEntityDAO;
 import com.chatalytics.compute.matrix.LabeledDenseMatrix;
+import com.chatalytics.core.ActiveMethod;
 import com.chatalytics.core.DimensionType;
 import com.chatalytics.core.config.ChatAlyticsConfig;
 import com.chatalytics.core.model.data.ChatEntity;
-import com.chatalytics.web.constant.ActiveMethod;
 import com.chatalytics.web.constant.WebConstants;
 import com.chatalytics.web.utils.DateTimeUtils;
 import com.chatalytics.web.utils.ResourceUtils;
@@ -138,18 +138,9 @@ public class EntitiesResource {
         Optional<Integer> topN = ResourceUtils.getOptionalForParameterAsInt(topNStr);
 
         if (dimension == DimensionType.ROOM) {
-            if (method == ActiveMethod.ToTV) {
-                return entityDao.getTopRoomsByEoTV(interval, topN.or(MAX_RESULTS));
-            } else {
-                throw new UnsupportedOperationException("Unrecognized method: " + method);
-            }
+            return entityDao.getTopRoomsByMethod(interval, method, topN.or(MAX_RESULTS));
         } else if (dimension == DimensionType.USER) {
-            if (method == ActiveMethod.ToTV) {
-                return entityDao.getTopUsersByEoTV(interval, topN.or(MAX_RESULTS));
-            } else {
-                throw new UnsupportedOperationException("Unrecognized method: " + method);
-            }
-
+            return entityDao.getTopUsersByMethod(interval, method, topN.or(MAX_RESULTS));
         } else {
             String formatMsg = "The dimension %s you provided is not supported. Pass in %s or %s";
             throw new UnsupportedOperationException(String.format(formatMsg, dimensionStr,

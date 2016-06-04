@@ -1,5 +1,6 @@
 package com.chatalytics.compute.db.dao;
 
+import com.chatalytics.core.ActiveMethod;
 import com.chatalytics.core.model.data.EmojiEntity;
 import com.google.common.base.Optional;
 import com.google.common.util.concurrent.Service;
@@ -103,29 +104,35 @@ public interface IEmojiDAO extends Service {
                                     int resultSize);
 
      /**
-      * Returns a sorted map of user to a ratio, where the ratio is the emoji volume over the total
-      * volume of all emojis in a time range. We call this metric EoTV (emoji over total volume)
+      * Returns a sorted map of users to a ratio, where the ratio is one of {@link ActiveMethod}s
       *
       * @param interval
       *            The interval to get the top values in. Note that the start is inclusive and the
       *            end is exclusive
+      * @param method
+      *            The method to compute top users for
       * @param resultSize
       *            The result size
       * @return A sorted map of top users to ratio
       */
-     Map<String, Double> getTopUsersByEoTV(Interval interval, int resultSize);
+     Map<String, Double> getTopUsersByMethod(Interval interval,
+                                             ActiveMethod method,
+                                             int resultSize);
 
-     /**
-      * Returns a sorted map of rooms to a ratio, where the ratio is the emoji volume over the
-      * total emoji volume. We call this metric EoTV (emoji over total volume)
+    /**
+      * Returns a sorted map of rooms to a ratio, where the ratio is one of {@link ActiveMethod}s
       *
       * @param interval
       *            The interval to get the top values in. Note that the start is inclusive and the
       *            end is exclusive
+      * @param method
+      *            The method to compute top users for
       * @param resultSize
       *            The result size
       * @return A sorted map of top room to ratio
       */
-     Map<String, Double> getTopRoomsByEoTV(Interval interval, int resultSize);
+     Map<String, Double> getTopRoomsByMethod(Interval interval,
+                                             ActiveMethod method,
+                                             int resultSize);
 
 }

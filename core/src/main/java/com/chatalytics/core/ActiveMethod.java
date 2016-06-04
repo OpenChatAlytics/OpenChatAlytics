@@ -1,4 +1,4 @@
-package com.chatalytics.web.constant;
+package com.chatalytics.core;
 
 import com.google.common.base.Preconditions;
 
@@ -6,7 +6,17 @@ import java.util.Arrays;
 
 public enum ActiveMethod {
 
+    /**
+     * A ratio of type over the total volume. For example an entity volume over the total volume of
+     * all entities.
+     */
     ToTV("totv"),
+
+    /**
+     * A ratio of type over the total message volume regardless of whether the message includes that
+     * type. For example an entity over all the messages seen, regardless of whether the message
+     * includes an entity
+     */
     ToMV("tomv");
 
     private String method;
