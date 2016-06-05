@@ -1,5 +1,7 @@
 package com.chatalytics.web.resources;
 
+import com.chatalytics.compute.chat.dao.ChatAPIFactory;
+import com.chatalytics.compute.chat.dao.IChatApiDAO;
 import com.chatalytics.compute.db.dao.ChatAlyticsDAOFactory;
 import com.chatalytics.compute.db.dao.IEmojiDAO;
 import com.chatalytics.core.ActiveMethod;
@@ -51,9 +53,11 @@ public class EmojisResource {
 
     private final IEmojiDAO emojiDao;
     private final DateTimeZone dtz;
+    private final IChatApiDAO chatApiDao;
 
     public EmojisResource(ChatAlyticsConfig config) {
         emojiDao = ChatAlyticsDAOFactory.createEmojiDAO(config);
+        chatApiDao = ChatAPIFactory.getChatApiDao(config);
         dtz = DateTimeZone.forID(config.timeZone);
     }
 
@@ -118,6 +122,14 @@ public class EmojisResource {
                                                                   DimensionType.ROOM,
                                                                   DimensionType.USER));
         }
+    }
+
+    @GET
+    @Path("icons")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Map<String, String> getEmojiIcons() {
+        LOG.debug("Got request for icons");
+        return chatApiDao.getEmojis();
     }
 
 }

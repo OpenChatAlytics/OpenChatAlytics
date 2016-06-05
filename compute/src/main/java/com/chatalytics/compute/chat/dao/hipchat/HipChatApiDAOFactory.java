@@ -1,4 +1,4 @@
-package com.chatalytics.compute.hipchat.dao;
+package com.chatalytics.compute.chat.dao.hipchat;
 
 import com.chatalytics.compute.chat.dao.IChatApiDAO;
 import com.chatalytics.core.config.ChatAlyticsConfig;

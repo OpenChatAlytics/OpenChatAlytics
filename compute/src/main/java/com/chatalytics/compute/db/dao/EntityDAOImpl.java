@@ -111,8 +111,8 @@ public class EntityDAOImpl extends AbstractIdleService implements IEntityDAO {
      */
     @Override
     public Map<String, Double> getActiveUsersByMethod(Interval interval,
-                                                   ActiveMethod method,
-                                                   int resultSize) {
+                                                      ActiveMethod method,
+                                                      int resultSize) {
         if (method == ActiveMethod.ToTV) {
             return occurrenceStatsDAO.getActiveColumnsByToTV("username", interval, resultSize);
         } else if (method == ActiveMethod.ToMV) {
@@ -128,8 +128,8 @@ public class EntityDAOImpl extends AbstractIdleService implements IEntityDAO {
      */
     @Override
     public Map<String, Double> getActiveRoomsByMethod(Interval interval,
-                                                   ActiveMethod method,
-                                                   int resultSize) {
+                                                      ActiveMethod method,
+                                                      int resultSize) {
         if (method == ActiveMethod.ToTV) {
             return occurrenceStatsDAO.getActiveColumnsByToTV("roomName", interval, resultSize);
         } else if (method == ActiveMethod.ToMV) {

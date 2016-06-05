@@ -1,10 +1,10 @@
 package com.chatalytics.compute.storm.spout;
 
 import com.chatalytics.compute.chat.dao.IChatApiDAO;
+import com.chatalytics.compute.chat.dao.slack.SlackApiDAOFactory;
 import com.chatalytics.compute.config.ConfigurationConstants;
 import com.chatalytics.compute.db.dao.ChatAlyticsDAOFactory;
 import com.chatalytics.compute.db.dao.IChatAlyticsDAO;
-import com.chatalytics.compute.slack.dao.SlackApiDAOFactory;
 import com.chatalytics.core.config.ChatAlyticsConfig;
 import com.chatalytics.core.config.SlackBackfillerConfig;
 import com.chatalytics.core.model.data.FatMessage;

@@ -1,9 +1,9 @@
 package com.chatalytics.compute.storm.spout;
 
+import com.chatalytics.compute.chat.dao.ChatAPIFactory;
 import com.chatalytics.compute.chat.dao.IChatApiDAO;
+import com.chatalytics.compute.chat.dao.slack.JsonSlackDAO;
 import com.chatalytics.compute.config.ConfigurationConstants;
-import com.chatalytics.compute.slack.dao.JsonSlackDAO;
-import com.chatalytics.compute.slack.dao.SlackApiDAOFactory;
 import com.chatalytics.core.config.ChatAlyticsConfig;
 import com.chatalytics.core.model.data.FatMessage;
 import com.chatalytics.core.model.data.Message;
@@ -69,7 +69,7 @@ public class SlackMessageSpout extends BaseRichSpout {
 
         LOG.info("Loaded config...");
         WebSocketContainer webSocketContainer = JdkContainerProvider.getWebSocketContainer();
-        IChatApiDAO slackDao = getChatApiDao(config);
+        IChatApiDAO slackDao = ChatAPIFactory.getChatApiDao(config);
         open(config, slackDao, webSocketContainer, context, collector);
     }
 
@@ -81,14 +81,6 @@ public class SlackMessageSpout extends BaseRichSpout {
         this.collector = collector;
         URI webSocketUri = getRealtimeWebSocketURI();
         openRealtimeConnection(config, webSocketUri, webSocketContainer);
-    }
-
-    /**
-     * @return The slack API DAO
-     */
-    @VisibleForTesting
-    protected IChatApiDAO getChatApiDao(ChatAlyticsConfig config) {
-        return SlackApiDAOFactory.getSlackApiDao(config);
     }
 
     /**

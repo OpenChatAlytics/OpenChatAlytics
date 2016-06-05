@@ -1,4 +1,4 @@
-package com.chatalytics.compute.slack.dao;
+package com.chatalytics.compute.chat.dao.slack;
 
 import com.chatalytics.compute.exception.NotConnectedException;
 import com.chatalytics.core.InputSourceType;
@@ -31,6 +31,7 @@ import javax.ws.rs.core.MediaType;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
@@ -228,6 +229,62 @@ public class JsonSlackDAOTest {
         when(builder.get(String.class)).thenReturn(jsonResult);
         when(mockRtmResrc.accept(MediaType.APPLICATION_JSON)).thenReturn(builder);
         underTest.getRealtimeWebSocketURI();
+    }
+
+    @Test
+    public void testGetEmojis() throws Exception {
+        WebResource emojiResource = mock(WebResource.class);
+        when(mockResource.path("emoji.list")).thenReturn(emojiResource);
+        URI emojiURI = Resources.getResource("slack_api_responses/emoji.list.txt").toURI();
+        Path emojiPath = Paths.get(emojiURI);
+        String emojiResponseStr = new String(Files.readAllBytes(emojiPath));
+        doReturn(emojiResponseStr).when(underTest).getJsonResultWithRetries(emojiResource,
+                                                                            apiRetries);
+
+        Map<String, String> result = underTest.getEmojis();
+        assertEquals(3, result.size());
+        assertTrue(result.containsKey("bowtie"));
+        assertEquals("https://my.slack.com/emoji/bowtie/46ec6f2bb0.png", result.get("bowtie"));
+        assertTrue(result.containsKey("squirrel"));
+        assertEquals("https://my.slack.com/emoji/squirrel/f35f40c0e0.png", result.get("squirrel"));
+        assertTrue(result.containsKey("shipit"));
+        assertEquals("https://my.slack.com/emoji/squirrel/f35f40c0e0.png", result.get("shipit"));
+    }
+
+    @Test
+    public void testGetEmojis_malformedJson() throws Exception {
+        WebResource emojiResource = mock(WebResource.class);
+        when(mockResource.path("emoji.list")).thenReturn(emojiResource);
+        String emojiResponseStr = "{ badJSON";
+        doReturn(emojiResponseStr).when(underTest).getJsonResultWithRetries(emojiResource,
+                                                                            apiRetries);
+
+        Map<String, String> result = underTest.getEmojis();
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
+    public void testGetEmojis_emptyEmojiList() throws Exception {
+        WebResource emojiResource = mock(WebResource.class);
+        when(mockResource.path("emoji.list")).thenReturn(emojiResource);
+        String emojiResponseStr = "{}";
+        doReturn(emojiResponseStr).when(underTest).getJsonResultWithRetries(emojiResource,
+                                                                            apiRetries);
+
+        Map<String, String> result = underTest.getEmojis();
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
+    public void testGetEmojis_badEmojiList() throws Exception {
+        WebResource emojiResource = mock(WebResource.class);
+        when(mockResource.path("emoji.list")).thenReturn(emojiResource);
+        String emojiResponseStr = "{\"emoji\": \"BAD JSON\"}";
+        doReturn(emojiResponseStr).when(underTest).getJsonResultWithRetries(emojiResource,
+                                                                            apiRetries);
+
+        Map<String, String> result = underTest.getEmojis();
+        assertTrue(result.isEmpty());
     }
 
 }

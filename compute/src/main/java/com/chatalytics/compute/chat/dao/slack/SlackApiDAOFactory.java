@@ -1,4 +1,4 @@
-package com.chatalytics.compute.slack.dao;
+package com.chatalytics.compute.chat.dao.slack;
 
 import com.chatalytics.compute.chat.dao.IChatApiDAO;
 import com.chatalytics.core.config.ChatAlyticsConfig;

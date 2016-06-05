@@ -1,4 +1,4 @@
-package com.chatalytics.compute.hipchat.dao;
+package com.chatalytics.compute.chat.dao.hipchat;
 
 import com.chatalytics.compute.chat.dao.AbstractJSONChatApiDAO;
 import com.chatalytics.compute.chat.dao.IChatApiDAO;
@@ -122,6 +122,11 @@ public class JsonHipChatDAO extends AbstractJSONChatApiDAO {
             curDate = curDate.plusDays(1);
         }
         return messages;
+    }
+
+    @Override
+    public Map<String, String> getEmojis() {
+        throw new UnsupportedOperationException("Will implement later");
     }
 
     /**

@@ -5,6 +5,7 @@ import com.chatalytics.compute.db.dao.IEmojiDAO;
 import com.chatalytics.core.ActiveMethod;
 import com.chatalytics.core.DimensionType;
 import com.chatalytics.core.config.ChatAlyticsConfig;
+import com.chatalytics.core.config.SlackConfig;
 import com.chatalytics.core.model.data.EmojiEntity;
 import com.chatalytics.web.utils.DateTimeUtils;
 import com.google.common.collect.Lists;
@@ -47,6 +48,7 @@ public class EmojisResourceTest {
     public void setUp() throws Exception {
         config = new ChatAlyticsConfig();
         config.persistenceUnitName = "chatalytics-web-test";
+        config.computeConfig.chatConfig = new SlackConfig();
         config.timeZone = "America/New_York";
         dtZone = DateTimeZone.forID(config.timeZone);
 

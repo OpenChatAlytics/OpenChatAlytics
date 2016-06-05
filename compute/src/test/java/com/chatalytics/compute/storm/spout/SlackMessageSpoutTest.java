@@ -1,8 +1,8 @@
 package com.chatalytics.compute.storm.spout;
 
+import com.chatalytics.compute.chat.dao.slack.JsonSlackDAO;
 import com.chatalytics.compute.config.ConfigurationConstants;
 import com.chatalytics.compute.exception.NotConnectedException;
-import com.chatalytics.compute.slack.dao.JsonSlackDAO;
 import com.chatalytics.core.config.ChatAlyticsConfig;
 import com.chatalytics.core.config.SlackConfig;
 import com.chatalytics.core.model.data.Message;
@@ -13,7 +13,6 @@ import com.chatalytics.core.util.YamlUtils;
 import com.google.common.collect.Maps;
 
 import org.apache.storm.shade.com.google.common.collect.ImmutableMap;
-import org.apache.storm.shade.com.google.common.collect.Lists;
 import org.apache.storm.spout.SpoutOutputCollector;
 import org.apache.storm.task.TopologyContext;
 import org.apache.storm.topology.OutputFieldsDeclarer;
@@ -67,7 +66,6 @@ public class SlackMessageSpoutTest {
         stormConf = Maps.newHashMapWithExpectedSize(1);
         config = new ChatAlyticsConfig();
         chatConfig = new SlackConfig();
-        chatConfig.authTokens = Lists.newArrayList("0");
         config.computeConfig.chatConfig = chatConfig;
 
     }

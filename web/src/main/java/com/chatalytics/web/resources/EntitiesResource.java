@@ -64,10 +64,10 @@ public class EntitiesResource {
     @Path("trending")
     @Produces(MediaType.APPLICATION_JSON)
     public Map<String, Long> getTrendingTopics(@QueryParam(START_TIME_PARAM) String startTimeStr,
-                                      @QueryParam(END_TIME_PARAM) String endTimeStr,
-                                      @QueryParam(USER_PARAM) String user,
-                                      @QueryParam(ROOM_PARAM) String room,
-                                      @QueryParam(TOP_N) String topNStr)
+                                               @QueryParam(END_TIME_PARAM) String endTimeStr,
+                                               @QueryParam(USER_PARAM) String user,
+                                               @QueryParam(ROOM_PARAM) String room,
+                                               @QueryParam(TOP_N) String topNStr)
                     throws JsonGenerationException, JsonMappingException, IOException {
 
         LOG.debug("Got trending topics query for starttime={}, endtime={}, user={}, room={}",
