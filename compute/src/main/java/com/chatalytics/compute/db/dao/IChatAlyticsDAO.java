@@ -15,7 +15,7 @@ public interface IChatAlyticsDAO extends Service {
     /**
      * @return The last date and time chat messages were pulled.
      */
-    public DateTime getLastMessagePullTime();
+    DateTime getLastMessagePullTime();
 
     /**
      * Update the last pull time to a new one
@@ -23,5 +23,5 @@ public interface IChatAlyticsDAO extends Service {
      * @param time
      *            The time to update to
      */
-    public void setLastMessagePullTime(DateTime time);
+    void setLastMessagePullTime(DateTime time);
 }
