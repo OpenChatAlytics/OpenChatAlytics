@@ -53,4 +53,11 @@ public interface IChatApiDAO {
      */
     public List<Message> getMessages(DateTime start, DateTime end, Room room);
 
+    /**
+     * Gets all the emojis, including custom ones from the chat API
+     *
+     * @return A map of emoji shortcut to URL
+     */
+    public Map<String, String> getEmojis();
+
 }

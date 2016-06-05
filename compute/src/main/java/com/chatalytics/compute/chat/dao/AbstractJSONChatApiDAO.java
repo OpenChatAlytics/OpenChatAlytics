@@ -62,6 +62,9 @@ public abstract class AbstractJSONChatApiDAO implements IChatApiDAO {
      * @return Returns a new resource with the token query parameter added.
      */
     private WebResource addTokenQueryParam(WebResource resource) {
+        if (authTokens == null || authTokens.isEmpty()) {
+            return resource;
+        }
         int tokenSize = authTokens.size();
         String randomAuthToken = authTokens.get(rand.nextInt(tokenSize));
         return resource.queryParam(authTokenParam, randomAuthToken);

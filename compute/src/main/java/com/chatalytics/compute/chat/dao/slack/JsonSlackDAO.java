@@ -1,4 +1,4 @@
-package com.chatalytics.compute.slack.dao;
+package com.chatalytics.compute.chat.dao.slack;
 
 import com.chatalytics.compute.chat.dao.AbstractJSONChatApiDAO;
 import com.chatalytics.compute.chat.dao.IChatApiDAO;
@@ -12,8 +12,10 @@ import com.chatalytics.core.model.slack.HistoryResult;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.CollectionType;
+import com.fasterxml.jackson.databind.type.MapLikeType;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.sun.jersey.api.client.Client;
@@ -164,6 +166,43 @@ public class JsonSlackDAO extends AbstractJSONChatApiDAO {
             }
         }
         return result;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Map<String, String> getEmojis() {
+        WebResource emojiResource = resource.path("emoji.list");
+        String jsonStr = getJsonResultWithRetries(emojiResource, apiRetries);
+        JsonNode node;
+        try {
+            node = objMapper.readTree(jsonStr);
+        } catch (IOException e) {
+            LOG.error("Can't read emoji result from chat API", e);
+            return ImmutableMap.of();
+        }
+        TypeFactory typeFactory = objMapper.getTypeFactory();
+        MapLikeType type = typeFactory.constructMapLikeType(Map.class, String.class, String.class);
+
+        try {
+            JsonNode emojiJson = node.get("emoji");
+            if (emojiJson == null) {
+                return ImmutableMap.of();
+            }
+            Map<String, String> apiResponse =  objMapper.readValue(emojiJson.toString(), type);
+            for (Map.Entry<String, String> emojiEntry : apiResponse.entrySet()) {
+                String value = emojiEntry.getValue();
+                if (value.startsWith("alias:")) {
+                    String alias = value.substring("alias:".length(), value.length());
+                    apiResponse.put(emojiEntry.getKey(), apiResponse.get(alias));
+                }
+            }
+            return apiResponse;
+        } catch (IOException e) {
+            LOG.error("Can't deserialize emojis");
+            return ImmutableMap.of();
+        }
     }
 
     /**
