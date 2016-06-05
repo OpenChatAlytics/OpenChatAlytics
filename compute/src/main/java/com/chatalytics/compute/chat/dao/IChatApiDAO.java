@@ -22,14 +22,14 @@ public interface IChatApiDAO {
      *
      * @return A map of room IDs to {@link Room}s.
      */
-    public Map<String, Room> getRooms();
+    Map<String, Room> getRooms();
 
     /**
      * Gets all the users.
      *
      * @return A map of user IDs to {@link User}s
      */
-    public Map<String, User> getUsers();
+    Map<String, User> getUsers();
 
     /**
      * Gets the list of participating users in a room.
@@ -38,7 +38,7 @@ public interface IChatApiDAO {
      *            The room for which to get the users.
      * @return A map of user IDs to {@link User}s that are participating in the <code>room</code>
      */
-    public Map<String, User> getUsersForRoom(Room room);
+    Map<String, User> getUsersForRoom(Room room);
 
     /**
      * Gets the list of messages in a room for a particular date range
@@ -51,13 +51,13 @@ public interface IChatApiDAO {
      *            The room or which messages will be fetched from
      * @return A list of messages containing the room ID
      */
-    public List<Message> getMessages(DateTime start, DateTime end, Room room);
+    List<Message> getMessages(DateTime start, DateTime end, Room room);
 
     /**
      * Gets all the emojis, including custom ones from the chat API
      *
      * @return A map of emoji shortcut to URL
      */
-    public Map<String, String> getEmojis();
+    Map<String, String> getEmojis();
 
 }
