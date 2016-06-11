@@ -4,6 +4,7 @@ import com.chatalytics.compute.chat.dao.ChatAPIFactory;
 import com.chatalytics.compute.chat.dao.IChatApiDAO;
 import com.chatalytics.compute.db.dao.ChatAlyticsDAOFactory;
 import com.chatalytics.compute.db.dao.IEmojiDAO;
+import com.chatalytics.compute.matrix.LabeledDenseMatrix;
 import com.chatalytics.core.ActiveMethod;
 import com.chatalytics.core.DimensionType;
 import com.chatalytics.core.config.ChatAlyticsConfig;
@@ -50,6 +51,8 @@ public class EmojisResource {
     public static final String USER_PARAM = "user";
     public static final String ROOM_PARAM = "room";
     public static final String TOP_N = "n";
+    public static final String FIRST_SIMILARITY_DIM_PARAM = "firstDim";
+    public static final String SECOND_SIMILARITY_DIM_PARAM = "secondDim";
     public static final String DIM_PARAM = "dimension";
     public static final String METHOD = "method";
 
@@ -109,6 +112,31 @@ public class EmojisResource {
         Interval interval = DateTimeUtils.getIntervalFromParameters(startTimeStr, endTimeStr, dtz);
 
         return emojiDao.getAllMentions(interval, roomName, username);
+    }
+
+    @GET
+    @Path("similarities")
+    @Produces(MediaType.APPLICATION_JSON)
+    public LabeledDenseMatrix<String> getSimilarities(
+            @QueryParam(START_TIME_PARAM) String startTimeStr,
+            @QueryParam(END_TIME_PARAM) String endTimeStr,
+            @QueryParam(FIRST_SIMILARITY_DIM_PARAM) String firstDimStr,
+            @QueryParam(SECOND_SIMILARITY_DIM_PARAM) String secondDimStr) {
+
+        LOG.debug("Got a call for dimensions {} and {} with starttime={}, endtime={}",
+                  firstDimStr, secondDimStr, startTimeStr, endTimeStr);
+
+        DimensionType firstDim = DimensionType.fromDimensionName(firstDimStr);
+        DimensionType secondDim = DimensionType.fromDimensionName(secondDimStr);
+        Interval interval = DateTimeUtils.getIntervalFromParameters(startTimeStr, endTimeStr, dtz);
+
+        if (firstDim == DimensionType.ROOM && secondDim == DimensionType.EMOJI) {
+            return emojiDao.getRoomSimilaritiesByEntity(interval);
+        } else {
+            String formatStr = "The dimension combination you specified (%s, %s) is not supported";
+            throw new UnsupportedOperationException(String.format(formatStr, firstDimStr,
+                                                                  secondDimStr));
+        }
     }
 
     @GET

@@ -3,6 +3,7 @@ package com.chatalytics.web.resources;
 import com.chatalytics.compute.chat.dao.IChatApiDAO;
 import com.chatalytics.compute.db.dao.ChatAlyticsDAOFactory;
 import com.chatalytics.compute.db.dao.IEmojiDAO;
+import com.chatalytics.compute.matrix.LabeledDenseMatrix;
 import com.chatalytics.core.ActiveMethod;
 import com.chatalytics.core.DimensionType;
 import com.chatalytics.core.config.ChatAlyticsConfig;
@@ -129,6 +130,32 @@ public class EmojisResourceTest {
         for (EmojiEntity expectedEmoji : emojis) {
             assertTrue(resultEmojiSet.contains(expectedEmoji));
         }
+    }
+
+    /**
+     * Tests the similarities endpoint
+     */
+    @Test
+    public void testGetSimilarities_RoomByEntity() throws Exception {
+        DateTimeFormatter dtf = DateTimeUtils.PARAMETER_WITH_DAY_DTF.withZone(dtZone);
+        String startTimeStr = dtf.print(mentionTime.minusDays(1));
+        String endTimeStr = dtf.print(mentionTime.plusDays(1));
+
+        LabeledDenseMatrix<String> ldm = underTest.getSimilarities(
+                startTimeStr, endTimeStr, DimensionType.ROOM.getDimensionName(),
+                DimensionType.EMOJI.getDimensionName());
+        assertEquals(4, ldm.getLabels().size());
+        assertEquals(4, ldm.getMatrix().length);
+    }
+
+    @Test(expected = UnsupportedOperationException.class)
+    public void testGetSimilarities_badCombination() throws Exception {
+        DateTimeFormatter dtf = DateTimeUtils.PARAMETER_WITH_DAY_DTF.withZone(dtZone);
+        String startTimeStr = dtf.print(mentionTime.minusDays(1));
+        String endTimeStr = dtf.print(mentionTime.plusDays(1));
+        underTest.getSimilarities(startTimeStr, endTimeStr,
+                                  DimensionType.ROOM.getDimensionName(),
+                                  DimensionType.ROOM.getDimensionName());
     }
 
     @Test

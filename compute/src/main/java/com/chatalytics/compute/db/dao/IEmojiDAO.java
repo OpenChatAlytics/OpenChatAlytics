@@ -1,5 +1,8 @@
 package com.chatalytics.compute.db.dao;
 
+import com.chatalytics.compute.matrix.GraphPartition;
+import com.chatalytics.compute.matrix.LabeledDenseMatrix;
+import com.chatalytics.compute.matrix.LabeledMTJMatrix;
 import com.chatalytics.core.ActiveMethod;
 import com.chatalytics.core.model.data.EmojiEntity;
 import com.google.common.base.Optional;
@@ -102,6 +105,17 @@ public interface IEmojiDAO extends Service {
                                     Optional<String> roomName,
                                     Optional<String> username,
                                     int resultSize);
+
+     /**
+      * Given a time interval this method will return a labeled room by room matrix with all the
+      * similar rooms, based on the emoji value clustered together. For more information see
+      * {@link GraphPartition#getSimilarityMatrix(LabeledMTJMatrix)}
+      *
+      * @param interval
+      *            The interval to search in
+      * @return A labeled matrix
+      */
+     LabeledDenseMatrix<String> getRoomSimilaritiesByEntity(Interval interval);
 
      /**
       * Returns a sorted map of users to a ratio, where the ratio is one of {@link ActiveMethod}s

@@ -1,5 +1,6 @@
 package com.chatalytics.compute.db.dao;
 
+import com.chatalytics.compute.matrix.LabeledDenseMatrix;
 import com.chatalytics.core.ActiveMethod;
 import com.chatalytics.core.model.data.EmojiEntity;
 import com.google.common.base.Optional;
@@ -94,6 +95,14 @@ public class EmojiDAOImpl extends AbstractIdleService implements IEmojiDAO {
                                           Optional<String> username,
                                           int resultSize) {
         return occurrenceStatsDAO.getTopValuesOfType(interval, roomName, username, resultSize);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public LabeledDenseMatrix<String> getRoomSimilaritiesByEntity(Interval interval) {
+        return occurrenceStatsDAO.getRoomSimilaritiesByValue(interval);
     }
 
     /**
