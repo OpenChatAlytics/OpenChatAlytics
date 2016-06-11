@@ -121,6 +121,17 @@ public interface IEntityDAO extends Service {
      LabeledDenseMatrix<String> getRoomSimilaritiesByEntity(Interval interval);
 
      /**
+      * Given a time interval this method will return a labeled user by user matrix with all the
+      * similar users, based on the entity value clustered together. For more information see
+      * {@link GraphPartition#getSimilarityMatrix(LabeledMTJMatrix)}
+      *
+      * @param interval
+      *            The interval to search in
+      * @return A labeled matrix
+      */
+     LabeledDenseMatrix<String> getUserSimilaritiesByEntity(Interval interval);
+
+     /**
       * Returns a sorted map of users to a ratio, where the ratio is one of {@link ActiveMethod}s
       *
       * @param interval

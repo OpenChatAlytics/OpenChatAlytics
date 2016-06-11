@@ -115,7 +115,18 @@ public interface IEmojiDAO extends Service {
       *            The interval to search in
       * @return A labeled matrix
       */
-     LabeledDenseMatrix<String> getRoomSimilaritiesByEntity(Interval interval);
+     LabeledDenseMatrix<String> getRoomSimilaritiesByEmoji(Interval interval);
+
+     /**
+      * Given a time interval this method will return a labeled user by user matrix with all the
+      * similar users, based on the emoji value clustered together. For more information see
+      * {@link GraphPartition#getSimilarityMatrix(LabeledMTJMatrix)}
+      *
+      * @param interval
+      *            The interval to search in
+      * @return A labeled matrix
+      */
+     LabeledDenseMatrix<String> getUserSimilaritiesByEmoji(Interval interval);
 
      /**
       * Returns a sorted map of users to a ratio, where the ratio is one of {@link ActiveMethod}s

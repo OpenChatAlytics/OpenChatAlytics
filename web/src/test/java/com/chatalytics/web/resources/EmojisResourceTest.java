@@ -136,13 +136,29 @@ public class EmojisResourceTest {
      * Tests the similarities endpoint
      */
     @Test
-    public void testGetSimilarities_RoomByEntity() throws Exception {
+    public void testGetSimilarities_RoomByEmoji() throws Exception {
         DateTimeFormatter dtf = DateTimeUtils.PARAMETER_WITH_DAY_DTF.withZone(dtZone);
         String startTimeStr = dtf.print(mentionTime.minusDays(1));
         String endTimeStr = dtf.print(mentionTime.plusDays(1));
 
         LabeledDenseMatrix<String> ldm = underTest.getSimilarities(
                 startTimeStr, endTimeStr, DimensionType.ROOM.getDimensionName(),
+                DimensionType.EMOJI.getDimensionName());
+        assertEquals(4, ldm.getLabels().size());
+        assertEquals(4, ldm.getMatrix().length);
+    }
+
+    /**
+     * Tests the similarities endpoint
+     */
+    @Test
+    public void testGetSimilarities_UserByEmoji() throws Exception {
+        DateTimeFormatter dtf = DateTimeUtils.PARAMETER_WITH_DAY_DTF.withZone(dtZone);
+        String startTimeStr = dtf.print(mentionTime.minusDays(1));
+        String endTimeStr = dtf.print(mentionTime.plusDays(1));
+
+        LabeledDenseMatrix<String> ldm = underTest.getSimilarities(
+                startTimeStr, endTimeStr, DimensionType.USER.getDimensionName(),
                 DimensionType.EMOJI.getDimensionName());
         assertEquals(4, ldm.getLabels().size());
         assertEquals(4, ldm.getMatrix().length);

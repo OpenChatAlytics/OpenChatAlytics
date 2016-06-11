@@ -138,6 +138,22 @@ public class EntitiesResourceTest {
         assertEquals(4, ldm.getMatrix().length);
     }
 
+    /**
+     * Tests the similarities endpoint
+     */
+    @Test
+    public void testGetSimilarities_UserByEntity() throws Exception {
+        DateTimeFormatter dtf = DateTimeUtils.PARAMETER_WITH_DAY_DTF.withZone(dtZone);
+        String startTimeStr = dtf.print(mentionTime.minusDays(1));
+        String endTimeStr = dtf.print(mentionTime.plusDays(1));
+
+        LabeledDenseMatrix<String> ldm = underTest.getSimilarities(
+                startTimeStr, endTimeStr, DimensionType.USER.getDimensionName(),
+                DimensionType.ENTITY.getDimensionName());
+        assertEquals(4, ldm.getLabels().size());
+        assertEquals(4, ldm.getMatrix().length);
+    }
+
     @Test(expected = UnsupportedOperationException.class)
     public void testGetSimilarities_badCombination() throws Exception {
         DateTimeFormatter dtf = DateTimeUtils.PARAMETER_WITH_DAY_DTF.withZone(dtZone);

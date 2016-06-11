@@ -101,8 +101,16 @@ public class EmojiDAOImpl extends AbstractIdleService implements IEmojiDAO {
      * {@inheritDoc}
      */
     @Override
-    public LabeledDenseMatrix<String> getRoomSimilaritiesByEntity(Interval interval) {
+    public LabeledDenseMatrix<String> getRoomSimilaritiesByEmoji(Interval interval) {
         return occurrenceStatsDAO.getRoomSimilaritiesByValue(interval);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public LabeledDenseMatrix<String> getUserSimilaritiesByEmoji(Interval interval) {
+        return occurrenceStatsDAO.getUserSimilaritiesByValue(interval);
     }
 
     /**

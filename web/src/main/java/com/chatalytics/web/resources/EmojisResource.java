@@ -131,7 +131,9 @@ public class EmojisResource {
         Interval interval = DateTimeUtils.getIntervalFromParameters(startTimeStr, endTimeStr, dtz);
 
         if (firstDim == DimensionType.ROOM && secondDim == DimensionType.EMOJI) {
-            return emojiDao.getRoomSimilaritiesByEntity(interval);
+            return emojiDao.getRoomSimilaritiesByEmoji(interval);
+        } else if (firstDim == DimensionType.USER && secondDim == DimensionType.EMOJI) {
+            return emojiDao.getUserSimilaritiesByEmoji(interval);
         } else {
             String formatStr = "The dimension combination you specified (%s, %s) is not supported";
             throw new UnsupportedOperationException(String.format(formatStr, firstDimStr,
