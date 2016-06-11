@@ -4,12 +4,10 @@ import com.chatalytics.compute.chat.dao.IChatApiDAO;
 import com.chatalytics.core.RandomStringUtils;
 import com.chatalytics.core.config.ChatAlyticsConfig;
 import com.chatalytics.core.config.LocalTestConfig;
-import com.chatalytics.core.emoji.LocalEmojiUtils;
-import com.chatalytics.core.json.JsonObjectMapperFactory;
 import com.chatalytics.core.model.data.Message;
 import com.chatalytics.core.model.data.Room;
 import com.chatalytics.core.model.data.User;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.ImmutableMap;
 
 import org.apache.storm.shade.com.google.common.collect.Maps;
 import org.joda.time.DateTime;
@@ -32,8 +30,6 @@ public class LocalChatDao implements IChatApiDAO {
 
     private final Map<String, User> users;
     private final Map<String, Room> rooms;
-    private final ObjectMapper objectMapper;
-    private final Map<String, String> emojis;
 
     public LocalChatDao(ChatAlyticsConfig config) {
         LocalTestConfig localConfig = (LocalTestConfig) config.computeConfig.chatConfig;
@@ -49,8 +45,6 @@ public class LocalChatDao implements IChatApiDAO {
 
         this.users = createRandomUsers(localConfig.numUsers, rand);
         this.rooms = createRandomRooms(localConfig.numRooms, rand);
-        this.objectMapper = JsonObjectMapperFactory.createObjectMapper(config.inputType);
-        this.emojis = LocalEmojiUtils.getUnicodeEmojis(objectMapper);
     }
 
     /**
@@ -90,7 +84,7 @@ public class LocalChatDao implements IChatApiDAO {
      */
     @Override
     public Map<String, String> getEmojis() {
-        return emojis;
+        return ImmutableMap.of();
     }
 
     /**
