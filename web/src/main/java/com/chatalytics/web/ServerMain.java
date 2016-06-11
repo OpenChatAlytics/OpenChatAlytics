@@ -8,6 +8,7 @@ import com.chatalytics.core.util.YamlUtils;
 import com.chatalytics.web.resources.EmojisResource;
 import com.chatalytics.web.resources.EntitiesResource;
 import com.chatalytics.web.resources.EventsResource;
+import com.chatalytics.web.resources.UsersResource;
 import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
 import com.google.common.collect.Sets;
 import com.sun.jersey.spi.container.servlet.ServletContainer;
@@ -94,6 +95,7 @@ public class ServerMain extends Application {
 
         return Sets.newHashSet(new EntitiesResource(config),
                                new EmojisResource(config),
+                               new UsersResource(config),
                                new ApiListingResource(),
                                jsonProvider);
     }

@@ -1,13 +1,14 @@
 package com.chatalytics.web.resources;
 
+import com.chatalytics.compute.chat.dao.IChatApiDAO;
 import com.chatalytics.compute.db.dao.ChatAlyticsDAOFactory;
 import com.chatalytics.compute.db.dao.IEmojiDAO;
 import com.chatalytics.core.ActiveMethod;
 import com.chatalytics.core.DimensionType;
 import com.chatalytics.core.config.ChatAlyticsConfig;
-import com.chatalytics.core.config.SlackConfig;
 import com.chatalytics.core.model.data.EmojiEntity;
 import com.chatalytics.web.utils.DateTimeUtils;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -28,6 +29,8 @@ import javax.persistence.EntityManager;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Tests {@link EmojisResource}
@@ -43,12 +46,12 @@ public class EmojisResourceTest {
     private DateTime mentionTime;
     private List<EmojiEntity> emojis;
     private ChatAlyticsConfig config;
+    private IChatApiDAO chatApiDao;
 
     @Before
     public void setUp() throws Exception {
         config = new ChatAlyticsConfig();
         config.persistenceUnitName = "chatalytics-web-test";
-        config.computeConfig.chatConfig = new SlackConfig();
         config.timeZone = "America/New_York";
         dtZone = DateTimeZone.forID(config.timeZone);
 
@@ -68,7 +71,8 @@ public class EmojisResourceTest {
         emojis.add(new EmojiEntity("e3", 3, mentionTime.minusHours(2), "u3", "r1"));
         emojis.add(new EmojiEntity("e4", 3, mentionTime.minusHours(1), "u1", "r4"));
         storeTestEmojis(emojis);
-        underTest = new EmojisResource(config);
+        chatApiDao = mock(IChatApiDAO.class);
+        underTest = new EmojisResource(config, chatApiDao);
     }
 
     private void storeTestEmojis(List<EmojiEntity> emojis) {
@@ -175,6 +179,16 @@ public class EmojisResourceTest {
         String endTimeStr = dtf.print(mentionTime.plusDays(1));
         underTest.getActive(startTimeStr, endTimeStr, DimensionType.EMOJI.toString(),
                                 ActiveMethod.ToTV.toString(), "10");
+    }
+
+    @Test
+    public void testGetEmojiIcons() {
+        Map<String, String> emojis = ImmutableMap.of("emoji1", "http://emoji1.com",
+                                                     "emoji2", "http://emoji2.com");
+        when(chatApiDao.getEmojis()).thenReturn(emojis);
+
+        Map<String, String> result = underTest.getEmojiIcons();
+        assertEquals(emojis, result);
     }
 
     @After
