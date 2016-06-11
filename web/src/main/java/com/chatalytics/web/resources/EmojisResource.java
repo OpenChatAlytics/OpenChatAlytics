@@ -13,6 +13,7 @@ import com.chatalytics.web.utils.DateTimeUtils;
 import com.chatalytics.web.utils.ResourceUtils;
 import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.databind.JsonMappingException;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Optional;
 
 import org.joda.time.DateTimeZone;
@@ -56,8 +57,13 @@ public class EmojisResource {
     private final IChatApiDAO chatApiDao;
 
     public EmojisResource(ChatAlyticsConfig config) {
+        this(config, ChatAPIFactory.getChatApiDao(config));
+    }
+
+    @VisibleForTesting
+    protected EmojisResource(ChatAlyticsConfig config, IChatApiDAO chatApiDao) {
         emojiDao = ChatAlyticsDAOFactory.createEmojiDAO(config);
-        chatApiDao = ChatAPIFactory.getChatApiDao(config);
+        this.chatApiDao = chatApiDao;
         dtz = DateTimeZone.forID(config.timeZone);
     }
 
