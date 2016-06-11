@@ -159,9 +159,17 @@ public class EmojiDAOImplTest {
     }
 
     @Test
-    public void testGetRoomSimilaritiesByEntity() {
+    public void testGetRoomSimilaritiesByEmoji() {
         Interval timeInterval = new Interval(mentionDate, mentionDate.plusHours(3));
-        LabeledDenseMatrix<String> result = underTest.getRoomSimilaritiesByEntity(timeInterval);
+        LabeledDenseMatrix<String> result = underTest.getRoomSimilaritiesByEmoji(timeInterval);
+        assertEquals(2, result.getLabels().size());
+        assertEquals(2, result.getMatrix().length);
+    }
+
+    @Test
+    public void testGetUserSimilaritiesByEmoji() {
+        Interval timeInterval = new Interval(mentionDate, mentionDate.plusHours(3));
+        LabeledDenseMatrix<String> result = underTest.getUserSimilaritiesByEmoji(timeInterval);
         assertEquals(2, result.getLabels().size());
         assertEquals(2, result.getMatrix().length);
     }

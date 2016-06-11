@@ -168,6 +168,14 @@ public class EntityDAOImplTest {
     }
 
     @Test
+    public void testGetUserSimilaritiesByEntity() {
+        Interval timeInterval = new Interval(mentionDate, mentionDate.plusHours(3));
+        LabeledDenseMatrix<String> result = underTest.getUserSimilaritiesByEntity(timeInterval);
+        assertEquals(2, result.getLabels().size());
+        assertEquals(2, result.getMatrix().length);
+    }
+
+    @Test
     public void testGetTopRoomsByMethod() {
         Interval interval = new Interval(mentionDate.minusMillis(1), mentionDate.plusMillis(1));
 

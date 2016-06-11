@@ -116,6 +116,8 @@ public class EntitiesResource {
 
         if (firstDim == DimensionType.ROOM && secondDim == DimensionType.ENTITY) {
             return entityDao.getRoomSimilaritiesByEntity(interval);
+        } else if (firstDim == DimensionType.USER && secondDim == DimensionType.ENTITY) {
+            return entityDao.getUserSimilaritiesByEntity(interval);
         } else {
             String formatStr = "The dimension combination you specified (%s, %s) is not supported";
             throw new UnsupportedOperationException(String.format(formatStr, firstDimStr,

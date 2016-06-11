@@ -110,6 +110,14 @@ public class EntityDAOImpl extends AbstractIdleService implements IEntityDAO {
      * {@inheritDoc}
      */
     @Override
+    public LabeledDenseMatrix<String> getUserSimilaritiesByEntity(Interval interval) {
+        return occurrenceStatsDAO.getUserSimilaritiesByValue(interval);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public Map<String, Double> getActiveUsersByMethod(Interval interval,
                                                       ActiveMethod method,
                                                       int resultSize) {
@@ -154,5 +162,4 @@ public class EntityDAOImpl extends AbstractIdleService implements IEntityDAO {
     protected void shutDown() throws Exception {
         occurrenceStatsDAO.close();
     }
-
 }
