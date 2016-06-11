@@ -1,7 +1,8 @@
 package com.chatalytics.compute.storm.spout;
 
+import com.chatalytics.compute.chat.dao.ChatAPIFactory;
+import com.chatalytics.compute.chat.dao.IChatApiDAO;
 import com.chatalytics.compute.config.ConfigurationConstants;
-import com.chatalytics.core.RandomStringUtils;
 import com.chatalytics.core.config.ChatAlyticsConfig;
 import com.chatalytics.core.config.LocalTestConfig;
 import com.chatalytics.core.model.data.FatMessage;
@@ -10,9 +11,8 @@ import com.chatalytics.core.model.data.MessageType;
 import com.chatalytics.core.model.data.Room;
 import com.chatalytics.core.model.data.User;
 import com.chatalytics.core.util.YamlUtils;
-import com.google.common.collect.Lists;
 
-import org.apache.storm.shade.com.google.common.collect.Maps;
+import org.apache.storm.shade.com.google.common.collect.Lists;
 import org.apache.storm.spout.SpoutOutputCollector;
 import org.apache.storm.task.TopologyContext;
 import org.apache.storm.topology.OutputFieldsDeclarer;
@@ -52,6 +52,7 @@ public class LocalTestSpout extends BaseRichSpout {
     private List<User> users;
     private List<Room> rooms;
     private List<String> sentences;
+    private IChatApiDAO localChatDao;
 
     @Override
     public void open(@SuppressWarnings("rawtypes") Map conf, TopologyContext context,
@@ -88,9 +89,9 @@ public class LocalTestSpout extends BaseRichSpout {
             seed = localConfig.randomSeed;
         }
         this.rand = new Random(seed);
-
-        this.users = createRandomUsers(localConfig.numUsers, rand);
-        this.rooms = createRandomRooms(localConfig.numRooms, rand);
+        this.localChatDao = ChatAPIFactory.getChatApiDao(config);
+        this.users = Lists.newArrayList(localChatDao.getUsers().values());
+        this.rooms = Lists.newArrayList(localChatDao.getRooms().values());
     }
 
     @Override
@@ -114,60 +115,6 @@ public class LocalTestSpout extends BaseRichSpout {
         } catch (InterruptedException e) {
             LOG.warn("Interrupted. Ignoring and moving on...");
         }
-    }
-
-    /**
-     * Creates random users that can be used for generating random messages
-     *
-     * @param numUsers The number of random users to create
-     * @return A list of random users
-     */
-    private List<User> createRandomUsers(int numUsers, Random rand) {
-
-        Map<String, User> users = Maps.newHashMapWithExpectedSize(numUsers);
-
-        for (int i = 0; i < numUsers; i++) {
-            String userId = RandomStringUtils.generateRandomAlphaNumericString(5, rand);
-            String emailId = RandomStringUtils.generateRandomAlphaNumericString(4, rand);
-            String email = String.format("%s@email.com", emailId);
-            String namePostfix = RandomStringUtils.generateRandomAlphaNumericString(4, rand);
-            String name = String.format("name-%s", namePostfix);
-            String mentionName = RandomStringUtils.generateRandomAlphaNumericString(6, rand);
-
-            User randomUser = new User(userId, email, false, false, false, name, mentionName, null,
-                                       DateTime.now(DateTimeZone.UTC),
-                                       DateTime.now(DateTimeZone.UTC), null, null, "UTC", null);
-
-            users.put(userId, randomUser);
-        }
-
-        return Lists.newArrayList(users.values());
-    }
-
-    /**
-     * Creates random rooms that can be used for generating random messages
-     *
-     * @param numRooms Number of rooms to create
-     * @return A list of random rooms
-     */
-    private List<Room> createRandomRooms(int numRooms, Random rand) {
-
-        Map<String, Room> rooms = Maps.newHashMapWithExpectedSize(numRooms);
-
-        for (int i = 0; i < numRooms; i++) {
-            String roomId = RandomStringUtils.generateRandomAlphaNumericString(5, rand);
-            String roomPostfix = RandomStringUtils.generateRandomAlphaNumericString(5, rand);
-            String name = String.format("room-%s", roomPostfix);
-            String ownerUserId =RandomStringUtils.generateRandomAlphaNumericString(5, rand);
-
-            Room randomRoom = new Room(roomId, name, "random topic", DateTime.now(DateTimeZone.UTC),
-                                       DateTime.now(DateTimeZone.UTC), ownerUserId, false, false,
-                                       null, null);
-
-            rooms.put(roomId, randomRoom);
-        }
-
-        return Lists.newArrayList(rooms.values());
     }
 
     @Override
