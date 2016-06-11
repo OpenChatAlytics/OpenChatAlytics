@@ -6,8 +6,12 @@ import com.chatalytics.compute.db.dao.IEmojiDAO;
 import com.chatalytics.core.ActiveMethod;
 import com.chatalytics.core.DimensionType;
 import com.chatalytics.core.config.ChatAlyticsConfig;
+import com.chatalytics.core.emoji.LocalEmojiUtils;
+import com.chatalytics.core.json.JsonObjectMapperFactory;
 import com.chatalytics.core.model.data.EmojiEntity;
+import com.chatalytics.core.model.data.EmojiMap;
 import com.chatalytics.web.utils.DateTimeUtils;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -28,6 +32,7 @@ import javax.persistence.EntityManager;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -187,8 +192,12 @@ public class EmojisResourceTest {
                                                      "emoji2", "http://emoji2.com");
         when(chatApiDao.getEmojis()).thenReturn(emojis);
 
-        Map<String, String> result = underTest.getEmojiIcons();
-        assertEquals(emojis, result);
+        EmojiMap result = underTest.getEmojiIcons();
+        assertEquals(emojis, result.getCustomEmojis());
+        assertNotNull(result.getUnicodeEmojis());
+        ObjectMapper objectMapper = JsonObjectMapperFactory.createObjectMapper();
+        Map<String, String> expectedUnicodeEmojis = LocalEmojiUtils.getUnicodeEmojis(objectMapper);
+        assertEquals(expectedUnicodeEmojis, result.getUnicodeEmojis());
     }
 
     @After

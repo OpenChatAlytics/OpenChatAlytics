@@ -1,28 +1,33 @@
 package com.chatalytics.compute.chat.dao.local;
 
 import com.chatalytics.compute.chat.dao.IChatApiDAO;
-import com.chatalytics.core.Constants;
 import com.chatalytics.core.RandomStringUtils;
 import com.chatalytics.core.config.ChatAlyticsConfig;
 import com.chatalytics.core.config.LocalTestConfig;
+import com.chatalytics.core.emoji.LocalEmojiUtils;
 import com.chatalytics.core.json.JsonObjectMapperFactory;
 import com.chatalytics.core.model.data.Message;
 import com.chatalytics.core.model.data.Room;
 import com.chatalytics.core.model.data.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.type.MapType;
-import com.fasterxml.jackson.databind.type.TypeFactory;
-import com.google.common.io.Resources;
 
 import org.apache.storm.shade.com.google.common.collect.Maps;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+/**
+ * An implementation of an {@link IChatApiDAO} that returns random users and rooms. For emojis it
+ * returns a map of all the standard unicode emojis. Note that if you want the random list of users
+ * and rooms to match with those returned by another instance of the application then set the
+ * <code>randomSeed</code> in the {@link LocalTestConfig} to the same value
+ *
+ * @author giannis
+ *
+ */
 public class LocalChatDao implements IChatApiDAO {
 
     private final Map<String, User> users;
@@ -45,7 +50,7 @@ public class LocalChatDao implements IChatApiDAO {
         this.users = createRandomUsers(localConfig.numUsers, rand);
         this.rooms = createRandomRooms(localConfig.numRooms, rand);
         this.objectMapper = JsonObjectMapperFactory.createObjectMapper(config.inputType);
-        this.emojis = createEmojis();
+        this.emojis = LocalEmojiUtils.getUnicodeEmojis(objectMapper);
     }
 
     /**
@@ -140,22 +145,5 @@ public class LocalChatDao implements IChatApiDAO {
         }
 
         return rooms;
-    }
-
-    /**
-     * A map of emojis to unicode
-     *
-     * @return A map of emoji names to unicode
-     * @throws IOException
-     *             When the emoji file can't be found, read or parsed
-     */
-    private Map<String, String> createEmojis() {
-        MapType mapType =  TypeFactory.defaultInstance()
-                                      .constructMapType(Map.class, String.class, String.class);
-        try {
-            return objectMapper.readValue(Resources.getResource(Constants.EMOJI_RESOURCE), mapType);
-        } catch (IOException e) {
-            throw new RuntimeException("Can't read emojis", e);
-        }
     }
 }

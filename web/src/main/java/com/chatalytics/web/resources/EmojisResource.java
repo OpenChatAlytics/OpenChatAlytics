@@ -7,12 +7,16 @@ import com.chatalytics.compute.db.dao.IEmojiDAO;
 import com.chatalytics.core.ActiveMethod;
 import com.chatalytics.core.DimensionType;
 import com.chatalytics.core.config.ChatAlyticsConfig;
+import com.chatalytics.core.emoji.LocalEmojiUtils;
+import com.chatalytics.core.json.JsonObjectMapperFactory;
 import com.chatalytics.core.model.data.EmojiEntity;
+import com.chatalytics.core.model.data.EmojiMap;
 import com.chatalytics.web.constant.WebConstants;
 import com.chatalytics.web.utils.DateTimeUtils;
 import com.chatalytics.web.utils.ResourceUtils;
 import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Optional;
 
@@ -55,6 +59,7 @@ public class EmojisResource {
     private final IEmojiDAO emojiDao;
     private final DateTimeZone dtz;
     private final IChatApiDAO chatApiDao;
+    private final Map<String, String> unicodeEmojis;
 
     public EmojisResource(ChatAlyticsConfig config) {
         this(config, ChatAPIFactory.getChatApiDao(config));
@@ -65,6 +70,8 @@ public class EmojisResource {
         emojiDao = ChatAlyticsDAOFactory.createEmojiDAO(config);
         this.chatApiDao = chatApiDao;
         dtz = DateTimeZone.forID(config.timeZone);
+        ObjectMapper objectMapper = JsonObjectMapperFactory.createObjectMapper(config.inputType);
+        unicodeEmojis = LocalEmojiUtils.getUnicodeEmojis(objectMapper);
     }
 
     @GET
@@ -133,9 +140,9 @@ public class EmojisResource {
     @GET
     @Path("icons")
     @Produces(MediaType.APPLICATION_JSON)
-    public Map<String, String> getEmojiIcons() {
+    public EmojiMap getEmojiIcons() {
         LOG.debug("Got request for icons");
-        return chatApiDao.getEmojis();
+        return new EmojiMap(chatApiDao.getEmojis(), unicodeEmojis);
     }
 
 }
