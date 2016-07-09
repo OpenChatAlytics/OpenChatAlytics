@@ -128,11 +128,11 @@ public class EntityExtractionBolt extends ChatAlyticsBaseBolt {
             if (room != null) {
                 roomName = room.getName();
             }
-            entities.put(entity, new ChatEntity(entity,
-                                                occurrences,
+            entities.put(entity, new ChatEntity(fatMessage.getUser().getMentionName(),
+                                                roomName,
                                                 message.getDate(),
-                                                fatMessage.getUser().getMentionName(),
-                                                roomName));
+                                                entity,
+                                                occurrences));
 
         }
 

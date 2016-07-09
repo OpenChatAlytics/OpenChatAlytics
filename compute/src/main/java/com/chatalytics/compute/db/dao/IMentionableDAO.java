@@ -36,17 +36,10 @@ public interface IMentionableDAO<K extends Serializable, T extends IMentionable<
     void persistValue(T value);
 
     /**
-     * Merges the existing value with the new value
-     *
-     * @param value The new value to replace the existing one
-     */
-    void mergeValue(T value);
-
-    /**
      * Gets a type <code>T</code> from the database. Note that all fields need to be set.
      *
      * @param value
-     *            Value to be retrieved
+     *            The value to get
      */
     T getValue(T value);
 

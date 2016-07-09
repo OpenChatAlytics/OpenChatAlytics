@@ -5,12 +5,13 @@ import com.google.common.base.MoreObjects;
 import org.joda.time.DateTime;
 
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Setter;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
@@ -23,7 +24,6 @@ import javax.persistence.Table;
 @Entity
 @Table(name = MessageSummary.MESSAGE_SUMMARY_TABLE_NAME)
 @EqualsAndHashCode
-@AllArgsConstructor
 @Setter(value = AccessLevel.PROTECTED) // for hibernate
 public class MessageSummary implements IMentionable<MessageType> {
 
@@ -40,32 +40,41 @@ public class MessageSummary implements IMentionable<MessageType> {
     private DateTime mentionTime;
     private MessageType value;
     private int occurrences;
+    @Id
+    @Column(name = "id")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    private Long id;
+
+    public MessageSummary(String username, String roomName, DateTime mentionTime,
+                          MessageType value, int occurrences) {
+        this.username = username;
+        this.roomName = roomName;
+        this.mentionTime = mentionTime;
+        this.value = value;
+        this.occurrences = occurrences;
+    }
 
     protected MessageSummary() {} // for jackson
 
     @Override
-    @Id
     @Column(name = TYPE_COLUMN)
     public MessageType getValue() {
         return value;
     }
 
     @Override
-    @Id
     @Column(name = USER_NAME_COLUMN)
     public String getUsername() {
         return username;
     }
 
     @Override
-    @Id
     @Column(name = ROOM_NAME_COLUMN)
     public String getRoomName() {
         return roomName;
     }
 
     @Override
-    @Id
     @Column(name = MENTION_TIME_COLUMN)
     public DateTime getMentionTime() {
         return mentionTime;

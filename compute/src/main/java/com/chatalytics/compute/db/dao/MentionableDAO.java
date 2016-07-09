@@ -25,6 +25,7 @@ import javax.persistence.EntityExistsException;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
+import javax.persistence.NoResultException;
 import javax.persistence.PersistenceException;
 import javax.persistence.Tuple;
 import javax.persistence.TypedQuery;
@@ -88,25 +89,6 @@ public class MentionableDAO<K extends Serializable, T extends IMentionable<K>>
         closeEntityManager(entityManager);
     }
 
-    @Override
-    public void mergeValue(T value) {
-        EntityManager entityManager = entityManagerFactory.createEntityManager();
-        EntityTransaction transaction = entityManager.getTransaction();
-        transaction.begin();
-        try {
-            entityManager.merge(value);
-            transaction.commit();
-        } catch (PersistenceException e) {
-            LOG.error("Cannot merge {}. {}", value, e.getMessage());
-        }
-
-        if (transaction.isActive() && transaction.getRollbackOnly()) {
-            transaction.rollback();
-        }
-
-        closeEntityManager(entityManager);
-    }
-
     /**
      * {@inheritDoc}
      */
@@ -114,8 +96,40 @@ public class MentionableDAO<K extends Serializable, T extends IMentionable<K>>
     public T getValue(T value) {
         EntityManager entityManager = entityManagerFactory.createEntityManager();
         try {
-            T result = entityManager.find(type, value);
-            return result;
+            CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+            CriteriaQuery<T> query = cb.createQuery(type);
+            Predicate[] wherePredicates = new Predicate[4];
+
+            Root<T> from = query.from(type);
+
+            Path<String> username = from.get("username");
+            Path<String> roomName = from.get("roomName");
+            Path<String> mentionTime = from.get("mentionTime");
+            Path<String> type = from.get(TYPE_COLUMN_NAME);
+
+            Expression<Integer> sum = cb.sum(from.get("occurrences")).as(Integer.class);
+            query.multiselect(username.alias("username"),
+                              roomName.alias("roomName"),
+                              mentionTime.alias("mentionTime"),
+                              type.alias(TYPE_COLUMN_NAME),
+                              sum.alias("occurrences"));
+
+            query.groupBy(username, roomName, mentionTime, type);
+
+            wherePredicates[0] = cb.equal(from.get(TYPE_COLUMN_NAME), value.getValue());
+            wherePredicates[1] = cb.equal(from.get("username"), value.getUsername());
+            wherePredicates[2] = cb.equal(from.get("roomName"), value.getRoomName());
+            wherePredicates[3] = cb.equal(from.get("mentionTime"), value.getMentionTime());
+            query.where(wherePredicates);
+
+            TypedQuery<T> finalQuery = entityManagerFactory.createEntityManager()
+                                                           .createQuery(query);
+
+            try {
+                return finalQuery.getSingleResult();
+            } catch (NoResultException e) {
+                return null;
+            }
         } finally {
             closeEntityManager(entityManager);
         }

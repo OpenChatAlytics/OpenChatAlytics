@@ -11,6 +11,8 @@ import lombok.Setter;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
@@ -35,25 +37,28 @@ public class ChatEntity implements IMentionable<String> {
 
     public static final long serialVersionUID = -4845804080646234255L;
 
-    private String value;
-    private int occurrences;
-    private DateTime mentionTime;
     private String username;
     private String roomName;
+    private DateTime mentionTime;
+    private String value;
+    private int occurrences;
+    @Id
+    @Column(name = "id")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    private Long id;
+
+    public ChatEntity(String username, String roomName, DateTime mentionTime,
+                      String value, int occurrences) {
+        this.username = username;
+        this.roomName = roomName;
+        this.mentionTime = mentionTime;
+        this.value = value;
+        this.occurrences = occurrences;
+    }
 
     protected ChatEntity() {} // for jackson
 
-    public ChatEntity(String value, int occurrences, DateTime mentionTime,
-                      String username, String roomName) {
-        this.value = value;
-        this.occurrences = occurrences;
-        this.mentionTime = mentionTime;
-        this.username = username;
-        this.roomName = roomName;
-    }
-
     @Override
-    @Id
     @Column(name = ENTITY_VALUE_COLUMN)
     public String getValue() {
         return value;
@@ -66,7 +71,6 @@ public class ChatEntity implements IMentionable<String> {
     }
 
     @Override
-    @Id
     @Column(name = MENTION_TIME_COLUMN)
     @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
     public DateTime getMentionTime() {
@@ -74,14 +78,12 @@ public class ChatEntity implements IMentionable<String> {
     }
 
     @Override
-    @Id
     @Column(name = USER_NAME_COLUMN)
     public String getUsername() {
         return username;
     }
 
     @Override
-    @Id
     @Column(name = ROOM_NAME_COLUMN)
     public String getRoomName() {
         return roomName;

@@ -57,16 +57,16 @@ public class EntitiesResourceTest {
 
         mentionTime = DateTime.now().withZone(DateTimeZone.UTC);
         this.entities = Lists.newArrayListWithCapacity(10);
-        entities.add(new ChatEntity("e1", 5, mentionTime.minusHours(1), "u1", "r1"));
-        entities.add(new ChatEntity("e1", 4, mentionTime.minusHours(1), "u2", "r1"));
-        entities.add(new ChatEntity("e1", 1, mentionTime.minusHours(2), "u3", "r2"));
-        entities.add(new ChatEntity("e1", 1, mentionTime.minusHours(3), "u4", "r3"));
-        entities.add(new ChatEntity("e2", 1, mentionTime.minusHours(1), "u1", "r1"));
-        entities.add(new ChatEntity("e2", 6, mentionTime.minusHours(1), "u2", "r1"));
-        entities.add(new ChatEntity("e2", 7, mentionTime.minusHours(2), "u3", "r2"));
-        entities.add(new ChatEntity("e3", 3, mentionTime.minusHours(1), "u2", "r2"));
-        entities.add(new ChatEntity("e3", 3, mentionTime.minusHours(2), "u3", "r1"));
-        entities.add(new ChatEntity("e4", 3, mentionTime.minusHours(1), "u1", "r4"));
+        entities.add(new ChatEntity("u1", "r1", mentionTime.minusHours(1), "e1", 5));
+        entities.add(new ChatEntity("u2", "r1", mentionTime.minusHours(1), "e1", 4));
+        entities.add(new ChatEntity("u3", "r2", mentionTime.minusHours(1), "e1", 1));
+        entities.add(new ChatEntity("u4", "r3", mentionTime.minusHours(3), "e1", 1));
+        entities.add(new ChatEntity("u1", "r1", mentionTime.minusHours(1), "e2", 1));
+        entities.add(new ChatEntity("u2", "r1", mentionTime.minusHours(1), "e2", 6));
+        entities.add(new ChatEntity("u3", "r2", mentionTime.minusHours(2), "e2", 7));
+        entities.add(new ChatEntity("u2", "r2", mentionTime.minusHours(1), "e3", 3));
+        entities.add(new ChatEntity("u3", "r1", mentionTime.minusHours(2), "e3", 3));
+        entities.add(new ChatEntity("u1", "r4", mentionTime.minusHours(1), "e4", 3));
         storeTestEntities(entities);
         underTest = new EntitiesResource(config);
     }

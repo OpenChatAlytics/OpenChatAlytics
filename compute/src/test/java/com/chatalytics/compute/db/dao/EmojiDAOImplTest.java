@@ -46,10 +46,10 @@ public class EmojiDAOImplTest {
         mentionDate = DateTime.now(DateTimeZone.UTC);
 
         // Insert a bunch of test values
-        underTest.persistEmoji(new EmojiEntity("emoji1", 1, mentionDate, "giannis", "room1"));
-        underTest.persistEmoji(new EmojiEntity("emoji2", 1, mentionDate, "giannis", "room1"));
-        underTest.persistEmoji(new EmojiEntity("emoji1", 1, mentionDate, "giannis", "room2"));
-        underTest.persistEmoji(new EmojiEntity("emoji1", 1, mentionDate, "jane", "room1"));
+        underTest.persistEmoji(new EmojiEntity("giannis", "room1", mentionDate, "emoji1", 1));
+        underTest.persistEmoji(new EmojiEntity("giannis", "room1", mentionDate, "emoji2", 1));
+        underTest.persistEmoji(new EmojiEntity("giannis", "room2", mentionDate, "emoji1", 1));
+        underTest.persistEmoji(new EmojiEntity("jane", "room1", mentionDate, "emoji1", 1));
 
         msgSummaryDao.persistMessageSummary(new MessageSummary("giannis", "room1", mentionDate,
                                                                MessageType.MESSAGE, 10));
@@ -60,13 +60,14 @@ public class EmojiDAOImplTest {
 
     @Test
     public void testPersistEmoji_withDuplicate() {
-        EmojiEntity emoji = new EmojiEntity("test_value", 1, DateTime.now(), "user", "testroom");
+        EmojiEntity emoji = new EmojiEntity("user", "testroom", mentionDate, "test_value", 1);
         underTest.persistEmoji(emoji);
         EmojiEntity existingEmoji = underTest.getEmoji(emoji);
         assertNotNull(existingEmoji);
         assertEquals(1, existingEmoji.getOccurrences());
 
         // insert it again
+        emoji = new EmojiEntity("user", "testroom", mentionDate, "test_value", 1);
         underTest.persistEmoji(emoji);
         existingEmoji = underTest.getEmoji(emoji);
         assertEquals(2, existingEmoji.getOccurrences());

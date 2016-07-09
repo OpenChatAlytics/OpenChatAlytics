@@ -10,7 +10,6 @@ import org.joda.time.Interval;
 import java.util.List;
 import java.util.Map;
 
-import javax.persistence.EntityExistsException;
 import javax.persistence.EntityManagerFactory;
 
 /**
@@ -32,16 +31,7 @@ public class EntityDAOImpl extends AbstractIdleService implements IEntityDAO {
      */
     @Override
     public void persistEntity(ChatEntity entity) {
-        try {
-            occurrenceStatsDAO.persistValue(entity);
-        } catch (EntityExistsException e) {
-            ChatEntity existingValue = occurrenceStatsDAO.getValue(entity);
-            int newOccurrences = entity.getOccurrences() + existingValue.getOccurrences();
-            ChatEntity mergedEntity = new ChatEntity(entity.getValue(), newOccurrences,
-                                                     entity.getMentionTime(), entity.getUsername(),
-                                                     entity.getRoomName());
-            occurrenceStatsDAO.mergeValue(mergedEntity);
-        }
+        occurrenceStatsDAO.persistValue(entity);
     }
 
     /**

@@ -26,15 +26,15 @@ public class GraphPartitionTest {
     public void testGetMentionMatrix() {
         List<EmojiEntity> mentions = Lists.newArrayListWithCapacity(16);
         // make r1, r2 and r2 kind of similar
-        mentions.add(new EmojiEntity("a", 1, DateTime.now(), "u1", "r1"));
-        mentions.add(new EmojiEntity("a", 1, DateTime.now(), "u1", "r2"));
-        mentions.add(new EmojiEntity("a", 1, DateTime.now(), "u1", "r3"));
+        mentions.add(new EmojiEntity("u1", "r1", DateTime.now(), "a", 1));
+        mentions.add(new EmojiEntity("u1", "r2", DateTime.now(), "a", 1));
+        mentions.add(new EmojiEntity("u1", "r3", DateTime.now(), "a", 1));
 
-        mentions.add(new EmojiEntity("b", 1, DateTime.now(), "u1", "r1"));
-        mentions.add(new EmojiEntity("b", 1, DateTime.now(), "u1", "r2"));
+        mentions.add(new EmojiEntity("u1", "r1", DateTime.now(), "b", 1));
+        mentions.add(new EmojiEntity("u1", "r2", DateTime.now(), "b", 1));
 
-        mentions.add(new EmojiEntity("c", 1, DateTime.now(), "u1", "r2"));
-        mentions.add(new EmojiEntity("c", 1, DateTime.now(), "u1", "r3"));
+        mentions.add(new EmojiEntity("u1", "r2", DateTime.now(), "c", 1));
+        mentions.add(new EmojiEntity("u1", "r3", DateTime.now(), "c", 1));
 
         LabeledMTJMatrix<String> result =
                 GraphPartition.getMentionMatrix(mentions,
