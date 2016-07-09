@@ -1,11 +1,15 @@
 package com.chatalytics.compute.db.dao;
 
+import com.chatalytics.core.ActiveMethod;
 import com.chatalytics.core.model.data.MessageSummary;
 import com.chatalytics.core.model.data.MessageType;
 import com.google.common.base.Optional;
 import com.google.common.util.concurrent.AbstractIdleService;
 
 import org.joda.time.Interval;
+
+import java.util.List;
+import java.util.Map;
 
 import javax.persistence.EntityExistsException;
 import javax.persistence.EntityManagerFactory;
@@ -52,6 +56,27 @@ public class MessageSummaryDAOImpl extends AbstractIdleService implements IMessa
      * {@inheritDoc}
      */
     @Override
+    public List<MessageSummary> getAllMessageSummariesForType(MessageType type,
+                                                              Interval interval,
+                                                              Optional<String> roomName,
+                                                              Optional<String> username) {
+        return occurrenceStatsDAO.getAllMentionsForValue(type, interval, roomName, username);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<MessageSummary> getAllMessageSummaries(Interval interval,
+                                                       Optional<String> roomName,
+                                                       Optional<String> username) {
+        return occurrenceStatsDAO.getAllMentions(interval, roomName, username);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public int getTotalMessageSummaries(Interval interval, Optional<String> roomName,
                                         Optional<String> username) {
         return occurrenceStatsDAO.getTotalMentionsOfType(interval, roomName, username);
@@ -68,6 +93,34 @@ public class MessageSummaryDAOImpl extends AbstractIdleService implements IMessa
         return occurrenceStatsDAO.getTotalMentionsForType(type, interval, roomName, username);
     }
 
+    @Override
+    public Map<String, Double> getActiveUsersByMethod(Interval interval,
+                                                      ActiveMethod method,
+                                                      int resultSize) {
+        if (method == ActiveMethod.ToTV) {
+            return occurrenceStatsDAO.getActiveColumnsByToTV("username", interval, resultSize);
+        } else if (method == ActiveMethod.ToMV) {
+            return occurrenceStatsDAO.getActiveColumnsByToMV("username", interval, resultSize);
+        } else {
+            throw new UnsupportedOperationException(String.format("Method %s not supported",
+                                                                  method));
+        }
+    }
+
+    @Override
+    public Map<String, Double> getActiveRoomsByMethod(Interval interval,
+                                                      ActiveMethod method,
+                                                      int resultSize) {
+        if (method == ActiveMethod.ToTV) {
+            return occurrenceStatsDAO.getActiveColumnsByToTV("roomName", interval, resultSize);
+        } else if (method == ActiveMethod.ToMV) {
+            return occurrenceStatsDAO.getActiveColumnsByToMV("roomName", interval, resultSize);
+        } else {
+            throw new UnsupportedOperationException(String.format("Method %s not supported",
+                                                                  method));
+        }
+    }
+
     /**
      * Does nothing
      */
@@ -82,5 +135,4 @@ public class MessageSummaryDAOImpl extends AbstractIdleService implements IMessa
     protected void shutDown() throws Exception {
         occurrenceStatsDAO.close();
     }
-
 }

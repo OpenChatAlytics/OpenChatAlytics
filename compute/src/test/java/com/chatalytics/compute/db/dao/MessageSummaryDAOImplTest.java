@@ -1,5 +1,6 @@
 package com.chatalytics.compute.db.dao;
 
+import com.chatalytics.core.ActiveMethod;
 import com.chatalytics.core.config.ChatAlyticsConfig;
 import com.chatalytics.core.model.data.MessageSummary;
 import com.chatalytics.core.model.data.MessageType;
@@ -11,6 +12,9 @@ import org.joda.time.Interval;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.util.List;
+import java.util.Map;
 
 import javax.persistence.EntityManager;
 
@@ -77,6 +81,25 @@ public class MessageSummaryDAOImplTest {
     }
 
     @Test
+    public void testGetAllMessageSummaries() {
+        Interval interval = new Interval(mentionDate.minusDays(1),  mentionDate.plusDays(1));
+        List<MessageSummary> result = underTest.getAllMessageSummaries(interval,
+                                                                       Optional.of("room1"),
+                                                                       Optional.of("user1"));
+        assertEquals(1, result.size());
+    }
+
+    @Test
+    public void testGetAllMessageSummariesForType() {
+        Interval interval = new Interval(mentionDate.minusDays(1),  mentionDate.plusDays(1));
+        List<MessageSummary> result = underTest.getAllMessageSummariesForType(MessageType.MESSAGE,
+                                                                              interval,
+                                                                              Optional.absent(),
+                                                                              Optional.absent());
+        assertEquals(2, result.size());
+    }
+
+    @Test
     public void testGetTotalMessageSummaries() {
         Interval interval = new Interval(mentionDate.minusDays(1),  mentionDate.plusDays(1));
         int result = underTest.getTotalMessageSummaries(interval, Optional.absent(),
@@ -91,6 +114,42 @@ public class MessageSummaryDAOImplTest {
                                                         interval, Optional.absent(),
                                                         Optional.absent());
         assertEquals(2, result);
+    }
+
+    @Test
+    public void testGetTopRoomsByMethod() {
+        Interval interval = new Interval(mentionDate.minusMillis(1), mentionDate.plusMillis(1));
+
+        Map<String, Double> result =
+                underTest.getActiveRoomsByMethod(interval, ActiveMethod.ToTV, 10);
+        assertEquals(2, result.size());
+        assertEquals(0.5, result.get("room1"), 0);
+        assertEquals(0.5, result.get("room2"), 0);
+
+        result = underTest.getActiveRoomsByMethod(interval, ActiveMethod.ToMV, 10);
+        assertEquals(2, result.size());
+        assertEquals(1.0, result.get("room1"), 0);
+        assertEquals(1.0, result.get("room2"), 0);
+    }
+
+    @Test
+    public void testGetActiveUsersByMethod() {
+        Interval interval = new Interval(mentionDate.minusMillis(1), mentionDate.plusMillis(1));
+
+        Map<String, Double> result =
+                underTest.getActiveUsersByMethod(interval, ActiveMethod.ToTV, 10);
+        assertEquals(4, result.size());
+        assertEquals(0.25, result.get("user1"), 0);
+        assertEquals(0.25, result.get("user2"), 0);
+        assertEquals(0.25, result.get("user3"), 0);
+        assertEquals(0.25, result.get("user4"), 0);
+
+        result = underTest.getActiveUsersByMethod(interval, ActiveMethod.ToMV, 10);
+        assertEquals(4, result.size());
+        assertEquals(0.5, result.get("user1"), 0);
+        assertEquals(0.5, result.get("user2"), 0);
+        assertEquals(0.5, result.get("user3"), 0);
+        assertEquals(0.5, result.get("user4"), 0);
     }
 
     @After
