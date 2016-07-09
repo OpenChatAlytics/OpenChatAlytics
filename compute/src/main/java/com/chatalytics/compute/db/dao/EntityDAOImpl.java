@@ -3,7 +3,6 @@ package com.chatalytics.compute.db.dao;
 import com.chatalytics.compute.matrix.LabeledDenseMatrix;
 import com.chatalytics.core.ActiveMethod;
 import com.chatalytics.core.model.data.ChatEntity;
-import com.google.common.base.Optional;
 import com.google.common.util.concurrent.AbstractIdleService;
 
 import org.joda.time.Interval;
@@ -59,9 +58,9 @@ public class EntityDAOImpl extends AbstractIdleService implements IEntityDAO {
     @Override
     public List<ChatEntity> getAllMentionsForEntity(String entity,
                                                     Interval interval,
-                                                    Optional<String> roomName,
-                                                    Optional<String> username) {
-        return occurrenceStatsDAO.getAllMentionsForValue(entity, interval, roomName, username);
+                                                    List<String> roomNames,
+                                                    List<String> usernames) {
+        return occurrenceStatsDAO.getAllMentionsForValue(entity, interval, roomNames, usernames);
     }
 
     /**
@@ -69,9 +68,9 @@ public class EntityDAOImpl extends AbstractIdleService implements IEntityDAO {
      */
     @Override
     public List<ChatEntity> getAllMentions(Interval interval,
-                                           Optional<String> roomName,
-                                           Optional<String> username) {
-        return occurrenceStatsDAO.getAllMentions(interval, roomName, username);
+                                           List<String> roomNames,
+                                           List<String> usernames) {
+        return occurrenceStatsDAO.getAllMentions(interval, roomNames, usernames);
     }
 
     /**
@@ -80,10 +79,10 @@ public class EntityDAOImpl extends AbstractIdleService implements IEntityDAO {
     @Override
     public int getTotalMentionsForEntity(String entity,
                                          Interval interval,
-                                         Optional<String> roomName,
-                                         Optional<String> username) {
+                                         List<String> roomNames,
+                                         List<String> usernames) {
 
-        return occurrenceStatsDAO.getTotalMentionsForType(entity, interval, roomName, username);
+        return occurrenceStatsDAO.getTotalMentionsForType(entity, interval, roomNames, usernames);
     }
 
     /**
@@ -91,11 +90,11 @@ public class EntityDAOImpl extends AbstractIdleService implements IEntityDAO {
      */
     @Override
     public Map<String, Long> getTopEntities(Interval interval,
-                                            Optional<String> roomName,
-                                            Optional<String> username,
+                                            List<String> roomNames,
+                                            List<String> usernames,
                                             int resultSize) {
 
-        return occurrenceStatsDAO.getTopValuesOfType(interval, roomName, username, resultSize);
+        return occurrenceStatsDAO.getTopValuesOfType(interval, roomNames, usernames, resultSize);
     }
 
     /**

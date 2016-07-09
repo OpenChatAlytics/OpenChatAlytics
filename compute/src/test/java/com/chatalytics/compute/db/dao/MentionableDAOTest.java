@@ -5,7 +5,7 @@ import com.chatalytics.core.config.ChatAlyticsConfig;
 import com.chatalytics.core.model.data.EmojiEntity;
 import com.chatalytics.core.model.data.MessageSummary;
 import com.chatalytics.core.model.data.MessageType;
-import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableList;
 
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
@@ -110,18 +110,33 @@ public class MentionableDAOTest {
         underTest.persistValue(new EmojiEntity("b", 1, start.plusMillis(4), "u2", "r3"));
         underTest.persistValue(new EmojiEntity("c", 1, start.plusMillis(5), "u1", "r3"));
 
-        int result = underTest.getTotalMentionsOfType(interval, Optional.absent(),
-                                                      Optional.absent());
+        int result = underTest.getTotalMentionsOfType(interval, ImmutableList.of(),
+                                                      ImmutableList.of());
         assertEquals(6, result);
 
-        result = underTest.getTotalMentionsOfType(interval, Optional.of("r1"), Optional.absent());
+        result = underTest.getTotalMentionsOfType(interval, ImmutableList.of("r1"),
+                                                  ImmutableList.of());
         assertEquals(2, result);
-
-        result = underTest.getTotalMentionsOfType(interval, Optional.absent(), Optional.of("u1"));
+        result = underTest.getTotalMentionsOfType(interval, ImmutableList.of("r1", "r2"),
+                                                  ImmutableList.of());
         assertEquals(4, result);
 
-        result = underTest.getTotalMentionsOfType(interval, Optional.of("r1"), Optional.of("u1"));
+        result = underTest.getTotalMentionsOfType(interval, ImmutableList.of(),
+                                                  ImmutableList.of("u1"));
+        assertEquals(4, result);
+        result = underTest.getTotalMentionsOfType(interval, ImmutableList.of(),
+                                                  ImmutableList.of("u1", "u2"));
+        assertEquals(6, result);
+
+        result = underTest.getTotalMentionsOfType(interval, ImmutableList.of("r1"),
+                                                  ImmutableList.of("u1"));
         assertEquals(1, result);
+        result = underTest.getTotalMentionsOfType(interval, ImmutableList.of("r1", "r2"),
+                                                  ImmutableList.of("u1"));
+        result = underTest.getTotalMentionsOfType(interval, ImmutableList.of("r1", "r2"),
+                                                  ImmutableList.of("u1", "u2"));
+
+        assertEquals(4, result);
     }
 
     @Test
@@ -135,17 +150,24 @@ public class MentionableDAOTest {
         underTest.persistValue(new EmojiEntity("b", 1, start.plusMillis(3), "u1", "r2"));
         underTest.persistValue(new EmojiEntity("c", 1, start.plusMillis(5), "u1", "r3"));
 
-        int result = underTest.getTotalMentionsForType("a", interval, Optional.absent(),
-                                                       Optional.absent());
+        int result = underTest.getTotalMentionsForType("a", interval, ImmutableList.of(),
+                                                       ImmutableList.of());
         assertEquals(3, result);
 
-        result = underTest.getTotalMentionsForType("a", interval, Optional.of("r1"),
-                                                   Optional.absent());
+        result = underTest.getTotalMentionsForType("a", interval, ImmutableList.of("r1"),
+                                                   ImmutableList.of());
         assertEquals(1, result);
-
-        result = underTest.getTotalMentionsForType("a", interval, Optional.absent(),
-                                                   Optional.of("u1"));
+        result = underTest.getTotalMentionsForType("a", interval, ImmutableList.of("r1", "r2"),
+                                                   ImmutableList.of());
         assertEquals(2, result);
+
+        result = underTest.getTotalMentionsForType("a", interval, ImmutableList.of(),
+                                                   ImmutableList.of("u1"));
+        assertEquals(2, result);
+        result = underTest.getTotalMentionsForType("a", interval, ImmutableList.of(),
+                                                   ImmutableList.of("u1", "u2"));
+        assertEquals(3, result);
+
     }
 
     @Test

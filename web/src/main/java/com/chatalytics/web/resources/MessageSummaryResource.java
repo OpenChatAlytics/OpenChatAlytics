@@ -65,9 +65,9 @@ public class MessageSummaryResource {
      *            The start time to get the summaries for
      * @param endTimeStr
      *            The end time to get the summaries for
-     * @param user
+     * @param users
      *            The user to query for (optional)
-     * @param room
+     * @param rooms
      *            The room to query for (optional)
      * @param msgTypeStr
      *            The type of the message. See {@link MessageType} for more info (optional)
@@ -77,23 +77,23 @@ public class MessageSummaryResource {
     @Produces(MediaType.APPLICATION_JSON)
     public List<MessageSummary> getAllMessageSummaries(@QueryParam(START_TIME) String startTimeStr,
                                                        @QueryParam(END_TIME) String endTimeStr,
-                                                       @QueryParam(USER) String user,
-                                                       @QueryParam(ROOM) String room,
+                                                       @QueryParam(USER) List<String> users,
+                                                       @QueryParam(ROOM) List<String> rooms,
                                                        @QueryParam(MESSAGE_TYPE) String msgTypeStr) {
 
-        LOG.debug("Got a call for msg summaries with starttime={} endtime={} user={} room={}",
-                  startTimeStr, endTimeStr, user, room);
+        LOG.debug("Got a call for msg summaries with starttime={} endtime={} users={} rooms={}",
+                  startTimeStr, endTimeStr, users, rooms);
 
         Interval interval = DateTimeUtils.getIntervalFromParameters(startTimeStr, endTimeStr, dtz);
-        Optional<String> username = ResourceUtils.getOptionalForParameter(user);
-        Optional<String> roomName = ResourceUtils.getOptionalForParameter(room);
+        users = ResourceUtils.getListFromNullable(users);
+        rooms = ResourceUtils.getListFromNullable(rooms);
+
         Optional<String> optMessageType = ResourceUtils.getOptionalForParameter(msgTypeStr);
         if (optMessageType.isPresent()) {
             MessageType msgType = MessageType.fromType(optMessageType.get());
-            return msgSummaryDao.getAllMessageSummariesForType(msgType, interval, roomName,
-                                                               username);
+            return msgSummaryDao.getAllMessageSummariesForType(msgType, interval, rooms, users);
         } else {
-            return msgSummaryDao.getAllMessageSummaries(interval, roomName, username);
+            return msgSummaryDao.getAllMessageSummaries(interval, rooms, users);
         }
     }
 
@@ -105,9 +105,9 @@ public class MessageSummaryResource {
      *            The start time to get the summaries for
      * @param endTimeStr
      *            The end time to get the summaries for
-     * @param user
+     * @param users
      *            The user to query for (optional)
-     * @param room
+     * @param rooms
      *            The room to query for (optional)
      * @param msgTypeStr
      *            The type of the message. See {@link MessageType} for more info (optional)
@@ -118,23 +118,22 @@ public class MessageSummaryResource {
     @Produces(MediaType.APPLICATION_JSON)
     public int getTotalMessageSummaries(@QueryParam(START_TIME) String startTimeStr,
                                         @QueryParam(END_TIME) String endTimeStr,
-                                        @QueryParam(USER) String user,
-                                        @QueryParam(ROOM) String room,
+                                        @QueryParam(USER) List<String> users,
+                                        @QueryParam(ROOM) List<String> rooms,
                                         @QueryParam(MESSAGE_TYPE) String msgTypeStr) {
 
-        LOG.debug("Got a call for total msg summaries with starttime={} endtime={} user={} room={}",
-                  startTimeStr, endTimeStr, user, room);
+        LOG.debug("Got total message summaries with starttime={} endtime={} users={} rooms={}",
+                  startTimeStr, endTimeStr, users, rooms);
 
         Interval interval = DateTimeUtils.getIntervalFromParameters(startTimeStr, endTimeStr, dtz);
-        Optional<String> username = ResourceUtils.getOptionalForParameter(user);
-        Optional<String> roomName = ResourceUtils.getOptionalForParameter(room);
+        users = ResourceUtils.getListFromNullable(users);
+        rooms = ResourceUtils.getListFromNullable(rooms);
         Optional<String> optMessageType = ResourceUtils.getOptionalForParameter(msgTypeStr);
         if (optMessageType.isPresent()) {
             MessageType msgType = MessageType.fromType(optMessageType.get());
-            return msgSummaryDao.getTotalMessageSummariesForType(msgType, interval, roomName,
-                                                                 username);
+            return msgSummaryDao.getTotalMessageSummariesForType(msgType, interval, rooms, users);
         } else {
-            return msgSummaryDao.getTotalMessageSummaries(interval, roomName, username);
+            return msgSummaryDao.getTotalMessageSummaries(interval, rooms, users);
         }
     }
 

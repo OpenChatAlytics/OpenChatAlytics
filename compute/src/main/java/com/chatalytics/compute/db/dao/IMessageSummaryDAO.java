@@ -4,7 +4,6 @@ import com.chatalytics.core.ActiveMethod;
 import com.chatalytics.core.model.data.ChatEntity;
 import com.chatalytics.core.model.data.MessageSummary;
 import com.chatalytics.core.model.data.MessageType;
-import com.google.common.base.Optional;
 import com.google.common.util.concurrent.Service;
 
 import org.joda.time.Interval;
@@ -40,17 +39,17 @@ public interface IMessageSummaryDAO extends Service {
      * @param interval
      *            The interval of interest. Note that the query is inclusive of the start time and
      *            exclusive of the end time.
-     * @param roomName
-     *            Optionally supply a room name
-     * @param username
-     *            Optionally supply a user name
+     * @param roomNames
+     *            Optionally supply a list of room names. This list can be empty
+     * @param usernames
+     *            Optionally supply a list of user names. This list can be empty
      * @return A list of {@link ChatEntity} representing all the times this entity was mentioned in
      *         the given time period
      */
      List<MessageSummary> getAllMessageSummariesForType(MessageType type,
-                                                Interval interval,
-                                                Optional<String> roomName,
-                                                Optional<String> username);
+                                                        Interval interval,
+                                                        List<String> roomNames,
+                                                        List<String> usernames);
 
      /**
       * Returns all the mention occurrences for an entity inside the given <code>interval</code>.
@@ -58,16 +57,16 @@ public interface IMessageSummaryDAO extends Service {
       * @param interval
       *            The interval of interest. Note that the query is inclusive of the start time and
       *            exclusive of the end time.
-      * @param roomName
-      *            Optionally supply a room name
-      * @param username
-      *            Optionally supply a user name
+      * @param roomNames
+     *            Optionally supply a list of room names. This list can be empty
+      * @param usernames
+     *            Optionally supply a list of user names. This list can be empty
       * @return A list of {@link ChatEntity} representing all the times this entity was mentioned
       *         in the given time period
       */
       List<MessageSummary> getAllMessageSummaries(Interval interval,
-                                          Optional<String> roomName,
-                                          Optional<String> username);
+                                                  List<String> roomNames,
+                                                  List<String> usernames);
 
     /**
      * Gets the total number of message summaries in the given time period with username and room
@@ -75,15 +74,15 @@ public interface IMessageSummaryDAO extends Service {
      *
      * @param interval
      *            The time interval to search in
-     * @param roomName
-     *            Optional room name to return count for
-     * @param username
-     *            Optional username to return count for
+     * @param roomNames
+     *            Optionally supply a list of room names. This list can be empty
+     * @param usernames
+     *            Optionally supply a list of user names. This list can be empty
      * @return The total count
      */
     int getTotalMessageSummaries(Interval interval,
-                                 Optional<String> roomName,
-                                 Optional<String> username);
+                                 List<String> roomNames,
+                                 List<String> usernames);
 
     /**
      * Gets the total number of message summaries for a given type in the given time period with
@@ -93,16 +92,16 @@ public interface IMessageSummaryDAO extends Service {
      *            The type to get counts for
      * @param interval
      *            The time interval to search in
-     * @param roomName
-     *            Optional room name to return count for
-     * @param username
-     *            Optional username to return count for
+     * @param roomNames
+     *            Optionally supply a list of room names. This list can be empty
+     * @param usernames
+     *            Optionally supply a list of user names. This list can be empty
      * @return The total count
      */
     int getTotalMessageSummariesForType(MessageType type,
                                         Interval interval,
-                                        Optional<String> roomName,
-                                        Optional<String> username);
+                                        List<String> roomNames,
+                                        List<String> usernames);
 
     /**
      * Returns a sorted map of users to a ratio, where the ratio is one of {@link ActiveMethod}s

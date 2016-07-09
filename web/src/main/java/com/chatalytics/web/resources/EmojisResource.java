@@ -83,36 +83,35 @@ public class EmojisResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Map<String, Long> getTopEmojis(@QueryParam(START_TIME) String startTimeStr,
                                  @QueryParam(END_TIME) String endTimeStr,
-                                 @QueryParam(USER) String user,
-                                 @QueryParam(ROOM) String room,
+                                 @QueryParam(USER) List<String> users,
+                                 @QueryParam(ROOM) List<String> rooms,
                                  @QueryParam(TOP_N) String topNStr)
                     throws JsonGenerationException, JsonMappingException, IOException {
 
-        LOG.debug("Got query for starttime={}, endtime={}, user={}, room={}",
-                  startTimeStr, endTimeStr, user, room);
+        LOG.debug("Got query for starttime={}, endtime={}, users={}, rooms={}",
+                  startTimeStr, endTimeStr, users, rooms);
 
-        Optional<String> username = ResourceUtils.getOptionalForParameter(user);
-        Optional<String> roomName = ResourceUtils.getOptionalForParameter(room);
+        users = ResourceUtils.getListFromNullable(users);
+        rooms = ResourceUtils.getListFromNullable(rooms);
         Optional<Integer> topN = ResourceUtils.getOptionalForParameterAsInt(topNStr);
 
         Interval interval = DateTimeUtils.getIntervalFromParameters(startTimeStr, endTimeStr, dtz);
 
-        return emojiDao.getTopEmojis(interval, roomName, username, topN.or(MAX_RESULTS));
+        return emojiDao.getTopEmojis(interval, rooms, users, topN.or(MAX_RESULTS));
     }
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public List<EmojiEntity> getAllEmojis(@QueryParam(START_TIME) String startTimeStr,
                                           @QueryParam(END_TIME) String endTimeStr,
-                                          @QueryParam(USER) String user,
-                                          @QueryParam(ROOM) String room) {
-
-        Optional<String> username = ResourceUtils.getOptionalForParameter(user);
-        Optional<String> roomName = ResourceUtils.getOptionalForParameter(room);
+                                          @QueryParam(USER) List<String> users,
+                                          @QueryParam(ROOM) List<String> rooms) {
 
         Interval interval = DateTimeUtils.getIntervalFromParameters(startTimeStr, endTimeStr, dtz);
+        users = ResourceUtils.getListFromNullable(users);
+        rooms = ResourceUtils.getListFromNullable(rooms);
 
-        return emojiDao.getAllMentions(interval, roomName, username);
+        return emojiDao.getAllMentions(interval, rooms, users);
     }
 
     @GET

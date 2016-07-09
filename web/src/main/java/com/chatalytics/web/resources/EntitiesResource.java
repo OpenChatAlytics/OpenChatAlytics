@@ -66,37 +66,37 @@ public class EntitiesResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Map<String, Long> getTrendingTopics(@QueryParam(START_TIME) String startTimeStr,
                                                @QueryParam(END_TIME) String endTimeStr,
-                                               @QueryParam(USER) String user,
-                                               @QueryParam(ROOM) String room,
+                                               @QueryParam(USER) List<String> users,
+                                               @QueryParam(ROOM) List<String> rooms,
                                                @QueryParam(TOP_N) String topNStr)
                     throws JsonGenerationException, JsonMappingException, IOException {
 
-        LOG.debug("Got trending topics query for starttime={}, endtime={}, user={}, room={}",
-                  startTimeStr, endTimeStr, user, room);
+        LOG.debug("Got trending topics query for starttime={}, endtime={}, users={}, rooms={}",
+                  startTimeStr, endTimeStr, users, rooms);
 
-        Optional<String> username = ResourceUtils.getOptionalForParameter(user);
-        Optional<String> roomName = ResourceUtils.getOptionalForParameter(room);
         Optional<Integer> topN = ResourceUtils.getOptionalForParameterAsInt(topNStr);
         Interval interval = DateTimeUtils.getIntervalFromParameters(startTimeStr, endTimeStr, dtz);
+        users = ResourceUtils.getListFromNullable(users);
+        rooms = ResourceUtils.getListFromNullable(rooms);
 
-        return entityDao.getTopEntities(interval, roomName, username, topN.or(MAX_RESULTS));
+        return entityDao.getTopEntities(interval, rooms, users, topN.or(MAX_RESULTS));
     }
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public List<ChatEntity> getAllEntites(@QueryParam(START_TIME) String startTimeStr,
                                           @QueryParam(END_TIME) String endTimeStr,
-                                          @QueryParam(USER) String user,
-                                          @QueryParam(ROOM) String room) {
+                                          @QueryParam(USER) List<String> users,
+                                          @QueryParam(ROOM) List<String> rooms) {
 
-        LOG.debug("Got all entities query for starttime={}, endtime={}, user={}, room={}",
-                  startTimeStr, endTimeStr, user, room);
+        LOG.debug("Got all entities query for starttime={}, endtime={}, users={}, rooms={}",
+                  startTimeStr, endTimeStr, users, rooms);
 
-        Optional<String> username = ResourceUtils.getOptionalForParameter(user);
-        Optional<String> roomName = ResourceUtils.getOptionalForParameter(room);
         Interval interval = DateTimeUtils.getIntervalFromParameters(startTimeStr, endTimeStr, dtz);
+        users = ResourceUtils.getListFromNullable(users);
+        rooms = ResourceUtils.getListFromNullable(rooms);
 
-        return entityDao.getAllMentions(interval, roomName, username);
+        return entityDao.getAllMentions(interval, rooms, users);
     }
 
     @GET

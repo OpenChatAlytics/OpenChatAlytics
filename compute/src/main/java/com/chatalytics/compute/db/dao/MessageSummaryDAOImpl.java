@@ -3,7 +3,6 @@ package com.chatalytics.compute.db.dao;
 import com.chatalytics.core.ActiveMethod;
 import com.chatalytics.core.model.data.MessageSummary;
 import com.chatalytics.core.model.data.MessageType;
-import com.google.common.base.Optional;
 import com.google.common.util.concurrent.AbstractIdleService;
 
 import org.joda.time.Interval;
@@ -58,9 +57,9 @@ public class MessageSummaryDAOImpl extends AbstractIdleService implements IMessa
     @Override
     public List<MessageSummary> getAllMessageSummariesForType(MessageType type,
                                                               Interval interval,
-                                                              Optional<String> roomName,
-                                                              Optional<String> username) {
-        return occurrenceStatsDAO.getAllMentionsForValue(type, interval, roomName, username);
+                                                              List<String> roomNames,
+                                                              List<String> usernames) {
+        return occurrenceStatsDAO.getAllMentionsForValue(type, interval, roomNames, usernames);
     }
 
     /**
@@ -68,18 +67,18 @@ public class MessageSummaryDAOImpl extends AbstractIdleService implements IMessa
      */
     @Override
     public List<MessageSummary> getAllMessageSummaries(Interval interval,
-                                                       Optional<String> roomName,
-                                                       Optional<String> username) {
-        return occurrenceStatsDAO.getAllMentions(interval, roomName, username);
+                                                       List<String> roomNames,
+                                                       List<String> usernames) {
+        return occurrenceStatsDAO.getAllMentions(interval, roomNames, usernames);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public int getTotalMessageSummaries(Interval interval, Optional<String> roomName,
-                                        Optional<String> username) {
-        return occurrenceStatsDAO.getTotalMentionsOfType(interval, roomName, username);
+    public int getTotalMessageSummaries(Interval interval, List<String> roomNames,
+                                        List<String> usernames) {
+        return occurrenceStatsDAO.getTotalMentionsOfType(interval, roomNames, usernames);
     }
 
     /**
@@ -88,9 +87,9 @@ public class MessageSummaryDAOImpl extends AbstractIdleService implements IMessa
     @Override
     public int getTotalMessageSummariesForType(MessageType type,
                                                Interval interval,
-                                               Optional<String> roomName,
-                                               Optional<String> username) {
-        return occurrenceStatsDAO.getTotalMentionsForType(type, interval, roomName, username);
+                                               List<String> roomNames,
+                                               List<String> usernames) {
+        return occurrenceStatsDAO.getTotalMentionsForType(type, interval, roomNames, usernames);
     }
 
     @Override

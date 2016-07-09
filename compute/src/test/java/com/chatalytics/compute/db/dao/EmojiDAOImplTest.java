@@ -6,7 +6,7 @@ import com.chatalytics.core.config.ChatAlyticsConfig;
 import com.chatalytics.core.model.data.EmojiEntity;
 import com.chatalytics.core.model.data.MessageSummary;
 import com.chatalytics.core.model.data.MessageType;
-import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableList;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -82,20 +82,21 @@ public class EmojiDAOImplTest {
         // Make sure that 0 is returned when nothing is found
         assertEquals(0, underTest.getTotalMentionsForEmoji("unknownemoji",
                                                            timeInterval,
-                                                           Optional.absent(),
-                                                           Optional.absent()));
+                                                           ImmutableList.of(),
+                                                           ImmutableList.of()));
 
         // make sure that the sums are correct for a bunch of different queries
         int result = underTest.getTotalMentionsForEmoji("emoji1", timeInterval,
-                                                        Optional.absent(), Optional.absent());
+                                                        ImmutableList.of(), ImmutableList.of());
         assertEquals(3, result);
 
         result = underTest.getTotalMentionsForEmoji("emoji1", timeInterval,
-                                                    Optional.of("room1"), Optional.absent());
+                                                    ImmutableList.of("room1"), ImmutableList.of());
         assertEquals(2, result);
 
         result = underTest.getTotalMentionsForEmoji("emoji1", timeInterval,
-                                                    Optional.of("room1"), Optional.of("giannis"));
+                                                    ImmutableList.of("room1"),
+                                                    ImmutableList.of("giannis"));
         assertEquals(1, result);
     }
 
@@ -106,16 +107,16 @@ public class EmojiDAOImplTest {
     public void testGetAllMentionsForEmoji() {
         Interval timeInterval = new Interval(mentionDate, mentionDate.plusHours(3));
         List<EmojiEntity> result = underTest.getAllMentionsForEmoji("emoji1", timeInterval,
-                                                                   Optional.absent(),
-                                                                   Optional.absent());
+                                                                   ImmutableList.of(),
+                                                                   ImmutableList.of());
         assertEquals(3, result.size());
 
-        result = underTest.getAllMentionsForEmoji("emoji1", timeInterval, Optional.of("room1"),
-                                                  Optional.absent());
+        result = underTest.getAllMentionsForEmoji("emoji1", timeInterval, ImmutableList.of("room1"),
+                                                  ImmutableList.of());
         assertEquals(2, result.size());
 
-        result = underTest.getAllMentionsForEmoji("emoji1", timeInterval, Optional.of("room1"),
-                                                  Optional.of("giannis"));
+        result = underTest.getAllMentionsForEmoji("emoji1", timeInterval, ImmutableList.of("room1"),
+                                                  ImmutableList.of("giannis"));
         assertEquals(1, result.size());
     }
 
@@ -125,34 +126,36 @@ public class EmojiDAOImplTest {
     @Test
     public void testGetAllMentions() {
         Interval timeInterval = new Interval(mentionDate, mentionDate.plusHours(3));
-        List<EmojiEntity> result = underTest.getAllMentions(timeInterval, Optional.absent(),
-                                                            Optional.absent());
+        List<EmojiEntity> result = underTest.getAllMentions(timeInterval, ImmutableList.of(),
+                                                            ImmutableList.of());
         assertEquals(4, result.size());
 
-        result = underTest.getAllMentions(timeInterval, Optional.of("room1"), Optional.absent());
+        result = underTest.getAllMentions(timeInterval, ImmutableList.of("room1"),
+                                          ImmutableList.of());
         assertEquals(3, result.size());
 
-        result = underTest.getAllMentions(timeInterval, Optional.of("room1"),
-                                          Optional.of("giannis"));
+        result = underTest.getAllMentions(timeInterval, ImmutableList.of("room1"),
+                                          ImmutableList.of("giannis"));
         assertEquals(2, result.size());
     }
 
     @Test
     public void testGetTopEmojis() {
         Interval timeInterval = new Interval(mentionDate, mentionDate.plusHours(3));
-        Map<String, Long> result = underTest.getTopEmojis(timeInterval, Optional.absent(),
-                                                          Optional.absent(), 10);
+        Map<String, Long> result = underTest.getTopEmojis(timeInterval, ImmutableList.of(),
+                                                          ImmutableList.of(), 10);
         assertEquals(2, result.size());
         assertEquals(3L, result.get("emoji1").longValue());
         assertEquals(1L, result.get("emoji2").longValue());
 
-        result = underTest.getTopEmojis(timeInterval, Optional.of("room1"), Optional.absent(), 10);
+        result = underTest.getTopEmojis(timeInterval, ImmutableList.of("room1"), ImmutableList.of(),
+                                        10);
         assertEquals(2, result.size());
         assertEquals(2L, result.get("emoji1").longValue());
         assertEquals(1L, result.get("emoji2").longValue());
 
-        result = underTest.getTopEmojis(timeInterval, Optional.of("room1"), Optional.of("giannis"),
-                                        10);
+        result = underTest.getTopEmojis(timeInterval, ImmutableList.of("room1"),
+                                        ImmutableList.of("giannis"), 10);
         assertEquals(2, result.size());
         assertEquals(1L, result.get("emoji1").longValue());
         assertEquals(1L, result.get("emoji2").longValue());
@@ -178,7 +181,8 @@ public class EmojiDAOImplTest {
     public void testGetActiveRoomsByMethod() {
         Interval interval = new Interval(mentionDate.minusMillis(1), mentionDate.plusMillis(1));
 
-        Map<String, Double> result = underTest.getActiveRoomsByMethod(interval, ActiveMethod.ToTV, 10);
+        Map<String, Double> result = underTest.getActiveRoomsByMethod(interval, ActiveMethod.ToTV,
+                                                                      10);
         assertEquals(2, result.size());
         assertEquals(0.75, result.get("room1"), 0);
         assertEquals(0.25, result.get("room2"), 0);

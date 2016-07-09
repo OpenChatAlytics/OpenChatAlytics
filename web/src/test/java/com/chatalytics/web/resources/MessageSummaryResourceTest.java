@@ -8,6 +8,7 @@ import com.chatalytics.core.config.ChatAlyticsConfig;
 import com.chatalytics.core.model.data.MessageSummary;
 import com.chatalytics.core.model.data.MessageType;
 import com.chatalytics.web.utils.DateTimeUtils;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
@@ -92,10 +93,12 @@ public class MessageSummaryResourceTest {
         int result = underTest.getTotalMessageSummaries(startTimeStr, endTimeStr, null, null, null);
         assertEquals(sums.size(), result);
 
-        result = underTest.getTotalMessageSummaries(startTimeStr, endTimeStr, "u1", null, null);
+        result = underTest.getTotalMessageSummaries(startTimeStr, endTimeStr,
+                                                    ImmutableList.of("u1"), null, null);
         assertEquals(1, result);
 
-        result = underTest.getTotalMessageSummaries(startTimeStr, endTimeStr, null, "r1", null);
+        result = underTest.getTotalMessageSummaries(startTimeStr, endTimeStr, null,
+                                                    ImmutableList.of("r1"), null);
         assertEquals(3, result);
 
         result = underTest.getTotalMessageSummaries(startTimeStr, endTimeStr, null, null,
