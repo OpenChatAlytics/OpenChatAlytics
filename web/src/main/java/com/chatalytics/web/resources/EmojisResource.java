@@ -36,6 +36,12 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
+import static com.chatalytics.web.constant.WebConstants.END_TIME;
+import static com.chatalytics.web.constant.WebConstants.ROOM;
+import static com.chatalytics.web.constant.WebConstants.START_TIME;
+import static com.chatalytics.web.constant.WebConstants.TOP_N;
+import static com.chatalytics.web.constant.WebConstants.USER;
+
 /**
  * REST endpoint for getting top emojis collected from chat messages
  *
@@ -46,14 +52,9 @@ import javax.ws.rs.core.MediaType;
 public class EmojisResource {
 
     public static final String EMOJI_ENDPOINT = WebConstants.API_PATH + "emojis";
-    public static final String START_TIME_PARAM = "starttime";
-    public static final String END_TIME_PARAM = "endtime";
-    public static final String USER_PARAM = "user";
-    public static final String ROOM_PARAM = "room";
-    public static final String TOP_N = "n";
-    public static final String FIRST_SIMILARITY_DIM_PARAM = "firstDim";
-    public static final String SECOND_SIMILARITY_DIM_PARAM = "secondDim";
-    public static final String DIM_PARAM = "dimension";
+    public static final String FIRST_SIMILARITY_DIM = "firstDim";
+    public static final String SECOND_SIMILARITY_DIM = "secondDim";
+    public static final String DIM = "dimension";
     public static final String METHOD = "method";
 
     private static final int MAX_RESULTS = 20;
@@ -80,10 +81,10 @@ public class EmojisResource {
     @GET
     @Path("trending")
     @Produces(MediaType.APPLICATION_JSON)
-    public Map<String, Long> getTopEmojis(@QueryParam(START_TIME_PARAM) String startTimeStr,
-                                 @QueryParam(END_TIME_PARAM) String endTimeStr,
-                                 @QueryParam(USER_PARAM) String user,
-                                 @QueryParam(ROOM_PARAM) String room,
+    public Map<String, Long> getTopEmojis(@QueryParam(START_TIME) String startTimeStr,
+                                 @QueryParam(END_TIME) String endTimeStr,
+                                 @QueryParam(USER) String user,
+                                 @QueryParam(ROOM) String room,
                                  @QueryParam(TOP_N) String topNStr)
                     throws JsonGenerationException, JsonMappingException, IOException {
 
@@ -101,10 +102,10 @@ public class EmojisResource {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public List<EmojiEntity> getAllEmojis(@QueryParam(START_TIME_PARAM) String startTimeStr,
-                                          @QueryParam(END_TIME_PARAM) String endTimeStr,
-                                          @QueryParam(USER_PARAM) String user,
-                                          @QueryParam(ROOM_PARAM) String room) {
+    public List<EmojiEntity> getAllEmojis(@QueryParam(START_TIME) String startTimeStr,
+                                          @QueryParam(END_TIME) String endTimeStr,
+                                          @QueryParam(USER) String user,
+                                          @QueryParam(ROOM) String room) {
 
         Optional<String> username = ResourceUtils.getOptionalForParameter(user);
         Optional<String> roomName = ResourceUtils.getOptionalForParameter(room);
@@ -118,10 +119,10 @@ public class EmojisResource {
     @Path("similarities")
     @Produces(MediaType.APPLICATION_JSON)
     public LabeledDenseMatrix<String> getSimilarities(
-            @QueryParam(START_TIME_PARAM) String startTimeStr,
-            @QueryParam(END_TIME_PARAM) String endTimeStr,
-            @QueryParam(FIRST_SIMILARITY_DIM_PARAM) String firstDimStr,
-            @QueryParam(SECOND_SIMILARITY_DIM_PARAM) String secondDimStr) {
+            @QueryParam(START_TIME) String startTimeStr,
+            @QueryParam(END_TIME) String endTimeStr,
+            @QueryParam(FIRST_SIMILARITY_DIM) String firstDimStr,
+            @QueryParam(SECOND_SIMILARITY_DIM) String secondDimStr) {
 
         LOG.debug("Got a call for dimensions {} and {} with starttime={}, endtime={}",
                   firstDimStr, secondDimStr, startTimeStr, endTimeStr);
@@ -144,9 +145,9 @@ public class EmojisResource {
     @GET
     @Path("active")
     @Produces(MediaType.APPLICATION_JSON)
-    public Map<String, Double> getActive(@QueryParam(START_TIME_PARAM) String startTimeStr,
-                                         @QueryParam(END_TIME_PARAM) String endTimeStr,
-                                         @QueryParam(DIM_PARAM) String dimensionStr,
+    public Map<String, Double> getActive(@QueryParam(START_TIME) String startTimeStr,
+                                         @QueryParam(END_TIME) String endTimeStr,
+                                         @QueryParam(DIM) String dimensionStr,
                                          @QueryParam(METHOD) String methodStr,
                                          @QueryParam(TOP_N) String topNStr) {
 
