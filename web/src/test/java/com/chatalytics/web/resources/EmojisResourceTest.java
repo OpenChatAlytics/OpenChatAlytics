@@ -81,12 +81,6 @@ public class EmojisResourceTest {
         underTest = new EmojisResource(config, chatApiDao);
     }
 
-    private void storeTestEmojis(List<EmojiEntity> emojis) {
-        for (EmojiEntity emoji : emojis) {
-            entityDao.persistEmoji(emoji);
-        }
-    }
-
     /**
      * Tests to see if the correct top emojis are returned
      */
@@ -246,10 +240,16 @@ public class EmojisResourceTest {
     @After
     public void tearDown() throws Exception {
         EntityManager em = ChatAlyticsDAOFactory.getEntityManagerFactory(config)
-            .createEntityManager();
+                                                .createEntityManager();
         em.getTransaction().begin();
         em.createNativeQuery("DELETE FROM " + EmojiEntity.EMOJI_TABLE_NAME).executeUpdate();
         em.getTransaction().commit();
         entityDao.stopAsync().awaitTerminated();
+    }
+
+    private void storeTestEmojis(List<EmojiEntity> emojis) {
+        for (EmojiEntity emoji : emojis) {
+            entityDao.persistEmoji(emoji);
+        }
     }
 }

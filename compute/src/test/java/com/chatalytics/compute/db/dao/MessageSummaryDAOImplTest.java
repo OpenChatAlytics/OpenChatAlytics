@@ -85,9 +85,9 @@ public class MessageSummaryDAOImplTest {
     }
 
     @Test
-    public void testGetTotalMessageSummaries_withValue() {
+    public void testGetTotalMessageSummariesForType_withValue() {
         Interval interval = new Interval(mentionDate.minusDays(1),  mentionDate.plusDays(1));
-        int result = underTest.getTotalMessageSummaries(MessageType.MESSAGE,
+        int result = underTest.getTotalMessageSummariesForType(MessageType.MESSAGE,
                                                         interval, Optional.absent(),
                                                         Optional.absent());
         assertEquals(2, result);
