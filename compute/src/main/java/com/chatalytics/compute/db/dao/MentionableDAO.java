@@ -7,6 +7,7 @@ import com.chatalytics.core.model.data.IMentionable;
 import com.chatalytics.core.model.data.MessageSummary;
 import com.chatalytics.core.model.data.MessageType;
 import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
@@ -28,6 +29,7 @@ import javax.persistence.PersistenceException;
 import javax.persistence.Tuple;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaBuilder.In;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.ParameterExpression;
@@ -124,23 +126,23 @@ public class MentionableDAO<K extends Serializable, T extends IMentionable<K>>
      */
     @Override
     public List<T> getAllMentionsForValue(K value, Interval interval,
-                                          Optional<String> roomName, Optional<String> username) {
-        return internalGetAllMentionsForValue(Optional.of(value), interval, roomName, username);
+                                          List<String> roomNames, List<String> usernames) {
+        return internalGetAllMentionsForValue(Optional.of(value), interval, roomNames, usernames);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public List<T> getAllMentions(Interval interval, Optional<String> roomName,
-                                  Optional<String> username) {
-        return internalGetAllMentionsForValue(Optional.absent(), interval, roomName, username);
+    public List<T> getAllMentions(Interval interval, List<String> roomNames,
+                                  List<String> usernames) {
+        return internalGetAllMentionsForValue(Optional.absent(), interval, roomNames, usernames);
     }
 
     public List<T> internalGetAllMentionsForValue(Optional<K> value,
                                                   Interval interval,
-                                                  Optional<String> roomName,
-                                                  Optional<String> username) {
+                                                  List<String> roomNames,
+                                                  List<String> usernames) {
         EntityManager entityManager = entityManagerFactory.createEntityManager();
 
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
@@ -163,15 +165,19 @@ public class MentionableDAO<K extends Serializable, T extends IMentionable<K>>
             wherePredicates.add(cb.equal(from.get(TYPE_COLUMN_NAME), valueParam));
 
         }
-        ParameterExpression<String> roomNameParam = null;
-        if (roomName.isPresent()) {
-            roomNameParam = cb.parameter(String.class);
-            wherePredicates.add(cb.equal(from.get("roomName"), roomNameParam));
+        if (!roomNames.isEmpty()) {
+            In<String> in = cb.in(from.get("roomName"));
+            for (String roomName : roomNames) {
+                in.value(roomName);
+            }
+            wherePredicates.add(in);
         }
-        ParameterExpression<String> usernameParam = null;
-        if (username.isPresent()) {
-            usernameParam = cb.parameter(String.class);
-            wherePredicates.add(cb.equal(from.get("username"), usernameParam));
+        if (!usernames.isEmpty()) {
+            In<String> in = cb.in(from.get("username"));
+            for (String username : usernames) {
+                in.value(username);
+            }
+            wherePredicates.add(in);
         }
 
         query.where(wherePredicates.toArray(new Predicate[wherePredicates.size()]));
@@ -182,12 +188,6 @@ public class MentionableDAO<K extends Serializable, T extends IMentionable<K>>
                                                                      interval.getStart())
                                                        .setParameter(endDateParam,
                                                                      interval.getEnd());
-        if (roomName.isPresent()) {
-            finalQuery.setParameter(roomNameParam, roomName.get());
-        }
-        if (username.isPresent()) {
-            finalQuery.setParameter(usernameParam, username.get());
-        }
         if (value.isPresent()) {
             finalQuery.setParameter(valueParam, value.get());
 
@@ -217,7 +217,7 @@ public class MentionableDAO<K extends Serializable, T extends IMentionable<K>>
 
     private <X extends Serializable> LabeledDenseMatrix<X>
             internalGetSimilaritiesByValue(Interval interval, Function<T, X> funcX) {
-        List<T> mentions = getAllMentions(interval, Optional.absent(), Optional.absent());
+        List<T> mentions = getAllMentions(interval, ImmutableList.of(), ImmutableList.of());
 
         if (mentions.isEmpty()) {
             return LabeledDenseMatrix.of();
@@ -234,9 +234,9 @@ public class MentionableDAO<K extends Serializable, T extends IMentionable<K>>
      * {@inheritDoc}
      */
     @Override
-    public int getTotalMentionsForType(K value, Interval interval, Optional<String> roomName,
-                                       Optional<String> username) {
-        return internalGetTotalMentions(interval, Optional.of(value), roomName, username);
+    public int getTotalMentionsForType(K value, Interval interval, List<String> roomNames,
+                                       List<String> usernames) {
+        return internalGetTotalMentions(interval, Optional.of(value), roomNames, usernames);
     }
 
     /**
@@ -244,15 +244,15 @@ public class MentionableDAO<K extends Serializable, T extends IMentionable<K>>
      */
     @Override
     public int getTotalMentionsOfType(Interval interval,
-                                      Optional<String> roomName,
-                                      Optional<String> username) {
-        return internalGetTotalMentions(interval, Optional.absent(), roomName, username);
+                                      List<String> roomNames,
+                                      List<String> usernames) {
+        return internalGetTotalMentions(interval, Optional.absent(), roomNames, usernames);
     }
 
     private int internalGetTotalMentions(Interval interval,
                                         Optional<K> value,
-                                        Optional<String> roomName,
-                                        Optional<String> username) {
+                                        List<String> roomNames,
+                                        List<String> usernames) {
         EntityManager entityManager = entityManagerFactory.createEntityManager();
 
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
@@ -279,15 +279,19 @@ public class MentionableDAO<K extends Serializable, T extends IMentionable<K>>
         wherePredicates.add(cb.lessThan(mentionTime, endDateParam));
 
         // Add the optional parameters
-        ParameterExpression<String> roomNameParam = null;
-        if (roomName.isPresent()) {
-            roomNameParam = cb.parameter(String.class);
-            wherePredicates.add(cb.equal(from.get("roomName"), roomNameParam));
+        if (!roomNames.isEmpty()) {
+            In<String> in = cb.in(from.get("roomName"));
+            for (String roomName : roomNames) {
+                in.value(roomName);
+            }
+            wherePredicates.add(in);
         }
-        ParameterExpression<String> usernameParam = null;
-        if (username.isPresent()) {
-            usernameParam = cb.parameter(String.class);
-            wherePredicates.add(cb.equal(from.get("username"), usernameParam));
+        if (!usernames.isEmpty()) {
+            In<String> in = cb.in(from.get("username"));
+            for (String username : usernames) {
+                in.value(username);
+            }
+            wherePredicates.add(in);
         }
 
         query.where(wherePredicates.toArray(new Predicate[wherePredicates.size()]));
@@ -299,12 +303,6 @@ public class MentionableDAO<K extends Serializable, T extends IMentionable<K>>
                                                                     interval.getEnd());
         if (value.isPresent()) {
             finalQuery.setParameter(valueParam, value.get());
-        }
-        if (roomName.isPresent()) {
-            finalQuery.setParameter(roomNameParam, roomName.get());
-        }
-        if (username.isPresent()) {
-            finalQuery.setParameter(usernameParam, username.get());
         }
 
         List<Integer> result = finalQuery.getResultList();
@@ -323,8 +321,8 @@ public class MentionableDAO<K extends Serializable, T extends IMentionable<K>>
      */
     @Override
     public Map<K, Long> getTopValuesOfType(Interval interval,
-                                           Optional<String> roomName,
-                                           Optional<String> username,
+                                           List<String> roomNames,
+                                           List<String> usernames,
                                            int resultSize) {
 
         EntityManager entityManager = entityManagerFactory.createEntityManager();
@@ -350,15 +348,19 @@ public class MentionableDAO<K extends Serializable, T extends IMentionable<K>>
         wherePredicates.add(cb.lessThan(mentionTime, endDateParam));
 
         // Add the optional parameters
-        ParameterExpression<String> roomNameParam = null;
-        if (roomName.isPresent()) {
-            roomNameParam = cb.parameter(String.class);
-            wherePredicates.add(cb.equal(from.get("roomName"), roomNameParam));
+        if (!roomNames.isEmpty()) {
+            In<String> in = cb.in(from.get("roomName"));
+            for (String roomName : roomNames) {
+                in.value(roomName);
+            }
+            wherePredicates.add(in);
         }
-        ParameterExpression<String> usernameParam = null;
-        if (username.isPresent()) {
-            usernameParam = cb.parameter(String.class);
-            wherePredicates.add(cb.equal(from.get("username"), usernameParam));
+        if (!usernames.isEmpty()) {
+            In<String> in = cb.in(from.get("username"));
+            for (String username : usernames) {
+                in.value(username);
+            }
+            wherePredicates.add(in);
         }
         query.where(wherePredicates.toArray(new Predicate[wherePredicates.size()]));
 
@@ -370,12 +372,7 @@ public class MentionableDAO<K extends Serializable, T extends IMentionable<K>>
                                                     .setParameter(startDateParam,
                                                                   interval.getStart())
                                                     .setParameter(endDateParam, interval.getEnd());
-        if (roomName.isPresent()) {
-            finalQuery.setParameter(roomNameParam, roomName.get());
-        }
-        if (username.isPresent()) {
-            finalQuery.setParameter(usernameParam, username.get());
-        }
+
         List<Tuple> resultList = finalQuery.getResultList();
 
         closeEntityManager(entityManager);

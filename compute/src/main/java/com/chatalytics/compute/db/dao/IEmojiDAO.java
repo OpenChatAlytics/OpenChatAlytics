@@ -5,7 +5,6 @@ import com.chatalytics.compute.matrix.LabeledDenseMatrix;
 import com.chatalytics.compute.matrix.LabeledMTJMatrix;
 import com.chatalytics.core.ActiveMethod;
 import com.chatalytics.core.model.data.EmojiEntity;
-import com.google.common.base.Optional;
 import com.google.common.util.concurrent.Service;
 
 import org.joda.time.Interval;
@@ -41,17 +40,17 @@ public interface IEmojiDAO extends Service {
      * @param interval
      *            The interval of interest. Note that the query is inclusive of the start time and
      *            exclusive of the end time.
-     * @param roomName
-     *            Optionally supply a room name
-     * @param username
-     *            Optionally supply a user name
+     * @param roomNames
+     *            Optionally supply a list of room names. This list can be empty
+     * @param usernames
+     *            Optionally supply a list of user names. This list can be empty
      * @return A list of {@link EmojiEntity} representing all the times this emoji was mentioned in
      *         the given time period
      */
      List<EmojiEntity> getAllMentionsForEmoji(String emoji,
                                               Interval interval,
-                                              Optional<String> roomName,
-                                              Optional<String> username);
+                                              List<String> roomNames,
+                                              List<String> usernames);
 
     /**
      * Returns all the mention occurrences of all the emojis inside the given <code>interval</code>
@@ -59,14 +58,16 @@ public interface IEmojiDAO extends Service {
      * @param interval
      *            The interval of interest. Note that the query is inclusive of the start time and
      *            exclusive of the end time.
-     * @param roomName Optionally supply a room name
-     * @param username Optionally supply a user name
+     * @param roomNames
+     *            Optionally supply a list of room names. This list can be empty
+     * @param usernames
+     *            Optionally supply a list of user names. This list can be empty
      * @return A list of {@link EmojiEntity} representing all the times emojis were mentioned in the
      *         given time period
      */
      List<EmojiEntity> getAllMentions(Interval interval,
-                                      Optional<String> roomName,
-                                      Optional<String> username);
+                                      List<String> roomNames,
+                                      List<String> usernames);
 
     /**
      * Returns the total number of times an emoji was mentioned in the given <code>interval</code>.
@@ -76,16 +77,16 @@ public interface IEmojiDAO extends Service {
      * @param interval
      *            The interval of interest. Note that the query is inclusive of the start time and
      *            exclusive of the end time.
-     * @param roomName
-     *            Optionally supply a room name
-     * @param username
-     *            Optionally supply a user name
+     * @param roomNames
+     *            Optionally supply a list of room names. This list can be empty
+     * @param usernames
+     *            Optionally supply a list of user names. This list can be empty
      * @return The total number of times the emoji was mentioned in the given time interval
      */
      int getTotalMentionsForEmoji(String emoji,
                                   Interval interval,
-                                  Optional<String> roomName,
-                                  Optional<String> username);
+                                  List<String> roomNames,
+                                  List<String> usernames);
 
     /**
      * Returns back the top emojis in the given time interval, and optionally by user name and/or
@@ -93,17 +94,17 @@ public interface IEmojiDAO extends Service {
      *
      * @param interval
      *            The time interval to search in
-     * @param roomName
-     *            Optional room name to filter by
-     * @param username
-     *            Optional user name to filter by
+     * @param roomNames
+     *            Optionally supply a list of room names. This list can be empty
+     * @param usernames
+     *            Optionally supply a list of user names. This list can be empty
      * @param resultSize
      *            The number of top emojis to return back
      * @return Returns back a map of emoji to number of occurrences.
      */
      Map<String, Long> getTopEmojis(Interval interval,
-                                    Optional<String> roomName,
-                                    Optional<String> username,
+                                    List<String> roomNames,
+                                    List<String> usernames,
                                     int resultSize);
 
      /**

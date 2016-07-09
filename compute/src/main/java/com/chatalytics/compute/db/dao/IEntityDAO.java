@@ -5,7 +5,6 @@ import com.chatalytics.compute.matrix.LabeledDenseMatrix;
 import com.chatalytics.compute.matrix.LabeledMTJMatrix;
 import com.chatalytics.core.ActiveMethod;
 import com.chatalytics.core.model.data.ChatEntity;
-import com.google.common.base.Optional;
 import com.google.common.util.concurrent.Service;
 
 import org.joda.time.Interval;
@@ -41,34 +40,34 @@ public interface IEntityDAO extends Service {
      * @param interval
      *            The interval of interest. Note that the query is inclusive of the start time and
      *            exclusive of the end time.
-     * @param roomName
-     *            Optionally supply a room name
-     * @param username
-     *            Optionally supply a user name
-     * @return A list of {@link ChatEntity} representing all the times this entity was mentioned
-     *         in the given time period
+     * @param roomNames
+     *            Optionally supply a list of room names. This list can be empty
+     * @param usernames
+     *            Optionally supply a list of user names. This list can be empty
+     * @return A list of {@link ChatEntity} representing all the times this entity was mentioned in
+     *         the given time period
      */
      List<ChatEntity> getAllMentionsForEntity(String entity,
                                               Interval interval,
-                                              Optional<String> roomName,
-                                              Optional<String> username);
+                                              List<String> roomNames,
+                                              List<String> usernames);
 
-     /**
-      * Returns all the mention occurrences for an entity inside the given <code>interval</code>.
-      *
-      * @param interval
-      *            The interval of interest. Note that the query is inclusive of the start time and
-      *            exclusive of the end time.
-      * @param roomName
-      *            Optionally supply a room name
-      * @param username
-      *            Optionally supply a user name
-      * @return A list of {@link ChatEntity} representing all the times this entity was mentioned
-      *         in the given time period
-      */
-      List<ChatEntity> getAllMentions(Interval interval,
-                                      Optional<String> roomName,
-                                      Optional<String> username);
+    /**
+     * Returns all the mention occurrences for an entity inside the given <code>interval</code>.
+     *
+     * @param interval
+     *            The interval of interest. Note that the query is inclusive of the start time and
+     *            exclusive of the end time.
+     * @param roomNames
+     *            Optionally supply a list of room names. This list can be empty
+     * @param usernames
+     *            Optionally supply a list of user names. This list can be empty
+     * @return A list of {@link ChatEntity} representing all the times this entity was mentioned in
+     *         the given time period
+     */
+    List<ChatEntity> getAllMentions(Interval interval,
+                                    List<String> roomNames,
+                                    List<String> usernames);
 
     /**
      * Returns the total number of times an entity was mentioned in the given <code>interval</code>.
@@ -78,16 +77,16 @@ public interface IEntityDAO extends Service {
      * @param interval
      *            The interval of interest. Note that the query is inclusive of the start time and
      *            exclusive of the end time.
-     * @param roomName
-     *            Optionally supply a room name
-     * @param username
-     *            Optionally supply a user name
+     * @param roomNames
+     *            Optionally supply a list of room names. This list can be empty
+     * @param usernames
+     *            Optionally supply a list of user names. This list can be empty
      * @return The total number of times the entity was mentioned in the given time interval
      */
      int getTotalMentionsForEntity(String entity,
                                    Interval interval,
-                                   Optional<String> roomName,
-                                   Optional<String> username);
+                                   List<String> roomNames,
+                                   List<String> usernames);
 
 
     /**
@@ -96,17 +95,17 @@ public interface IEntityDAO extends Service {
      *
      * @param interval
      *            The time interval to search in
-     * @param roomName
-     *            Optional room name to filter by
-     * @param username
-     *            Optional user name to filter by
+     * @param roomNames
+     *            Optionally supply a list of room names. This list can be empty
+     * @param usernames
+     *            Optionally supply a list of user names. This list can be empty
      * @param resultSize
      *            The number of top entities to return back
      * @return Returns back a map of entity value to number of occurrences.
      */
      Map<String, Long> getTopEntities(Interval interval,
-                                      Optional<String> roomName,
-                                      Optional<String> username,
+                                      List<String> roomNames,
+                                      List<String> usernames,
                                       int resultSize);
 
      /**

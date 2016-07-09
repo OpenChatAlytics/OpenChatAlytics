@@ -13,6 +13,7 @@ import com.chatalytics.core.model.data.EmojiEntity;
 import com.chatalytics.core.model.data.EmojiMap;
 import com.chatalytics.web.utils.DateTimeUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -89,14 +90,17 @@ public class EmojisResourceTest {
         DateTimeFormatter dtf = DateTimeUtils.PARAMETER_WITH_DAY_DTF.withZone(dtZone);
         String startTimeStr = dtf.print(mentionTime.minusDays(1));
         String endTimeStr = dtf.print(mentionTime.plusDays(1));
-        Map<String, Long> response = underTest.getTopEmojis(startTimeStr, endTimeStr, "u1", "r1",
+        Map<String, Long> response = underTest.getTopEmojis(startTimeStr, endTimeStr,
+                                                            ImmutableList.of("u1"),
+                                                            ImmutableList.of("r1"),
                                                             null);
         Map<String, Long> expected = Maps.newHashMap();
         expected.put("e1", 5L);
         expected.put("e2", 1L);
         assertEquals(expected, response);
 
-        response = underTest.getTopEmojis(startTimeStr, endTimeStr, "u1", null, null);
+        response = underTest.getTopEmojis(startTimeStr, endTimeStr, ImmutableList.of("u1"),
+                                          null, null);
         expected.clear();
         expected.put("e1", 5L);
         expected.put("e4", 3L);

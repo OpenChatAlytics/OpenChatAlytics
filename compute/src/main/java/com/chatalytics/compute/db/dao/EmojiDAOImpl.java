@@ -3,7 +3,6 @@ package com.chatalytics.compute.db.dao;
 import com.chatalytics.compute.matrix.LabeledDenseMatrix;
 import com.chatalytics.core.ActiveMethod;
 import com.chatalytics.core.model.data.EmojiEntity;
-import com.google.common.base.Optional;
 import com.google.common.util.concurrent.AbstractIdleService;
 
 import org.joda.time.Interval;
@@ -59,9 +58,9 @@ public class EmojiDAOImpl extends AbstractIdleService implements IEmojiDAO {
     @Override
     public List<EmojiEntity> getAllMentionsForEmoji(String emoji,
                                                     Interval interval,
-                                                    Optional<String> roomName,
-                                                    Optional<String> username) {
-        return occurrenceStatsDAO.getAllMentionsForValue(emoji, interval, roomName, username);
+                                                    List<String> roomNames,
+                                                    List<String> usernames) {
+        return occurrenceStatsDAO.getAllMentionsForValue(emoji, interval, roomNames, usernames);
     }
 
     /**
@@ -69,9 +68,9 @@ public class EmojiDAOImpl extends AbstractIdleService implements IEmojiDAO {
      */
     @Override
     public List<EmojiEntity> getAllMentions(Interval interval,
-                                            Optional<String> roomName,
-                                            Optional<String> username) {
-        return occurrenceStatsDAO.getAllMentions(interval, roomName, username);
+                                            List<String> roomNames,
+                                            List<String> usernames) {
+        return occurrenceStatsDAO.getAllMentions(interval, roomNames, usernames);
     }
 
 
@@ -81,9 +80,9 @@ public class EmojiDAOImpl extends AbstractIdleService implements IEmojiDAO {
     @Override
     public int getTotalMentionsForEmoji(String emoji,
                                         Interval interval,
-                                        Optional<String> roomName,
-                                        Optional<String> username) {
-        return occurrenceStatsDAO.getTotalMentionsForType(emoji, interval, roomName, username);
+                                        List<String> roomNames,
+                                        List<String> usernames) {
+        return occurrenceStatsDAO.getTotalMentionsForType(emoji, interval, roomNames, usernames);
     }
 
     /**
@@ -91,10 +90,10 @@ public class EmojiDAOImpl extends AbstractIdleService implements IEmojiDAO {
      */
     @Override
     public Map<String, Long> getTopEmojis(Interval interval,
-                                          Optional<String> roomName,
-                                          Optional<String> username,
+                                          List<String> roomNames,
+                                          List<String> usernames,
                                           int resultSize) {
-        return occurrenceStatsDAO.getTopValuesOfType(interval, roomName, username, resultSize);
+        return occurrenceStatsDAO.getTopValuesOfType(interval, roomNames, usernames, resultSize);
     }
 
     /**

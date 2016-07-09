@@ -6,7 +6,7 @@ import com.chatalytics.core.config.ChatAlyticsConfig;
 import com.chatalytics.core.model.data.ChatEntity;
 import com.chatalytics.core.model.data.MessageSummary;
 import com.chatalytics.core.model.data.MessageType;
-import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableList;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -82,20 +82,21 @@ public class EntityDAOImplTest {
         // Make sure that 0 is returned when nothing is found
         assertEquals(0, underTest.getTotalMentionsForEntity("unknownentity",
                                                             timeInterval,
-                                                            Optional.absent(),
-                                                            Optional.absent()));
+                                                            ImmutableList.of(),
+                                                            ImmutableList.of()));
 
         // make sure that the sums are correct for a bunch of different queries
         int result = underTest.getTotalMentionsForEntity("entity1", timeInterval,
-                                                          Optional.absent(), Optional.absent());
+                                                          ImmutableList.of(), ImmutableList.of());
         assertEquals(3, result);
 
         result = underTest.getTotalMentionsForEntity("entity1", timeInterval,
-                                                     Optional.of("room1"), Optional.absent());
+                                                     ImmutableList.of("room1"), ImmutableList.of());
         assertEquals(2, result);
 
         result = underTest.getTotalMentionsForEntity("entity1", timeInterval,
-                                                     Optional.of("room1"), Optional.of("giannis"));
+                                                     ImmutableList.of("room1"),
+                                                     ImmutableList.of("giannis"));
         assertEquals(1, result);
     }
 
@@ -106,16 +107,17 @@ public class EntityDAOImplTest {
     public void testGetAllMentionsForEntity() {
         Interval timeInterval = new Interval(mentionDate, mentionDate.plusHours(3));
         List<ChatEntity> result = underTest.getAllMentionsForEntity("entity1", timeInterval,
-                                                                    Optional.absent(),
-                                                                    Optional.absent());
+                                                                    ImmutableList.of(),
+                                                                    ImmutableList.of());
         assertEquals(3, result.size());
 
-        result = underTest.getAllMentionsForEntity("entity1", timeInterval, Optional.of("room1"),
-                                                Optional.absent());
+        result = underTest.getAllMentionsForEntity("entity1", timeInterval,
+                                                   ImmutableList.of("room1"), ImmutableList.of());
         assertEquals(2, result.size());
 
-        result = underTest.getAllMentionsForEntity("entity1", timeInterval, Optional.of("room1"),
-                                                Optional.of("giannis"));
+        result = underTest.getAllMentionsForEntity("entity1", timeInterval,
+                                                   ImmutableList.of("room1"),
+                                                   ImmutableList.of("giannis"));
         assertEquals(1, result.size());
     }
 
@@ -125,15 +127,16 @@ public class EntityDAOImplTest {
     @Test
     public void testGetAllMentions() {
         Interval timeInterval = new Interval(mentionDate, mentionDate.plusHours(3));
-        List<ChatEntity> result = underTest.getAllMentions(timeInterval, Optional.absent(),
-                                                           Optional.absent());
+        List<ChatEntity> result = underTest.getAllMentions(timeInterval, ImmutableList.of(),
+                                                           ImmutableList.of());
         assertEquals(4, result.size());
 
-        result = underTest.getAllMentions(timeInterval, Optional.of("room1"), Optional.absent());
+        result = underTest.getAllMentions(timeInterval, ImmutableList.of("room1"),
+                                          ImmutableList.of());
         assertEquals(3, result.size());
 
-        result = underTest.getAllMentions(timeInterval, Optional.of("room1"),
-                                          Optional.of("giannis"));
+        result = underTest.getAllMentions(timeInterval, ImmutableList.of("room1"),
+                                          ImmutableList.of("giannis"));
         assertEquals(2, result.size());
     }
 
@@ -141,19 +144,19 @@ public class EntityDAOImplTest {
     public void testGetTopEntities() {
         Interval timeInterval = new Interval(mentionDate, mentionDate.plusHours(3));
         Map<String, Long> result =
-            underTest.getTopEntities(timeInterval, Optional.absent(), Optional.absent(), 10);
+            underTest.getTopEntities(timeInterval, ImmutableList.of(), ImmutableList.of(), 10);
         assertEquals(2, result.size());
         assertEquals(3L, result.get("entity1").longValue());
         assertEquals(1L, result.get("entity2").longValue());
 
-        result = underTest.getTopEntities(timeInterval, Optional.of("room1"), Optional.absent(),
-                                          10);
+        result = underTest.getTopEntities(timeInterval, ImmutableList.of("room1"),
+                                          ImmutableList.of(), 10);
         assertEquals(2, result.size());
         assertEquals(2L, result.get("entity1").longValue());
         assertEquals(1L, result.get("entity2").longValue());
 
-        result = underTest.getTopEntities(timeInterval, Optional.of("room1"),
-                                          Optional.of("giannis"), 10);
+        result = underTest.getTopEntities(timeInterval, ImmutableList.of("room1"),
+                                          ImmutableList.of("giannis"), 10);
         assertEquals(2, result.size());
         assertEquals(1L, result.get("entity1").longValue());
         assertEquals(1L, result.get("entity2").longValue());

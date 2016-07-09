@@ -4,7 +4,7 @@ import com.chatalytics.core.ActiveMethod;
 import com.chatalytics.core.config.ChatAlyticsConfig;
 import com.chatalytics.core.model.data.MessageSummary;
 import com.chatalytics.core.model.data.MessageType;
-import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableList;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -84,8 +84,8 @@ public class MessageSummaryDAOImplTest {
     public void testGetAllMessageSummaries() {
         Interval interval = new Interval(mentionDate.minusDays(1),  mentionDate.plusDays(1));
         List<MessageSummary> result = underTest.getAllMessageSummaries(interval,
-                                                                       Optional.of("room1"),
-                                                                       Optional.of("user1"));
+                                                                       ImmutableList.of("room1"),
+                                                                       ImmutableList.of("user1"));
         assertEquals(1, result.size());
     }
 
@@ -94,16 +94,16 @@ public class MessageSummaryDAOImplTest {
         Interval interval = new Interval(mentionDate.minusDays(1),  mentionDate.plusDays(1));
         List<MessageSummary> result = underTest.getAllMessageSummariesForType(MessageType.MESSAGE,
                                                                               interval,
-                                                                              Optional.absent(),
-                                                                              Optional.absent());
+                                                                              ImmutableList.of(),
+                                                                              ImmutableList.of());
         assertEquals(2, result.size());
     }
 
     @Test
     public void testGetTotalMessageSummaries() {
         Interval interval = new Interval(mentionDate.minusDays(1),  mentionDate.plusDays(1));
-        int result = underTest.getTotalMessageSummaries(interval, Optional.absent(),
-                                                        Optional.absent());
+        int result = underTest.getTotalMessageSummaries(interval, ImmutableList.of(),
+                                                        ImmutableList.of());
         assertEquals(4, result);
     }
 
@@ -111,8 +111,8 @@ public class MessageSummaryDAOImplTest {
     public void testGetTotalMessageSummariesForType_withValue() {
         Interval interval = new Interval(mentionDate.minusDays(1),  mentionDate.plusDays(1));
         int result = underTest.getTotalMessageSummariesForType(MessageType.MESSAGE,
-                                                        interval, Optional.absent(),
-                                                        Optional.absent());
+                                                        interval, ImmutableList.of(),
+                                                        ImmutableList.of());
         assertEquals(2, result);
     }
 

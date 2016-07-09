@@ -8,6 +8,7 @@ import com.chatalytics.core.DimensionType;
 import com.chatalytics.core.config.ChatAlyticsConfig;
 import com.chatalytics.core.model.data.ChatEntity;
 import com.chatalytics.web.utils.DateTimeUtils;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -84,14 +85,16 @@ public class EntitiesResourceTest {
         DateTimeFormatter dtf = DateTimeUtils.PARAMETER_WITH_DAY_DTF.withZone(dtZone);
         String startTimeStr = dtf.print(mentionTime.minusDays(1));
         String endTimeStr = dtf.print(mentionTime.plusDays(1));
-        Map<String, Long> response = underTest.getTrendingTopics(startTimeStr, endTimeStr, "u1",
-                                                                 "r1", null);
+        Map<String, Long> response = underTest.getTrendingTopics(startTimeStr, endTimeStr,
+                                                                 ImmutableList.of("u1"),
+                                                                 ImmutableList.of("r1"), null);
         Map<String, Long> expected = Maps.newHashMap();
         expected.put("e1", 5L);
         expected.put("e2", 1L);
         assertEquals(expected, response);
 
-        response = underTest.getTrendingTopics(startTimeStr, endTimeStr, "u1", null, null);
+        response = underTest.getTrendingTopics(startTimeStr, endTimeStr, ImmutableList.of("u1"),
+                                               null, null);
         expected.clear();
         expected.put("e1", 5L);
         expected.put("e4", 3L);
