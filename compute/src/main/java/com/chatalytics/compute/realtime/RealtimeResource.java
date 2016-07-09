@@ -35,9 +35,9 @@ import javax.websocket.server.ServerEndpoint;
 public class RealtimeResource {
 
     public static final String RT_COMPUTE_ENDPOINT = "/rtcompute";
-    private static final String RT_COMPUTE_ENDPOINT_PARAMETER = "type";
+    private static final String RT_COMPUTE_ENDPOINT_PARAM = "type";
     public static final String RT_FULL_ENDPOINT =
-        RT_COMPUTE_ENDPOINT + "/{" + RT_COMPUTE_ENDPOINT_PARAMETER + "}";
+        RT_COMPUTE_ENDPOINT + "/{" + RT_COMPUTE_ENDPOINT_PARAM + "}";
 
     private static final Logger LOG = LoggerFactory.getLogger(RealtimeResource.class);
 
@@ -53,7 +53,7 @@ public class RealtimeResource {
      * @param session The session that just opened
      */
     @OnOpen
-    public void openSocket(@PathParam(RT_COMPUTE_ENDPOINT_PARAMETER) ConnectionType type,
+    public void openSocket(@PathParam(RT_COMPUTE_ENDPOINT_PARAM) ConnectionType type,
                            Session session) {
         if (type == ConnectionType.SUBSCRIBER) {
             LOG.info("Got a new subscriber connection request with ID {}. Saving session",
@@ -70,7 +70,6 @@ public class RealtimeResource {
 
             sessions.add(session);
         } else {
-//            session.setMaxIdleTimeout(Long.MAX_VALUE);
             LOG.info("Got a new publisher connection request with ID {}", session.getId());
         }
     }

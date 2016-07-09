@@ -21,6 +21,11 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
+import static com.chatalytics.web.constant.WebConstants.END_TIME;
+import static com.chatalytics.web.constant.WebConstants.ROOM;
+import static com.chatalytics.web.constant.WebConstants.START_TIME;
+import static com.chatalytics.web.constant.WebConstants.USER;
+
 /**
  * REST endpoint for getting message summary data. Check {@link MessageSummary} for all the
  * properties of a message summary.
@@ -31,10 +36,6 @@ import javax.ws.rs.core.MediaType;
 public class MessageSummaryResource {
 
     public static final String MESSAGE_SUMMARY_ENDPOINT = WebConstants.API_PATH + "message-summary";
-    public static final String START_TIME_PARAM = "starttime";
-    public static final String END_TIME_PARAM = "endtime";
-    public static final String USER_PARAM = "user";
-    public static final String ROOM_PARAM = "room";
     public static final String MESSAGE_TYPE = "type";
 
     private final IMessageSummaryDAO msgSummaryDao;
@@ -66,10 +67,10 @@ public class MessageSummaryResource {
     @GET
     @Path("total")
     @Produces(MediaType.APPLICATION_JSON)
-    public int getTotalMessageSummaries(@QueryParam(START_TIME_PARAM) String startTimeStr,
-                                        @QueryParam(END_TIME_PARAM) String endTimeStr,
-                                        @QueryParam(USER_PARAM) String user,
-                                        @QueryParam(ROOM_PARAM) String room,
+    public int getTotalMessageSummaries(@QueryParam(START_TIME) String startTimeStr,
+                                        @QueryParam(END_TIME) String endTimeStr,
+                                        @QueryParam(USER) String user,
+                                        @QueryParam(ROOM) String room,
                                         @QueryParam(MESSAGE_TYPE) String msgTypeStr) {
 
         LOG.debug("Got a call for total msg summaries with starttime={} endtime={} user={} room={}",
