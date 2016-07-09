@@ -12,6 +12,8 @@ import lombok.Setter;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
@@ -22,7 +24,7 @@ import javax.persistence.Table;
 @Setter(value = AccessLevel.PROTECTED) // for hibernate
 public class EmojiEntity implements IMentionable<String> {
 
-    private static final long serialVersionUID = 7180644692083145759L;
+    private static final long serialVersionUID = 7180644692083145769L;
 
     public static final String EMOJI_TABLE_NAME = "EMOJI";
     public static final String EMOJI_COLUMN = "VALUE";
@@ -34,16 +36,28 @@ public class EmojiEntity implements IMentionable<String> {
     /**
      * Emoji alias without ':'
      */
-    private String value;
-    private int occurrences;
-    private DateTime mentionTime;
     private String username;
     private String roomName;
+    private DateTime mentionTime;
+    private String value;
+    private int occurrences;
+    @Id
+    @Column(name = "id")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    private Long id;
+
+    public EmojiEntity(String username, String roomName, DateTime mentionTime,
+                       String value, int occurrences) {
+        this.username = username;
+        this.roomName = roomName;
+        this.mentionTime = mentionTime;
+        this.value = value;
+        this.occurrences = occurrences;
+    }
 
     protected EmojiEntity() {} // for jackson
 
     @Override
-    @Id
     @Column(name = EMOJI_COLUMN)
     public String getValue() {
         return value;
@@ -56,7 +70,6 @@ public class EmojiEntity implements IMentionable<String> {
     }
 
     @Override
-    @Id
     @Column(name = MENTION_TIME_COLUMN)
     @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
     public DateTime getMentionTime() {
@@ -64,14 +77,12 @@ public class EmojiEntity implements IMentionable<String> {
     }
 
     @Override
-    @Id
     @Column(name = USER_NAME_COLUMN)
     public String getUsername() {
         return username;
     }
 
     @Override
-    @Id
     @Column(name = ROOM_NAME_COLUMN)
     public String getRoomName() {
         return roomName;

@@ -10,7 +10,6 @@ import org.joda.time.Interval;
 import java.util.List;
 import java.util.Map;
 
-import javax.persistence.EntityExistsException;
 import javax.persistence.EntityManagerFactory;
 
 /**
@@ -29,18 +28,7 @@ public class MessageSummaryDAOImpl extends AbstractIdleService implements IMessa
 
     @Override
     public void persistMessageSummary(MessageSummary messageSummary) {
-        try {
-            occurrenceStatsDAO.persistValue(messageSummary);
-        } catch (EntityExistsException e) {
-            MessageSummary existingValue = occurrenceStatsDAO.getValue(messageSummary);
-            int newOccurrences = messageSummary.getOccurrences() + existingValue.getOccurrences();
-            MessageSummary mergedSummary = new MessageSummary(messageSummary.getUsername(),
-                                                              messageSummary.getRoomName(),
-                                                              messageSummary.getMentionTime(),
-                                                              messageSummary.getValue(),
-                                                              newOccurrences);
-            occurrenceStatsDAO.mergeValue(mergedSummary);
-        }
+        occurrenceStatsDAO.persistValue(messageSummary);
     }
 
     /**

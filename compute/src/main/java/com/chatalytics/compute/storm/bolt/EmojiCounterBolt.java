@@ -92,11 +92,11 @@ public class EmojiCounterBolt extends ChatAlyticsBaseBolt {
                         occurrences = existingEmoji.getOccurrences() + 1;
                     }
 
-                    emojis.put(emoji, new EmojiEntity(emoji,
-                                                      occurrences,
+                    emojis.put(emoji, new EmojiEntity(fatMessage.getUser().getMentionName(),
+                                                      roomName,
                                                       fatMessage.getMessage().getDate(),
-                                                      fatMessage.getUser().getMentionName(),
-                                                      roomName));
+                                                      emoji,
+                                                      occurrences));
                     emojiStrBuilder = new StringBuilder();
                 }
                 capturingEmoji = !capturingEmoji;

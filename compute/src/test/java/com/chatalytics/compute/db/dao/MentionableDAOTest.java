@@ -53,23 +53,24 @@ public class MentionableDAOTest {
         DateTime start = end.minusDays(1);
 
         // make r1, r2 and r3 kind of similar and r4
-        underTest.persistValue(new EmojiEntity("a", 1, start, "u1", "r1"));
-        underTest.persistValue(new EmojiEntity("a", 1, start.plusMillis(1), "u1", "r2"));
-        underTest.persistValue(new EmojiEntity("a", 1, start.plusMillis(2), "u1", "r3"));
-        underTest.persistValue(new EmojiEntity("b", 1, start.plusMillis(3), "u1", "r2"));
-        underTest.persistValue(new EmojiEntity("b", 1, start.plusMillis(4), "u1", "r3"));
-        underTest.persistValue(new EmojiEntity("c", 1, start.plusMillis(5), "u1", "r1"));
-        underTest.persistValue(new EmojiEntity("c", 1, start.plusMillis(6), "u1", "r2"));
-        underTest.persistValue(new EmojiEntity("d", 1, start.plusMillis(7), "u1", "r1"));
-        underTest.persistValue(new EmojiEntity("d", 1, start.plusMillis(8), "u1", "r2"));
-        underTest.persistValue(new EmojiEntity("d", 1, start.plusMillis(9), "u1", "r3"));
+        underTest.persistValue(new EmojiEntity("u1", "r1", start, "a", 1));
+        underTest.persistValue(new EmojiEntity("u1", "r2", start.plusMillis(1), "a", 1));
 
-        underTest.persistValue(new EmojiEntity("e", 1, start.plusMillis(10), "u1", "r4"));
-        underTest.persistValue(new EmojiEntity("e", 1, start.plusMillis(11), "u1", "r4"));
-        underTest.persistValue(new EmojiEntity("e", 1, start.plusMillis(12), "u1", "r5"));
-        underTest.persistValue(new EmojiEntity("f", 1, start.plusMillis(13), "u1", "r6"));
-        underTest.persistValue(new EmojiEntity("g", 1, start.plusMillis(14), "u1", "r7"));
-        underTest.persistValue(new EmojiEntity("h", 1, start.plusMillis(15), "u1", "r7"));
+        underTest.persistValue(new EmojiEntity("u1", "r3", start.plusMillis(2), "a", 1));
+        underTest.persistValue(new EmojiEntity("u1", "r2", start.plusMillis(3), "b", 1));
+        underTest.persistValue(new EmojiEntity("u1", "r3", start.plusMillis(4), "b", 1));
+        underTest.persistValue(new EmojiEntity("u1", "r1", start.plusMillis(5), "c", 1));
+        underTest.persistValue(new EmojiEntity("u1", "r2", start.plusMillis(6), "c", 1));
+        underTest.persistValue(new EmojiEntity("u1", "r1", start.plusMillis(7), "d", 1));
+        underTest.persistValue(new EmojiEntity("u1", "r2", start.plusMillis(8), "d", 1));
+        underTest.persistValue(new EmojiEntity("u1", "r3", start.plusMillis(9), "d", 1));
+
+        underTest.persistValue(new EmojiEntity("u1", "r4", start.plusMillis(10), "e", 1));
+        underTest.persistValue(new EmojiEntity("u1", "r4", start.plusMillis(11), "e", 1));
+        underTest.persistValue(new EmojiEntity("u1", "r5", start.plusMillis(12), "e", 1));
+        underTest.persistValue(new EmojiEntity("u1", "r6", start.plusMillis(13), "f", 1));
+        underTest.persistValue(new EmojiEntity("u1", "r7", start.plusMillis(14), "g", 1));
+        underTest.persistValue(new EmojiEntity("u1", "r7", start.plusMillis(15), "h", 1));
 
         Interval interval = new Interval(start, end);
         LabeledDenseMatrix<String> result = underTest.getRoomSimilaritiesByValue(interval);
@@ -80,7 +81,7 @@ public class MentionableDAOTest {
     @Test
     public void testPersistValue() {
         DateTime dateTime = DateTime.now();
-        EmojiEntity emoji = new EmojiEntity("a", 1, dateTime, "u1", "r1");
+        EmojiEntity emoji = new EmojiEntity("u1", "r1", dateTime, "a", 1);
         assertNull(underTest.getValue(emoji));
         underTest.persistValue(emoji);
         assertNotNull(underTest.getValue(emoji));
@@ -89,7 +90,7 @@ public class MentionableDAOTest {
     @Test(expected = EntityExistsException.class)
     public void testPersistValue_withDuplicate() {
         DateTime dateTime = DateTime.now();
-        EmojiEntity emoji = new EmojiEntity("a", 1, dateTime, "u1", "r1");
+        EmojiEntity emoji = new EmojiEntity("u1", "r1", dateTime, "a", 1);
         assertNull(underTest.getValue(emoji));
         underTest.persistValue(emoji);
         assertNotNull(underTest.getValue(emoji));
@@ -103,12 +104,12 @@ public class MentionableDAOTest {
         DateTime end = DateTime.now();
         DateTime start = end.minusDays(1);
         Interval interval = new Interval(start, end);
-        underTest.persistValue(new EmojiEntity("a", 1, start, "u1", "r1"));
-        underTest.persistValue(new EmojiEntity("a", 1, start.plusMillis(1), "u1", "r2"));
-        underTest.persistValue(new EmojiEntity("a", 1, start.plusMillis(2), "u2", "r1"));
-        underTest.persistValue(new EmojiEntity("b", 1, start.plusMillis(3), "u1", "r2"));
-        underTest.persistValue(new EmojiEntity("b", 1, start.plusMillis(4), "u2", "r3"));
-        underTest.persistValue(new EmojiEntity("c", 1, start.plusMillis(5), "u1", "r3"));
+        underTest.persistValue(new EmojiEntity("u1", "r1", start, "a", 1));
+        underTest.persistValue(new EmojiEntity("u1", "r2", start.plusMillis(1), "a", 1));
+        underTest.persistValue(new EmojiEntity("u2", "r1", start.plusMillis(2), "a", 1));
+        underTest.persistValue(new EmojiEntity("u1", "r2", start.plusMillis(3), "b", 1));
+        underTest.persistValue(new EmojiEntity("u2", "r3", start.plusMillis(4), "b", 1));
+        underTest.persistValue(new EmojiEntity("u1", "r3", start.plusMillis(5), "c", 1));
 
         int result = underTest.getTotalMentionsOfType(interval, ImmutableList.of(),
                                                       ImmutableList.of());
@@ -144,11 +145,11 @@ public class MentionableDAOTest {
         DateTime end = DateTime.now();
         DateTime start = end.minusDays(1);
         Interval interval = new Interval(start, end);
-        underTest.persistValue(new EmojiEntity("a", 1, start, "u1", "r1"));
-        underTest.persistValue(new EmojiEntity("a", 1, start.plusMillis(1), "u1", "r2"));
-        underTest.persistValue(new EmojiEntity("a", 1, start.plusMillis(2), "u2", "r3"));
-        underTest.persistValue(new EmojiEntity("b", 1, start.plusMillis(3), "u1", "r2"));
-        underTest.persistValue(new EmojiEntity("c", 1, start.plusMillis(5), "u1", "r3"));
+        underTest.persistValue(new EmojiEntity("u1", "r1", start, "a", 1));
+        underTest.persistValue(new EmojiEntity("u1", "r2", start.plusMillis(1), "a", 1));
+        underTest.persistValue(new EmojiEntity("u2", "r3", start.plusMillis(2), "a", 1));
+        underTest.persistValue(new EmojiEntity("u1", "r2", start.plusMillis(3), "b", 1));
+        underTest.persistValue(new EmojiEntity("u1", "r3", start.plusMillis(5), "c", 1));
 
         int result = underTest.getTotalMentionsForType("a", interval, ImmutableList.of(),
                                                        ImmutableList.of());
@@ -175,14 +176,14 @@ public class MentionableDAOTest {
         DateTime end = DateTime.now();
         DateTime start = end.minusDays(1);
 
-        underTest.persistValue(new EmojiEntity("a", 1, start.plusMillis(1), "u1", "r1"));
-        underTest.persistValue(new EmojiEntity("b", 1, start.plusMillis(2), "u1", "r2"));
-        underTest.persistValue(new EmojiEntity("c", 1, start.plusMillis(3), "u2", "r3"));
-        underTest.persistValue(new EmojiEntity("d", 1, start.plusMillis(4), "u1", "r4"));
-        underTest.persistValue(new EmojiEntity("e", 1, start.plusMillis(5), "u1", "r4"));
-        underTest.persistValue(new EmojiEntity("f", 1, start.plusMillis(6), "u1", "r5"));
-        underTest.persistValue(new EmojiEntity("g", 1, start.plusMillis(7), "u1", "r5"));
-        underTest.persistValue(new EmojiEntity("h", 1, start.plusMillis(8), "u1", "r5"));
+        underTest.persistValue(new EmojiEntity("u1", "r1", start.plusMillis(1), "a", 1));
+        underTest.persistValue(new EmojiEntity("u1", "r2", start.plusMillis(2), "b", 1));
+        underTest.persistValue(new EmojiEntity("u2", "r3", start.plusMillis(3), "c", 1));
+        underTest.persistValue(new EmojiEntity("u1", "r4", start.plusMillis(4), "d", 1));
+        underTest.persistValue(new EmojiEntity("u1", "r4", start.plusMillis(5), "e", 1));
+        underTest.persistValue(new EmojiEntity("u1", "r5", start.plusMillis(6), "f", 1));
+        underTest.persistValue(new EmojiEntity("u1", "r5", start.plusMillis(7), "g", 1));
+        underTest.persistValue(new EmojiEntity("u1", "r5", start.plusMillis(8), "h", 1));
 
         Interval interval = new Interval(start, end);
 
@@ -218,9 +219,9 @@ public class MentionableDAOTest {
         IMessageSummaryDAO msgSummaryDao =  ChatAlyticsDAOFactory.createMessageSummaryDAO(config);
         msgSummaryDao.startAsync().awaitRunning();
 
-        underTest.persistValue(new EmojiEntity("a", 1, start.plusMillis(1), "u1", "r1"));
-        underTest.persistValue(new EmojiEntity("c", 1, start.plusMillis(3), "u2", "r1"));
-        underTest.persistValue(new EmojiEntity("a", 1, start.plusMillis(4), "u1", "r2"));
+        underTest.persistValue(new EmojiEntity("u1", "r1", start.plusMillis(1), "a", 1));
+        underTest.persistValue(new EmojiEntity("u2", "r1", start.plusMillis(3), "c", 1));
+        underTest.persistValue(new EmojiEntity("u1", "r2", start.plusMillis(4), "a", 1));
 
         msgSummaryDao.persistMessageSummary(new MessageSummary("u1", "r1", start.plusMillis(1),
                                                                MessageType.MESSAGE, 1));

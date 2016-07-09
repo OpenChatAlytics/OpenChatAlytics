@@ -75,6 +75,8 @@ public class MessageSummaryDAOImplTest {
         assertEquals(1, existingMsgSummary.getOccurrences());
 
         // insert it again
+        msgSummary = new MessageSummary("test_user", "room2", mentionDate,
+                                        MessageType.PINNED_ITEM, 1);
         underTest.persistMessageSummary(msgSummary);
         existingMsgSummary = underTest.getMessageSummary(msgSummary);
         assertEquals(2, existingMsgSummary.getOccurrences());

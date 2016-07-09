@@ -45,10 +45,10 @@ public class EntityDAOImplTest {
         mentionDate = DateTime.now(DateTimeZone.UTC);
 
         // Insert a bunch of test values
-        underTest.persistEntity(new ChatEntity("entity1", 1, mentionDate, "giannis", "room1"));
-        underTest.persistEntity(new ChatEntity("entity2", 1, mentionDate, "giannis", "room1"));
-        underTest.persistEntity(new ChatEntity("entity1", 1, mentionDate, "giannis", "room2"));
-        underTest.persistEntity(new ChatEntity("entity1", 1, mentionDate, "jane", "room1"));
+        underTest.persistEntity(new ChatEntity("giannis", "room1", mentionDate, "entity1", 1));
+        underTest.persistEntity(new ChatEntity("giannis", "room1", mentionDate, "entity2", 1));
+        underTest.persistEntity(new ChatEntity("giannis", "room2", mentionDate, "entity1", 1));
+        underTest.persistEntity(new ChatEntity("jane", "room1", mentionDate, "entity1", 1));
 
         msgSummaryDao.persistMessageSummary(new MessageSummary("giannis", "room1", mentionDate,
                                                                MessageType.MESSAGE, 10));
@@ -59,13 +59,15 @@ public class EntityDAOImplTest {
 
     @Test
     public void testPersistEntity_withDuplicate() {
-        ChatEntity entity = new ChatEntity("test_value", 1, DateTime.now(), "user", "testroom");
+        DateTime mentionTime = DateTime.now();
+        ChatEntity entity = new ChatEntity("user", "testroom", mentionTime, "test_value", 1);
         underTest.persistEntity(entity);
         ChatEntity existingEntity = underTest.getEntity(entity);
         assertNotNull(existingEntity);
         assertEquals(1, existingEntity.getOccurrences());
 
         // insert it again
+        entity = new ChatEntity("user", "testroom", mentionTime, "test_value", 1);
         underTest.persistEntity(entity);
         existingEntity = underTest.getEntity(entity);
         assertEquals(2, existingEntity.getOccurrences());
