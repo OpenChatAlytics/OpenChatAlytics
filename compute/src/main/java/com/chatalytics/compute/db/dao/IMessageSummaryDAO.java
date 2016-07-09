@@ -38,7 +38,8 @@ public interface IMessageSummaryDAO extends Service {
      *            Optional username to return count for
      * @return The total count
      */
-    int getTotalMessageSummaries(Interval interval, Optional<String> roomName,
+    int getTotalMessageSummaries(Interval interval,
+                                 Optional<String> roomName,
                                  Optional<String> username);
 
     /**
@@ -55,6 +56,8 @@ public interface IMessageSummaryDAO extends Service {
      *            Optional username to return count for
      * @return The total count
      */
-    int getTotalMessageSummaries(MessageType type, Interval interval, Optional<String> roomName,
-                                 Optional<String> username);
+    int getTotalMessageSummariesForType(MessageType type,
+                                        Interval interval,
+                                        Optional<String> roomName,
+                                        Optional<String> username);
 }

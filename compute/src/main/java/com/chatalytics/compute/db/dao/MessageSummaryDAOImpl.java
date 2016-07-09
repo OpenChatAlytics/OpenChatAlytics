@@ -61,8 +61,10 @@ public class MessageSummaryDAOImpl extends AbstractIdleService implements IMessa
      * {@inheritDoc}
      */
     @Override
-    public int getTotalMessageSummaries(MessageType type, Interval interval,
-                                        Optional<String> roomName, Optional<String> username) {
+    public int getTotalMessageSummariesForType(MessageType type,
+                                               Interval interval,
+                                               Optional<String> roomName,
+                                               Optional<String> username) {
         return occurrenceStatsDAO.getTotalMentionsForType(type, interval, roomName, username);
     }
 
