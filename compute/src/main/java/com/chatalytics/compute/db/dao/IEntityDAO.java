@@ -144,8 +144,8 @@ public interface IEntityDAO extends Service {
       * @return A sorted map of top users to ratio
       */
      Map<String, Double> getActiveUsersByMethod(Interval interval,
-                                             ActiveMethod method,
-                                             int resultSize);
+                                                ActiveMethod method,
+                                                int resultSize);
 
     /**
       * Returns a sorted map of rooms to a ratio, where the ratio is one of {@link ActiveMethod}s
@@ -160,6 +160,6 @@ public interface IEntityDAO extends Service {
       * @return A sorted map of top room to ratio
       */
      Map<String, Double> getActiveRoomsByMethod(Interval interval,
-                                             ActiveMethod method,
-                                             int resultSize);
+                                                ActiveMethod method,
+                                                int resultSize);
 }

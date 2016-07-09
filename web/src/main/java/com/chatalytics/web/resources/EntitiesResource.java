@@ -126,6 +126,22 @@ public class EntitiesResource {
         }
     }
 
+    /**
+     * Gets the active users or rooms (or any other supported {@link DimensionType} using the
+     * selected {@link ActiveMethod} with the given parameters
+     *
+     * @param startTimeStr
+     *            The start time to get the summaries for
+     * @param endTimeStr
+     *            The end time to get the summaries for
+     * @param dimensionStr
+     *            The type to get activity for. See {@link DimensionType}
+     * @param methodStr
+     *            The method to use to compute activity. See {@link ActiveMethod}
+     * @param topNStr
+     *            The number of elements to return
+     * @return The most active user or room (or any other supported {@link DimensionType}
+     */
     @GET
     @Path("active")
     @Produces(MediaType.APPLICATION_JSON)
