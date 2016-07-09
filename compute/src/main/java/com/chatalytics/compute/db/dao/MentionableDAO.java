@@ -356,10 +356,11 @@ public class MentionableDAO<K extends Serializable, T extends IMentionable<K>>
         Selection<Long> occurrencesSumAlias = occurrencesSum.alias("occurrences_sum");
 
         // do where clause
-        List<Predicate> wherePredicates = Lists.newArrayListWithCapacity(4);
+        List<Predicate> wherePredicates = Lists.newArrayListWithCapacity(5);
         Path<DateTime> mentionTime = from.get("mentionTime");
         wherePredicates.add(cb.greaterThanOrEqualTo(mentionTime, startDateParam));
         wherePredicates.add(cb.lessThan(mentionTime, endDateParam));
+        wherePredicates.add(cb.isNotNull(typeValuePath));
 
         // Add the optional parameters
         if (!roomNames.isEmpty()) {
@@ -421,18 +422,19 @@ public class MentionableDAO<K extends Serializable, T extends IMentionable<K>>
         Root<T> totalFrom = totalQuery.from(type);
         totalQuery.select(cb.sum(totalFrom.get("occurrences")));
         Path<DateTime> totalMentionTime = totalFrom.get("mentionTime");
+        Path<String> columnPath = from.get(columnName);
         totalQuery.where(cb.greaterThanOrEqualTo(totalMentionTime, startDateParam),
-                         cb.lessThan(totalMentionTime, endDateParam));
+                         cb.lessThan(totalMentionTime, endDateParam),
+                         cb.isNotNull(columnPath));
 
         // occurrences / total occurrences
         Expression<Double> ratio = cb.quot(cb.sum(occurrences), totalQuery).as(Double.class);
 
-        Path<String> roomName = from.get(columnName);
-        query.multiselect(roomName, ratio);
+        query.multiselect(columnPath, ratio);
         Path<DateTime> mentionTime = from.get("mentionTime");
         query.where(cb.greaterThanOrEqualTo(mentionTime, startDateParam),
                     cb.lessThan(mentionTime, endDateParam));
-        query.groupBy(roomName);
+        query.groupBy(columnPath);
         query.orderBy(cb.desc(ratio));
         List<Tuple> resultList =
                 entityManagerFactory.createEntityManager()
@@ -447,7 +449,7 @@ public class MentionableDAO<K extends Serializable, T extends IMentionable<K>>
         // linked hashmap to preserve order
         Map<String, Double> result = Maps.newLinkedHashMap();
         for (Tuple tuple : resultList) {
-            result.put(tuple.get(roomName), tuple.get(ratio));
+            result.put(tuple.get(columnPath), tuple.get(ratio));
         }
         return result;
     }
@@ -475,19 +477,20 @@ public class MentionableDAO<K extends Serializable, T extends IMentionable<K>>
         totalQuery.select(cb.sum(totalFrom.get("occurrences")));
         Path<DateTime> totalMentionTime = totalFrom.get("mentionTime");
         Path<MessageType> messageType = totalFrom.get("value");
+        Path<String> columnPath = from.get(columnName);
         totalQuery.where(cb.greaterThanOrEqualTo(totalMentionTime, startDateParam),
                          cb.lessThan(totalMentionTime, endDateParam),
-                         cb.equal(messageType, MessageType.MESSAGE));
+                         cb.equal(messageType, MessageType.MESSAGE),
+                         cb.isNotNull(columnPath));
 
         // occurrences / total occurrences
         Expression<Double> ratio = cb.quot(cb.sum(occurrences), totalQuery).as(Double.class);
 
-        Path<String> roomName = from.get(columnName);
-        query.multiselect(roomName, ratio);
+        query.multiselect(columnPath, ratio);
         Path<DateTime> mentionTime = from.get("mentionTime");
         query.where(cb.greaterThanOrEqualTo(mentionTime, startDateParam),
                     cb.lessThan(mentionTime, endDateParam));
-        query.groupBy(roomName);
+        query.groupBy(columnPath);
         query.orderBy(cb.desc(ratio));
         List<Tuple> resultList =
                 entityManagerFactory.createEntityManager()
@@ -502,7 +505,7 @@ public class MentionableDAO<K extends Serializable, T extends IMentionable<K>>
         // linked hashmap to preserve order
         Map<String, Double> result = Maps.newLinkedHashMap();
         for (Tuple tuple : resultList) {
-            result.put(tuple.get(roomName), tuple.get(ratio));
+            result.put(tuple.get(columnPath), tuple.get(ratio));
         }
         return result;
     }
