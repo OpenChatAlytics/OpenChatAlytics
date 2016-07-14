@@ -15,10 +15,14 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Index;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = EmojiEntity.EMOJI_TABLE_NAME)
+@Table(name = EmojiEntity.EMOJI_TABLE_NAME,
+       indexes = {@Index(name = "idx_username", columnList = "username"),
+                  @Index(name = "idx_roomName", columnList = "roomName"),
+                  @Index(name = "idx_value", columnList = "value")})
 @EqualsAndHashCode
 @AllArgsConstructor
 @Setter(value = AccessLevel.PROTECTED) // for hibernate

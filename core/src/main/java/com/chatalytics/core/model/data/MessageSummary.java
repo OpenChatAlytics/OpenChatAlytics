@@ -13,6 +13,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Index;
 import javax.persistence.Table;
 
 /**
@@ -22,7 +23,10 @@ import javax.persistence.Table;
  * @author giannis
  */
 @Entity
-@Table(name = MessageSummary.MESSAGE_SUMMARY_TABLE_NAME)
+@Table(name = MessageSummary.MESSAGE_SUMMARY_TABLE_NAME,
+       indexes = {@Index(name = "idx_username", columnList = "username"),
+                  @Index(name = "idx_roomName", columnList = "roomName"),
+                  @Index(name = "idx_value", columnList = "value")})
 @EqualsAndHashCode
 @Setter(value = AccessLevel.PROTECTED) // for hibernate
 public class MessageSummary implements IMentionable<MessageType> {
