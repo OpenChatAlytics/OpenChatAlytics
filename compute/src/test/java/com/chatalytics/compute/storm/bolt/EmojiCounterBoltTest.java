@@ -179,6 +179,38 @@ public class EmojiCounterBoltTest {
     }
 
     @Test
+    public void testGetEmojisFromMessage_withSpaces() {
+        Message message = new Message(mentionTime, "randomFrom", "randomUserId",
+                                      String.format("::%s: test :%s:", emoji, emoji),
+                                      "randomRoomId", MessageType.MESSAGE);
+
+        FatMessage fatMessage = new FatMessage(message, user, room);
+
+        List<EmojiEntity> emojis = underTest.getEmojisFromMessage(fatMessage);
+
+        assertEquals(1, emojis.size());
+        EmojiEntity firstEmoji = emojis.get(0);
+        assertEquals(user.getMentionName(), firstEmoji.getUsername());
+        assertEquals(room.getName(), firstEmoji.getRoomName());
+        assertEquals(mentionTime, firstEmoji.getMentionTime());
+        assertEquals(emoji, firstEmoji.getValue());
+        assertEquals(2, firstEmoji.getOccurrences());
+    }
+
+    @Test
+    public void testGetEmojisFromMessage_withJSON() {
+        Message message = new Message(mentionTime, "randomFrom", "randomUserId",
+                                      "{'test':true,'value':'hello'}",
+                                      "randomRoomId", MessageType.MESSAGE);
+
+        FatMessage fatMessage = new FatMessage(message, user, room);
+
+        List<EmojiEntity> emojis = underTest.getEmojisFromMessage(fatMessage);
+
+        assertEquals(0, emojis.size());
+    }
+
+    @Test
     public void testDeclareOutputFields() {
         OutputFieldsDeclarer fields = mock(OutputFieldsDeclarer.class);
         underTest.declareOutputFields(fields);
