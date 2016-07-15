@@ -7,6 +7,7 @@ import com.chatalytics.core.model.data.EmojiEntity;
 import com.chatalytics.core.model.data.FatMessage;
 import com.chatalytics.core.model.data.Room;
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 
 import org.apache.storm.shade.com.google.common.collect.ImmutableList;
@@ -23,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 import java.util.Map;
 import java.util.PrimitiveIterator.OfInt;
+import java.util.Set;
 
 public class EmojiCounterBolt extends ChatAlyticsBaseBolt {
 
@@ -30,6 +32,8 @@ public class EmojiCounterBolt extends ChatAlyticsBaseBolt {
     public static final String BOLT_ID = "EMOJI_COUNTER_BOLT_ID";
     private static final String EMOJI_ENTITY_FIELD_STR = "emoji-entity";
     private static final Logger LOG = LoggerFactory.getLogger(EmojiCounterBolt.class);
+    private static Set<Character> BLACKLISTED_CHARS = ImmutableSet.of(' ', ',', '{', '}', '\t',
+                                                                      '\n', '/');
 
     private IEmojiDAO emojiDao;
     private OutputCollector collector;
@@ -82,6 +86,12 @@ public class EmojiCounterBolt extends ChatAlyticsBaseBolt {
                 // done capturing
                 if (capturingEmoji) {
 
+                    // There's another : right after so continue capturing from there but skip this
+                    if (emojiStrBuilder.length() <= 0) {
+                        emojiStrBuilder = new StringBuilder();
+                        continue;
+                    }
+
                     String emoji = emojiStrBuilder.toString();
 
                     EmojiEntity existingEmoji = emojis.remove(emoji);
@@ -104,7 +114,7 @@ public class EmojiCounterBolt extends ChatAlyticsBaseBolt {
             }
             if (capturingEmoji) {
 
-                if (ch == ' ' || ch == '\t' || ch == '\n' || ch == '/') {
+                if (BLACKLISTED_CHARS.contains(ch)) {
                     capturingEmoji = !capturingEmoji;
                     emojiStrBuilder = new StringBuilder();
                     continue;
