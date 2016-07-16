@@ -38,6 +38,22 @@ To stop the container run:
 To remove old containers run:
 `docker rm chatalytics`
 
+##Running with PostgreSQL
+install postgres on your computer. If you're running on MacOS you can type brew install postgres
+
+To initialize the database run:
+`initdb /mnt/postgres/chatalytics`
+
+Then start postgres by running
+`pg_ctl  start`
+
+You then need to create a user by running
+`createuser chat_user`
+
+Make sure you don't have a previous version of the database and re-create it by running:
+`dropdb chatalytics`
+`createdb chatalytics`
+
 ##Author
 Giannis Neokleous
 

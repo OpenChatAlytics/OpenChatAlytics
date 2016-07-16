@@ -131,6 +131,11 @@
         <artifactId>hibernate-core</artifactId>
         <version>5.1.0.Final</version>
       </dependency>
+      <dependency>
+        <groupId>org.hibernate</groupId>
+        <artifactId>hibernate-hikaricp</artifactId>
+        <version>5.1.0.Final</version>
+      </dependency>
 
       <dependency>
         <groupId>com.fasterxml.jackson.jaxrs</groupId>
@@ -169,6 +174,16 @@
         <groupId>com.h2database</groupId>
         <artifactId>h2</artifactId>
         <version>1.4.191</version>
+      </dependency>
+      <dependency>
+        <groupId>org.postgresql</groupId>
+        <artifactId>postgresql</artifactId>
+        <version>9.4.1208</version>
+      </dependency>
+      <dependency>
+        <groupId>com.zaxxer</groupId>
+        <artifactId>HikariCP</artifactId>
+        <version>2.4.7</version>
       </dependency>
       <dependency>
         <groupId>javax.websocket</groupId>
