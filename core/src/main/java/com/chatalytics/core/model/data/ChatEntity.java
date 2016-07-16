@@ -25,9 +25,9 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = ChatEntity.ENTITY_TABLE_NAME,
-indexes = {@Index(name = "idx_username", columnList = "username"),
-           @Index(name = "idx_roomName", columnList = "roomName"),
-           @Index(name = "idx_value", columnList = "value")})
+indexes = {@Index(name = "ce_idx_username", columnList = "username"),
+           @Index(name = "ce_idx_roomName", columnList = "roomName"),
+           @Index(name = "ce_idx_value", columnList = "value")})
 @EqualsAndHashCode
 @Setter(value = AccessLevel.PROTECTED) // for hibernate
 public class ChatEntity implements IMentionable<String> {

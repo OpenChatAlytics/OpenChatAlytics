@@ -525,11 +525,16 @@ public class MentionableDAO<K extends Serializable, T extends IMentionable<K>>
      * Closes the entity manager
      */
     private void closeEntityManager(EntityManager entityManager) {
+        if (!entityManager.isOpen()) {
+            return;
+        }
         try {
-            if (entityManager.isOpen() && entityManager.isJoinedToTransaction()) {
-                entityManager.flush();
-                entityManager.close();
-            }
+            entityManager.flush();
+        } catch (RuntimeException e) {
+            LOG.warn("Couldn't flush entity manager. Reason: {}", e.getMessage());
+        }
+        try {
+            entityManager.close();
         } catch (RuntimeException e) {
             LOG.warn("Couldn't close entity manager. Reason: {}", e.getMessage());
         }

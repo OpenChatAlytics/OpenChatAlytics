@@ -24,9 +24,9 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = MessageSummary.MESSAGE_SUMMARY_TABLE_NAME,
-       indexes = {@Index(name = "idx_username", columnList = "username"),
-                  @Index(name = "idx_roomName", columnList = "roomName"),
-                  @Index(name = "idx_value", columnList = "value")})
+       indexes = {@Index(name = "ms_idx_username", columnList = "username"),
+                  @Index(name = "ms_idx_roomName", columnList = "roomName"),
+                  @Index(name = "ms_idx_value", columnList = "value")})
 @EqualsAndHashCode
 @Setter(value = AccessLevel.PROTECTED) // for hibernate
 public class MessageSummary implements IMentionable<MessageType> {
