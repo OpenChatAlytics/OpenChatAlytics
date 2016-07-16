@@ -82,10 +82,10 @@ public class EmojisResource {
     @Path("trending")
     @Produces(MediaType.APPLICATION_JSON)
     public Map<String, Long> getTopEmojis(@QueryParam(START_TIME) String startTimeStr,
-                                 @QueryParam(END_TIME) String endTimeStr,
-                                 @QueryParam(USER) List<String> users,
-                                 @QueryParam(ROOM) List<String> rooms,
-                                 @QueryParam(TOP_N) String topNStr)
+                                          @QueryParam(END_TIME) String endTimeStr,
+                                          @QueryParam(USER) List<String> users,
+                                          @QueryParam(ROOM) List<String> rooms,
+                                          @QueryParam(TOP_N) String topNStr)
                     throws JsonGenerationException, JsonMappingException, IOException {
 
         LOG.debug("Got query for starttime={}, endtime={}, users={}, rooms={}",

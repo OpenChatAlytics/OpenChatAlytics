@@ -6,7 +6,6 @@ import com.chatalytics.core.ActiveMethod;
 import com.chatalytics.core.DimensionType;
 import com.chatalytics.core.config.ChatAlyticsConfig;
 import com.chatalytics.core.model.data.MessageSummary;
-import com.chatalytics.core.model.data.MessageType;
 import com.chatalytics.web.utils.DateTimeUtils;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
@@ -25,9 +24,14 @@ import java.util.Set;
 
 import javax.persistence.EntityManager;
 
+import static com.chatalytics.core.model.data.MessageType.BOT_MESSAGE;
+import static com.chatalytics.core.model.data.MessageType.CHANNEL_JOIN;
+import static com.chatalytics.core.model.data.MessageType.MESSAGE;
+import static com.chatalytics.core.model.data.MessageType.PINNED_ITEM;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+
 
 /**
  * Tests {@link MessageSummaryResource}
@@ -53,12 +57,12 @@ public class MessageSummaryResourceTest {
         mentionTime = DateTime.now().withZone(DateTimeZone.UTC);
 
         sums = Lists.newArrayList();
-        sums.add(new MessageSummary("u1", "r1", mentionTime.minus(1), MessageType.BOT_MESSAGE, 1));
-        sums.add(new MessageSummary("u2", "r1", mentionTime.minus(2), MessageType.MESSAGE, 1));
-        sums.add(new MessageSummary("u2", "r2", mentionTime.minus(3), MessageType.CHANNEL_JOIN, 1));
-        sums.add(new MessageSummary("u3", "r1", mentionTime.minus(4), MessageType.MESSAGE, 1));
-        sums.add(new MessageSummary("u3", "r2", mentionTime.minus(5), MessageType.CHANNEL_JOIN, 1));
-        sums.add(new MessageSummary("u3", "r3", mentionTime.minus(6), MessageType.PINNED_ITEM, 1));
+        sums.add(new MessageSummary("u1", "r1", mentionTime.minus(1), BOT_MESSAGE, 1, true));
+        sums.add(new MessageSummary("u2", "r1", mentionTime.minus(2), MESSAGE, 1, false));
+        sums.add(new MessageSummary("u2", "r2", mentionTime.minus(3), CHANNEL_JOIN, 1, false));
+        sums.add(new MessageSummary("u3", "r1", mentionTime.minus(4), MESSAGE, 1, false));
+        sums.add(new MessageSummary("u3", "r2", mentionTime.minus(5), CHANNEL_JOIN, 1, false));
+        sums.add(new MessageSummary("u3", "r3", mentionTime.minus(6), PINNED_ITEM, 1, false));
         storeTestMessageSummaries(sums);
 
         underTest = new MessageSummaryResource(config);
@@ -79,9 +83,9 @@ public class MessageSummaryResourceTest {
         }
 
         result = underTest.getAllMessageSummaries(startTimeStr, endTimeStr, null, null,
-                                                  MessageType.BOT_MESSAGE.toString());
+                                                  BOT_MESSAGE.toString());
         assertEquals(1, result.size());
-        assertEquals(MessageType.BOT_MESSAGE, result.get(0).getValue());
+        assertEquals(BOT_MESSAGE, result.get(0).getValue());
     }
 
     @Test
@@ -102,7 +106,7 @@ public class MessageSummaryResourceTest {
         assertEquals(3, result);
 
         result = underTest.getTotalMessageSummaries(startTimeStr, endTimeStr, null, null,
-                                                    MessageType.MESSAGE.toString());
+                                                    MESSAGE.toString());
         assertEquals(2, result);
     }
 
@@ -158,7 +162,7 @@ public class MessageSummaryResourceTest {
         String startTimeStr = dtf.print(mentionTime.minusDays(1));
         String endTimeStr = dtf.print(mentionTime.plusDays(1));
         underTest.getActive(startTimeStr, endTimeStr, DimensionType.EMOJI.toString(),
-                                ActiveMethod.ToTV.toString(), "10");
+                            ActiveMethod.ToTV.toString(), "10");
     }
 
     @After

@@ -26,7 +26,8 @@ import javax.persistence.Table;
 @Table(name = MessageSummary.MESSAGE_SUMMARY_TABLE_NAME,
        indexes = {@Index(name = "ms_idx_username", columnList = "username"),
                   @Index(name = "ms_idx_roomName", columnList = "roomName"),
-                  @Index(name = "ms_idx_value", columnList = "value")})
+                  @Index(name = "ms_idx_value", columnList = "value"),
+                  @Index(name = "ms_idx_bot", columnList = "bot")})
 @EqualsAndHashCode
 @Setter(value = AccessLevel.PROTECTED) // for hibernate
 public class MessageSummary implements IMentionable<MessageType> {
@@ -38,24 +39,27 @@ public class MessageSummary implements IMentionable<MessageType> {
     public static final String ROOM_NAME_COLUMN = "ROOM_NAME";
     public static final String USER_NAME_COLUMN = "USER_NAME";
     public static final String TYPE_COLUMN = "VALUE";
+    public static final String BOT_COLUMN = "BOT";
 
     private String username;
     private String roomName;
     private DateTime mentionTime;
     private MessageType value;
     private int occurrences;
+    private boolean bot;
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
 
     public MessageSummary(String username, String roomName, DateTime mentionTime,
-                          MessageType value, int occurrences) {
+                          MessageType value, int occurrences, boolean bot) {
         this.username = username;
         this.roomName = roomName;
         this.mentionTime = mentionTime;
         this.value = value;
         this.occurrences = occurrences;
+        this.bot = bot;
     }
 
     protected MessageSummary() {} // for jackson
@@ -91,6 +95,12 @@ public class MessageSummary implements IMentionable<MessageType> {
     }
 
     @Override
+    @Column(name = BOT_COLUMN)
+    public boolean isBot() {
+        return bot;
+    }
+
+    @Override
     public String toString() {
         return MoreObjects.toStringHelper(this.getClass())
                           .add("value", value)
@@ -98,6 +108,7 @@ public class MessageSummary implements IMentionable<MessageType> {
                           .add("mentionTime", mentionTime)
                           .add("username", username)
                           .add("roomName", roomName)
+                          .add("bot", bot)
                           .toString();
     }
 }

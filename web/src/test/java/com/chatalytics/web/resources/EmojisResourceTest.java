@@ -67,16 +67,16 @@ public class EmojisResourceTest {
 
         mentionTime = DateTime.now().withZone(DateTimeZone.UTC);
         emojis = Lists.newArrayListWithCapacity(10);
-        emojis.add(new EmojiEntity("u1", "r1", mentionTime.minusHours(1), "e1", 5));
-        emojis.add(new EmojiEntity("u2", "r1", mentionTime.minusHours(1), "e1", 4));
-        emojis.add(new EmojiEntity("u3", "r2", mentionTime.minusHours(2), "e1", 1));
-        emojis.add(new EmojiEntity("u4", "r3", mentionTime.minusHours(3), "e1", 1));
-        emojis.add(new EmojiEntity("u1", "r1", mentionTime.minusHours(1), "e2", 1));
-        emojis.add(new EmojiEntity("u2", "r1", mentionTime.minusHours(1), "e2", 6));
-        emojis.add(new EmojiEntity("u3", "r2", mentionTime.minusHours(2), "e2", 7));
-        emojis.add(new EmojiEntity("u2", "r2", mentionTime.minusHours(1), "e3", 3));
-        emojis.add(new EmojiEntity("u3", "r1", mentionTime.minusHours(2), "e3", 3));
-        emojis.add(new EmojiEntity("u1", "r4", mentionTime.minusHours(1), "e4", 3));
+        emojis.add(new EmojiEntity("u1", "r1", mentionTime.minusHours(1), "e1", 5, false));
+        emojis.add(new EmojiEntity("u2", "r1", mentionTime.minusHours(1), "e1", 4, false));
+        emojis.add(new EmojiEntity("u3", "r2", mentionTime.minusHours(2), "e1", 1, false));
+        emojis.add(new EmojiEntity("u4", "r3", mentionTime.minusHours(3), "e1", 1, false));
+        emojis.add(new EmojiEntity("u1", "r1", mentionTime.minusHours(1), "e2", 1, false));
+        emojis.add(new EmojiEntity("u2", "r1", mentionTime.minusHours(1), "e2", 6, false));
+        emojis.add(new EmojiEntity("u3", "r2", mentionTime.minusHours(2), "e2", 7, false));
+        emojis.add(new EmojiEntity("u2", "r2", mentionTime.minusHours(1), "e3", 3, false));
+        emojis.add(new EmojiEntity("u3", "r1", mentionTime.minusHours(2), "e3", 3, false));
+        emojis.add(new EmojiEntity("u1", "r4", mentionTime.minusHours(1), "e4", 3, false));
 
         storeTestEmojis(emojis);
         chatApiDao = mock(IChatApiDAO.class);

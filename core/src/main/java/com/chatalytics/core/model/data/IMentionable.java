@@ -20,6 +20,8 @@ public interface IMentionable<T extends Serializable> extends Serializable {
 
     public DateTime getMentionTime();
 
+    public boolean isBot();
+
     public int getOccurrences();
 
 }

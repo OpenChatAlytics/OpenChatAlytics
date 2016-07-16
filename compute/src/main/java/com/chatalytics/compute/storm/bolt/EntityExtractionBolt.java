@@ -132,7 +132,8 @@ public class EntityExtractionBolt extends ChatAlyticsBaseBolt {
                                                 roomName,
                                                 message.getDate(),
                                                 entity,
-                                                occurrences));
+                                                occurrences,
+                                                fatMessage.getUser().isBot()));
 
         }
 

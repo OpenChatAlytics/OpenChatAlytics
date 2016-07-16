@@ -25,9 +25,10 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = ChatEntity.ENTITY_TABLE_NAME,
-indexes = {@Index(name = "ce_idx_username", columnList = "username"),
-           @Index(name = "ce_idx_roomName", columnList = "roomName"),
-           @Index(name = "ce_idx_value", columnList = "value")})
+       indexes = {@Index(name = "ce_idx_username", columnList = "username"),
+                  @Index(name = "ce_idx_roomName", columnList = "roomName"),
+                  @Index(name = "ce_idx_value", columnList = "value"),
+                  @Index(name = "ce_idx_bot", columnList = "bot")})
 @EqualsAndHashCode
 @Setter(value = AccessLevel.PROTECTED) // for hibernate
 public class ChatEntity implements IMentionable<String> {
@@ -38,6 +39,7 @@ public class ChatEntity implements IMentionable<String> {
     public static final String MENTION_TIME_COLUMN = "MENTION_TIME";
     public static final String ROOM_NAME_COLUMN = "ROOM_NAME";
     public static final String USER_NAME_COLUMN = "USER_NAME";
+    public static final String BOT_COLUMN = "BOT";
 
     public static final long serialVersionUID = -4845804080646234255L;
 
@@ -46,18 +48,20 @@ public class ChatEntity implements IMentionable<String> {
     private DateTime mentionTime;
     private String value;
     private int occurrences;
+    private boolean bot;
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
 
     public ChatEntity(String username, String roomName, DateTime mentionTime,
-                      String value, int occurrences) {
+                      String value, int occurrences, boolean bot) {
         this.username = username;
         this.roomName = roomName;
         this.mentionTime = mentionTime;
         this.value = value;
         this.occurrences = occurrences;
+        this.bot = bot;
     }
 
     protected ChatEntity() {} // for jackson
@@ -94,6 +98,12 @@ public class ChatEntity implements IMentionable<String> {
     }
 
     @Override
+    @Column(name = BOT_COLUMN)
+    public boolean isBot() {
+        return bot;
+    }
+
+    @Override
     public String toString() {
         return MoreObjects.toStringHelper(this.getClass())
                           .add("value", value)
@@ -101,6 +111,7 @@ public class ChatEntity implements IMentionable<String> {
                           .add("mentionTime", mentionTime)
                           .add("username", username)
                           .add("roomName", roomName)
+                          .add("bot", bot)
                           .toString();
     }
 

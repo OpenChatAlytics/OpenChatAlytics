@@ -44,15 +44,18 @@ public class MessageSummaryBolt extends ChatAlyticsBaseBolt {
         FatMessage fatMessage = (FatMessage) input.getValue(0);
         String username = null;
         String roomName = null;
+        boolean isBot = true;
         if (fatMessage.getUser() != null) {
             username = fatMessage.getUser().getMentionName();
+            isBot = fatMessage.getUser().isBot();
         }
         if (fatMessage.getRoom() != null) {
             roomName = fatMessage.getRoom().getName();
         }
         DateTime messageDate = fatMessage.getMessage().getDate();
         MessageType type = fatMessage.getMessage().getType();
-        MessageSummary chatSummary = new MessageSummary(username, roomName, messageDate, type, 1);
+        MessageSummary chatSummary = new MessageSummary(username, roomName, messageDate, type, 1,
+                                                        isBot);
         collector.emit(new Values(chatSummary));
         messageSummaryDao.persistMessageSummary(chatSummary);
     }

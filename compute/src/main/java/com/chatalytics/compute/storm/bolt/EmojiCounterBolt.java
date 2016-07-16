@@ -106,7 +106,8 @@ public class EmojiCounterBolt extends ChatAlyticsBaseBolt {
                                                       roomName,
                                                       fatMessage.getMessage().getDate(),
                                                       emoji,
-                                                      occurrences));
+                                                      occurrences,
+                                                      fatMessage.getUser().isBot()));
                     emojiStrBuilder = new StringBuilder();
                 }
                 capturingEmoji = !capturingEmoji;

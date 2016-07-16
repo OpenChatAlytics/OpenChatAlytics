@@ -27,15 +27,15 @@ public class GraphPartitionTest {
     public void testGetMentionMatrix() {
         List<EmojiEntity> mentions = Lists.newArrayListWithCapacity(16);
         // make r1, r2 and r2 kind of similar
-        mentions.add(new EmojiEntity("u1", "r1", DateTime.now(), "a", 1));
-        mentions.add(new EmojiEntity("u1", "r2", DateTime.now(), "a", 1));
-        mentions.add(new EmojiEntity("u1", "r3", DateTime.now(), "a", 1));
+        mentions.add(new EmojiEntity("u1", "r1", DateTime.now(), "a", 1, false));
+        mentions.add(new EmojiEntity("u1", "r2", DateTime.now(), "a", 1, false));
+        mentions.add(new EmojiEntity("u1", "r3", DateTime.now(), "a", 1, false));
 
-        mentions.add(new EmojiEntity("u1", "r1", DateTime.now(), "b", 1));
-        mentions.add(new EmojiEntity("u1", "r2", DateTime.now(), "b", 1));
+        mentions.add(new EmojiEntity("u1", "r1", DateTime.now(), "b", 1, false));
+        mentions.add(new EmojiEntity("u1", "r2", DateTime.now(), "b", 1, false));
 
-        mentions.add(new EmojiEntity("u1", "r2", DateTime.now(), "c", 1));
-        mentions.add(new EmojiEntity("u1", "r3", DateTime.now(), "c", 1));
+        mentions.add(new EmojiEntity("u1", "r2", DateTime.now(), "c", 1, false));
+        mentions.add(new EmojiEntity("u1", "r3", DateTime.now(), "c", 1, false));
 
         LabeledMTJMatrix<String> result =
                 GraphPartition.getMentionMatrix(mentions,
@@ -52,8 +52,8 @@ public class GraphPartitionTest {
     public void testGetMentionMatrix_withNulls() {
         List<EmojiEntity> mentions = Lists.newArrayListWithCapacity(16);
         // throw in some null rooms and users
-        mentions.add(new EmojiEntity(null, "r2", DateTime.now().plus(1), "a", 1));
-        mentions.add(new EmojiEntity("u1", null, DateTime.now().plus(2), "a", 1));
+        mentions.add(new EmojiEntity(null, "r2", DateTime.now().plus(1), "a", 1, false));
+        mentions.add(new EmojiEntity("u1", null, DateTime.now().plus(2), "a", 1, false));
 
         LabeledMTJMatrix<String> result =
                 GraphPartition.getMentionMatrix(mentions,

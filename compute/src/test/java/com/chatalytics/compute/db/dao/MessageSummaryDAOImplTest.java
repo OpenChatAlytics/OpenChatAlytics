@@ -43,19 +43,19 @@ public class MessageSummaryDAOImplTest {
 
         // Insert a bunch of test values
         underTest.persistMessageSummary(new MessageSummary("user1", "room1", mentionDate,
-                                                           MessageType.MESSAGE, 1));
+                                                           MessageType.MESSAGE, 1, false));
         underTest.persistMessageSummary(new MessageSummary("user2", "room1", mentionDate,
-                                                           MessageType.MESSAGE, 1));
+                                                           MessageType.MESSAGE, 1, false));
         underTest.persistMessageSummary(new MessageSummary("user3", "room2", mentionDate,
-                                                           MessageType.PINNED_ITEM, 1));
+                                                           MessageType.PINNED_ITEM, 1, false));
         underTest.persistMessageSummary(new MessageSummary("user4", "room2", mentionDate,
-                                                           MessageType.CHANNEL_JOIN, 1));
+                                                           MessageType.CHANNEL_JOIN, 1, false));
     }
 
     @Test
     public void testGetMentionSummary() {
         MessageSummary msgSummary = new MessageSummary("user1", "room1", mentionDate,
-                                                       MessageType.MESSAGE, 0);
+                                                       MessageType.MESSAGE, 0, false);
         MessageSummary result = underTest.getMessageSummary(msgSummary);
         assertNotNull(result);
         assertEquals(msgSummary.getMentionTime(), result.getMentionTime());
@@ -68,7 +68,7 @@ public class MessageSummaryDAOImplTest {
     @Test
     public void testPersistValue_withDuplicate() {
         MessageSummary msgSummary = new MessageSummary("test_user", "room2", mentionDate,
-                                                       MessageType.PINNED_ITEM, 1);
+                                                       MessageType.PINNED_ITEM, 1, false);
         underTest.persistMessageSummary(msgSummary);
         MessageSummary existingMsgSummary = underTest.getMessageSummary(msgSummary);
         assertNotNull(existingMsgSummary);
@@ -76,7 +76,7 @@ public class MessageSummaryDAOImplTest {
 
         // insert it again
         msgSummary = new MessageSummary("test_user", "room2", mentionDate,
-                                        MessageType.PINNED_ITEM, 1);
+                                        MessageType.PINNED_ITEM, 1, false);
         underTest.persistMessageSummary(msgSummary);
         existingMsgSummary = underTest.getMessageSummary(msgSummary);
         assertEquals(2, existingMsgSummary.getOccurrences());
