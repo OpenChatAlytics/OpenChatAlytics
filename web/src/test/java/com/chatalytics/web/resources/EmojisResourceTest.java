@@ -94,21 +94,21 @@ public class EmojisResourceTest {
         Map<String, Long> response = underTest.getTopEmojis(startTimeStr, endTimeStr,
                                                             ImmutableList.of("u1"),
                                                             ImmutableList.of("r1"),
-                                                            null);
+                                                            null, null);
         Map<String, Long> expected = Maps.newHashMap();
         expected.put("e1", 5L);
         expected.put("e2", 1L);
         assertEquals(expected, response);
 
         response = underTest.getTopEmojis(startTimeStr, endTimeStr, ImmutableList.of("u1"),
-                                          null, null);
+                                          null, null, null);
         expected.clear();
         expected.put("e1", 5L);
         expected.put("e4", 3L);
         expected.put("e2", 1L);
         assertEquals(expected, response);
 
-        response = underTest.getTopEmojis(startTimeStr, endTimeStr, null, null, null);
+        response = underTest.getTopEmojis(startTimeStr, endTimeStr, null, null, null, null);
         expected.clear();
         expected.put("e2", 14L);
         expected.put("e1", 11L);
@@ -122,7 +122,8 @@ public class EmojisResourceTest {
         DateTimeFormatter dtf = DateTimeUtils.PARAMETER_WITH_DAY_DTF.withZone(dtZone);
         String startTimeStr = dtf.print(mentionTime.minusDays(1));
         String endTimeStr = dtf.print(mentionTime.plusDays(1));
-        List<EmojiEntity> result = underTest.getAllEmojis(startTimeStr, endTimeStr, null, null);
+        List<EmojiEntity> result = underTest.getAllEmojis(startTimeStr, endTimeStr, null, null,
+                                                          null);
         assertEquals(emojis.size(), result.size());
 
         Set<EmojiEntity> resultEmojiSet = Sets.newHashSet(result);
@@ -142,7 +143,7 @@ public class EmojisResourceTest {
 
         LabeledDenseMatrix<String> ldm = underTest.getSimilarities(
                 startTimeStr, endTimeStr, DimensionType.ROOM.getDimensionName(),
-                DimensionType.EMOJI.getDimensionName());
+                DimensionType.EMOJI.getDimensionName(), null);
         assertEquals(4, ldm.getLabels().size());
         assertEquals(4, ldm.getMatrix().length);
     }
@@ -158,7 +159,7 @@ public class EmojisResourceTest {
 
         LabeledDenseMatrix<String> ldm = underTest.getSimilarities(
                 startTimeStr, endTimeStr, DimensionType.USER.getDimensionName(),
-                DimensionType.EMOJI.getDimensionName());
+                DimensionType.EMOJI.getDimensionName(), null);
         assertEquals(4, ldm.getLabels().size());
         assertEquals(4, ldm.getMatrix().length);
     }
@@ -170,7 +171,7 @@ public class EmojisResourceTest {
         String endTimeStr = dtf.print(mentionTime.plusDays(1));
         underTest.getSimilarities(startTimeStr, endTimeStr,
                                   DimensionType.ROOM.getDimensionName(),
-                                  DimensionType.ROOM.getDimensionName());
+                                  DimensionType.ROOM.getDimensionName(), "true");
     }
 
     @Test
@@ -180,7 +181,8 @@ public class EmojisResourceTest {
         String endTimeStr = dtf.print(mentionTime.plusDays(1));
         Map<String, Double> scores = underTest.getActive(startTimeStr, endTimeStr,
                                                          DimensionType.USER.toString(),
-                                                         ActiveMethod.ToTV.toString(), "10");
+                                                         ActiveMethod.ToTV.toString(), "10",
+                                                         "true");
 
         assertFalse(scores.isEmpty());
     }
@@ -192,7 +194,8 @@ public class EmojisResourceTest {
         String endTimeStr = dtf.print(mentionTime.plusDays(1));
         Map<String, Double> scores = underTest.getActive(startTimeStr, endTimeStr,
                                                          DimensionType.ROOM.toString(),
-                                                         ActiveMethod.ToTV.toString(), "10");
+                                                         ActiveMethod.ToTV.toString(), "10",
+                                                         "true");
 
         assertFalse(scores.isEmpty());
     }
@@ -204,7 +207,8 @@ public class EmojisResourceTest {
         String endTimeStr = dtf.print(mentionTime.plusDays(1));
         Map<String, Double> scores = underTest.getActive(startTimeStr, endTimeStr,
                                                          DimensionType.USER.toString(),
-                                                         ActiveMethod.ToMV.toString(), "10");
+                                                         ActiveMethod.ToMV.toString(), "10",
+                                                         "true");
         assertFalse(scores.isEmpty());
     }
 
@@ -215,7 +219,8 @@ public class EmojisResourceTest {
         String endTimeStr = dtf.print(mentionTime.plusDays(1));
         Map<String, Double> scores =  underTest.getActive(startTimeStr, endTimeStr,
                                                           DimensionType.ROOM.toString(),
-                                                          ActiveMethod.ToMV.toString(), "10");
+                                                          ActiveMethod.ToMV.toString(), "10",
+                                                          "true");
         assertFalse(scores.isEmpty());
     }
 
@@ -225,7 +230,7 @@ public class EmojisResourceTest {
         String startTimeStr = dtf.print(mentionTime.minusDays(1));
         String endTimeStr = dtf.print(mentionTime.plusDays(1));
         underTest.getActive(startTimeStr, endTimeStr, DimensionType.EMOJI.toString(),
-                                ActiveMethod.ToTV.toString(), "10");
+                                ActiveMethod.ToTV.toString(), "10", "true");
     }
 
     @Test

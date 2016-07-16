@@ -87,7 +87,8 @@ public class MessageSummaryDAOImplTest {
         Interval interval = new Interval(mentionDate.minusDays(1),  mentionDate.plusDays(1));
         List<MessageSummary> result = underTest.getAllMessageSummaries(interval,
                                                                        ImmutableList.of("room1"),
-                                                                       ImmutableList.of("user1"));
+                                                                       ImmutableList.of("user1"),
+                                                                       true);
         assertEquals(1, result.size());
     }
 
@@ -104,8 +105,10 @@ public class MessageSummaryDAOImplTest {
     @Test
     public void testGetTotalMessageSummaries() {
         Interval interval = new Interval(mentionDate.minusDays(1),  mentionDate.plusDays(1));
-        int result = underTest.getTotalMessageSummaries(interval, ImmutableList.of(),
-                                                        ImmutableList.of());
+        int result = underTest.getTotalMessageSummaries(interval,
+                                                        ImmutableList.of(),
+                                                        ImmutableList.of(),
+                                                        true);
         assertEquals(4, result);
     }
 
@@ -113,8 +116,10 @@ public class MessageSummaryDAOImplTest {
     public void testGetTotalMessageSummariesForType_withValue() {
         Interval interval = new Interval(mentionDate.minusDays(1),  mentionDate.plusDays(1));
         int result = underTest.getTotalMessageSummariesForType(MessageType.MESSAGE,
-                                                        interval, ImmutableList.of(),
-                                                        ImmutableList.of());
+                                                               interval,
+                                                               ImmutableList.of(),
+                                                               ImmutableList.of(),
+                                                               true);
         assertEquals(2, result);
     }
 
@@ -123,12 +128,12 @@ public class MessageSummaryDAOImplTest {
         Interval interval = new Interval(mentionDate.minusMillis(1), mentionDate.plusMillis(1));
 
         Map<String, Double> result =
-                underTest.getActiveRoomsByMethod(interval, ActiveMethod.ToTV, 10);
+                underTest.getActiveRoomsByMethod(interval, ActiveMethod.ToTV, 10, true);
         assertEquals(2, result.size());
         assertEquals(0.5, result.get("room1"), 0);
         assertEquals(0.5, result.get("room2"), 0);
 
-        result = underTest.getActiveRoomsByMethod(interval, ActiveMethod.ToMV, 10);
+        result = underTest.getActiveRoomsByMethod(interval, ActiveMethod.ToMV, 10, true);
         assertEquals(2, result.size());
         assertEquals(1.0, result.get("room1"), 0);
         assertEquals(1.0, result.get("room2"), 0);
@@ -139,14 +144,14 @@ public class MessageSummaryDAOImplTest {
         Interval interval = new Interval(mentionDate.minusMillis(1), mentionDate.plusMillis(1));
 
         Map<String, Double> result =
-                underTest.getActiveUsersByMethod(interval, ActiveMethod.ToTV, 10);
+                underTest.getActiveUsersByMethod(interval, ActiveMethod.ToTV, 10, true);
         assertEquals(4, result.size());
         assertEquals(0.25, result.get("user1"), 0);
         assertEquals(0.25, result.get("user2"), 0);
         assertEquals(0.25, result.get("user3"), 0);
         assertEquals(0.25, result.get("user4"), 0);
 
-        result = underTest.getActiveUsersByMethod(interval, ActiveMethod.ToMV, 10);
+        result = underTest.getActiveUsersByMethod(interval, ActiveMethod.ToMV, 10, true);
         assertEquals(4, result.size());
         assertEquals(0.5, result.get("user1"), 0);
         assertEquals(0.5, result.get("user2"), 0);

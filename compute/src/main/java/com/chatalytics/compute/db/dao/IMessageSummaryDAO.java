@@ -51,22 +51,25 @@ public interface IMessageSummaryDAO extends Service {
                                                         List<String> roomNames,
                                                         List<String> usernames);
 
-     /**
-      * Returns all the mention occurrences for an entity inside the given <code>interval</code>.
-      *
-      * @param interval
-      *            The interval of interest. Note that the query is inclusive of the start time and
-      *            exclusive of the end time.
-      * @param roomNames
+    /**
+     * Returns all the mention occurrences for an entity inside the given <code>interval</code>.
+     *
+     * @param interval
+     *            The interval of interest. Note that the query is inclusive of the start time and
+     *            exclusive of the end time.
+     * @param roomNames
      *            Optionally supply a list of room names. This list can be empty
-      * @param usernames
+     * @param usernames
      *            Optionally supply a list of user names. This list can be empty
-      * @return A list of {@link ChatEntity} representing all the times this entity was mentioned
-      *         in the given time period
-      */
-      List<MessageSummary> getAllMessageSummaries(Interval interval,
-                                                  List<String> roomNames,
-                                                  List<String> usernames);
+     * @param withBots
+     *            Set to true if the result should include mentions by bots
+     * @return A list of {@link ChatEntity} representing all the times this entity was mentioned
+     *         in the given time period
+     */
+    List<MessageSummary> getAllMessageSummaries(Interval interval,
+                                                List<String> roomNames,
+                                                List<String> usernames,
+                                                boolean withBots);
 
     /**
      * Gets the total number of message summaries in the given time period with username and room
@@ -78,11 +81,14 @@ public interface IMessageSummaryDAO extends Service {
      *            Optionally supply a list of room names. This list can be empty
      * @param usernames
      *            Optionally supply a list of user names. This list can be empty
+     * @param withBots
+     *            Set to true if the result should include mentions by bots
      * @return The total count
      */
     int getTotalMessageSummaries(Interval interval,
                                  List<String> roomNames,
-                                 List<String> usernames);
+                                 List<String> usernames,
+                                 boolean withBots);
 
     /**
      * Gets the total number of message summaries for a given type in the given time period with
@@ -96,12 +102,15 @@ public interface IMessageSummaryDAO extends Service {
      *            Optionally supply a list of room names. This list can be empty
      * @param usernames
      *            Optionally supply a list of user names. This list can be empty
+     * @param withBots
+     *            Set to true if the result should include mentions by bots
      * @return The total count
      */
     int getTotalMessageSummariesForType(MessageType type,
                                         Interval interval,
                                         List<String> roomNames,
-                                        List<String> usernames);
+                                        List<String> usernames,
+                                        boolean withBots);
 
     /**
      * Returns a sorted map of users to a ratio, where the ratio is one of {@link ActiveMethod}s
@@ -113,11 +122,14 @@ public interface IMessageSummaryDAO extends Service {
      *            The method to compute top users for
      * @param resultSize
      *            The result size
+     * @param withBots
+     *            Set to true if the result should include mentions by bots
      * @return A sorted map of top users to ratio
      */
     Map<String, Double> getActiveUsersByMethod(Interval interval,
                                                ActiveMethod method,
-                                               int resultSize);
+                                               int resultSize,
+                                               boolean withBots);
 
    /**
      * Returns a sorted map of rooms to a ratio, where the ratio is one of {@link ActiveMethod}s
@@ -129,9 +141,12 @@ public interface IMessageSummaryDAO extends Service {
      *            The method to compute top users for
      * @param resultSize
      *            The result size
+     * @param withBots
+     *            Set to true if the result should include mentions by bots
      * @return A sorted map of top room to ratio
      */
     Map<String, Double> getActiveRoomsByMethod(Interval interval,
                                                ActiveMethod method,
-                                               int resultSize);
+                                               int resultSize,
+                                               boolean withBots);
 }

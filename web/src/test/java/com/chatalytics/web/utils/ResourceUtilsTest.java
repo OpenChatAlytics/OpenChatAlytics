@@ -37,4 +37,30 @@ public class ResourceUtilsTest {
         List<String> test = Lists.newArrayList("a", "b");
         assertEquals(test, ResourceUtils.getListFromNullable(test));
     }
+
+    @Test
+    public void testGetOptionalForParameterAsInt() {
+        Optional<Integer> result = ResourceUtils.getOptionalForParameterAsInt(null);
+        assertEquals(Optional.absent(), result);
+
+        result = ResourceUtils.getOptionalForParameterAsInt("");
+        assertEquals(Optional.absent(), result);
+
+        int value = 2;
+        result = ResourceUtils.getOptionalForParameterAsInt(Integer.toString(value));
+        assertEquals(value, result.get().intValue());
+    }
+
+    @Test
+    public void testGetOptionalForParameterAsBool() {
+        Optional<Boolean> result = ResourceUtils.getOptionalForParameterAsBool(null);
+        assertEquals(Optional.absent(), result);
+
+        result = ResourceUtils.getOptionalForParameterAsBool("");
+        assertEquals(Optional.absent(), result);
+
+        boolean value = false;
+        result = ResourceUtils.getOptionalForParameterAsBool(Boolean.toString(value));
+        assertEquals(value, result.get().booleanValue());
+    }
 }

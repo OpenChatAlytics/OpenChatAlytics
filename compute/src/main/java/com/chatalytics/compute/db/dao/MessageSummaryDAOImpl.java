@@ -56,8 +56,9 @@ public class MessageSummaryDAOImpl extends AbstractIdleService implements IMessa
     @Override
     public List<MessageSummary> getAllMessageSummaries(Interval interval,
                                                        List<String> roomNames,
-                                                       List<String> usernames) {
-        return occurrenceStatsDAO.getAllMentions(interval, roomNames, usernames);
+                                                       List<String> usernames,
+                                                       boolean withBots) {
+        return occurrenceStatsDAO.getAllMentions(interval, roomNames, usernames, withBots);
     }
 
     /**
@@ -65,8 +66,8 @@ public class MessageSummaryDAOImpl extends AbstractIdleService implements IMessa
      */
     @Override
     public int getTotalMessageSummaries(Interval interval, List<String> roomNames,
-                                        List<String> usernames) {
-        return occurrenceStatsDAO.getTotalMentionsOfType(interval, roomNames, usernames);
+                                        List<String> usernames, boolean withBots) {
+        return occurrenceStatsDAO.getTotalMentionsOfType(interval, roomNames, usernames, withBots);
     }
 
     /**
@@ -76,18 +77,23 @@ public class MessageSummaryDAOImpl extends AbstractIdleService implements IMessa
     public int getTotalMessageSummariesForType(MessageType type,
                                                Interval interval,
                                                List<String> roomNames,
-                                               List<String> usernames) {
-        return occurrenceStatsDAO.getTotalMentionsForType(type, interval, roomNames, usernames);
+                                               List<String> usernames,
+                                               boolean withBots) {
+        return occurrenceStatsDAO.getTotalMentionsForType(type, interval, roomNames, usernames,
+                                                          withBots);
     }
 
     @Override
     public Map<String, Double> getActiveUsersByMethod(Interval interval,
                                                       ActiveMethod method,
-                                                      int resultSize) {
+                                                      int resultSize,
+                                                      boolean withBots) {
         if (method == ActiveMethod.ToTV) {
-            return occurrenceStatsDAO.getActiveColumnsByToTV("username", interval, resultSize);
+            return occurrenceStatsDAO.getActiveColumnsByToTV("username", interval, resultSize,
+                                                             withBots);
         } else if (method == ActiveMethod.ToMV) {
-            return occurrenceStatsDAO.getActiveColumnsByToMV("username", interval, resultSize);
+            return occurrenceStatsDAO.getActiveColumnsByToMV("username", interval, resultSize,
+                                                             withBots);
         } else {
             throw new UnsupportedOperationException(String.format("Method %s not supported",
                                                                   method));
@@ -97,11 +103,14 @@ public class MessageSummaryDAOImpl extends AbstractIdleService implements IMessa
     @Override
     public Map<String, Double> getActiveRoomsByMethod(Interval interval,
                                                       ActiveMethod method,
-                                                      int resultSize) {
+                                                      int resultSize,
+                                                      boolean withBots) {
         if (method == ActiveMethod.ToTV) {
-            return occurrenceStatsDAO.getActiveColumnsByToTV("roomName", interval, resultSize);
+            return occurrenceStatsDAO.getActiveColumnsByToTV("roomName", interval, resultSize,
+                                                             withBots);
         } else if (method == ActiveMethod.ToMV) {
-            return occurrenceStatsDAO.getActiveColumnsByToMV("roomName", interval, resultSize);
+            return occurrenceStatsDAO.getActiveColumnsByToMV("roomName", interval, resultSize,
+                                                             withBots);
         } else {
             throw new UnsupportedOperationException(String.format("Method %s not supported",
                                                                   method));

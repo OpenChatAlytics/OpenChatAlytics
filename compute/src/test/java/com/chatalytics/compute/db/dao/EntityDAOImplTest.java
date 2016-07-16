@@ -85,20 +85,26 @@ public class EntityDAOImplTest {
         assertEquals(0, underTest.getTotalMentionsForEntity("unknownentity",
                                                             timeInterval,
                                                             ImmutableList.of(),
-                                                            ImmutableList.of()));
+                                                            ImmutableList.of(),
+                                                            true));
 
         // make sure that the sums are correct for a bunch of different queries
         int result = underTest.getTotalMentionsForEntity("e1", timeInterval,
-                                                          ImmutableList.of(), ImmutableList.of());
+                                                          ImmutableList.of(),
+                                                          ImmutableList.of(),
+                                                          true);
         assertEquals(3, result);
 
         result = underTest.getTotalMentionsForEntity("e1", timeInterval,
-                                                     ImmutableList.of("room1"), ImmutableList.of());
+                                                     ImmutableList.of("room1"),
+                                                     ImmutableList.of(),
+                                                     true);
         assertEquals(2, result);
 
         result = underTest.getTotalMentionsForEntity("e1", timeInterval,
                                                      ImmutableList.of("room1"),
-                                                     ImmutableList.of("giannis"));
+                                                     ImmutableList.of("giannis"),
+                                                     true);
         assertEquals(1, result);
     }
 
@@ -129,16 +135,22 @@ public class EntityDAOImplTest {
     @Test
     public void testGetAllMentions() {
         Interval timeInterval = new Interval(mentionDate, mentionDate.plusHours(3));
-        List<ChatEntity> result = underTest.getAllMentions(timeInterval, ImmutableList.of(),
-                                                           ImmutableList.of());
+        List<ChatEntity> result = underTest.getAllMentions(timeInterval,
+                                                           ImmutableList.of(),
+                                                           ImmutableList.of(),
+                                                           true);
         assertEquals(4, result.size());
 
-        result = underTest.getAllMentions(timeInterval, ImmutableList.of("room1"),
-                                          ImmutableList.of());
+        result = underTest.getAllMentions(timeInterval,
+                                          ImmutableList.of("room1"),
+                                          ImmutableList.of(),
+                                          true);
         assertEquals(3, result.size());
 
-        result = underTest.getAllMentions(timeInterval, ImmutableList.of("room1"),
-                                          ImmutableList.of("giannis"));
+        result = underTest.getAllMentions(timeInterval,
+                                          ImmutableList.of("room1"),
+                                          ImmutableList.of("giannis"),
+                                          true);
         assertEquals(2, result.size());
     }
 
@@ -146,19 +158,20 @@ public class EntityDAOImplTest {
     public void testGetTopEntities() {
         Interval timeInterval = new Interval(mentionDate, mentionDate.plusHours(3));
         Map<String, Long> result =
-            underTest.getTopEntities(timeInterval, ImmutableList.of(), ImmutableList.of(), 10);
+            underTest.getTopEntities(timeInterval, ImmutableList.of(), ImmutableList.of(), 10,
+                                     true);
         assertEquals(2, result.size());
         assertEquals(3L, result.get("e1").longValue());
         assertEquals(1L, result.get("e2").longValue());
 
         result = underTest.getTopEntities(timeInterval, ImmutableList.of("room1"),
-                                          ImmutableList.of(), 10);
+                                          ImmutableList.of(), 10, true);
         assertEquals(2, result.size());
         assertEquals(2L, result.get("e1").longValue());
         assertEquals(1L, result.get("e2").longValue());
 
         result = underTest.getTopEntities(timeInterval, ImmutableList.of("room1"),
-                                          ImmutableList.of("giannis"), 10);
+                                          ImmutableList.of("giannis"), 10, true);
         assertEquals(2, result.size());
         assertEquals(1L, result.get("e1").longValue());
         assertEquals(1L, result.get("e2").longValue());
@@ -167,7 +180,8 @@ public class EntityDAOImplTest {
     @Test
     public void testGetRoomSimilaritiesByEntity() {
         Interval timeInterval = new Interval(mentionDate, mentionDate.plusHours(3));
-        LabeledDenseMatrix<String> result = underTest.getRoomSimilaritiesByEntity(timeInterval);
+        LabeledDenseMatrix<String> result = underTest.getRoomSimilaritiesByEntity(timeInterval,
+                                                                                  true);
         assertEquals(2, result.getLabels().size());
         assertEquals(2, result.getMatrix().length);
     }
@@ -175,7 +189,8 @@ public class EntityDAOImplTest {
     @Test
     public void testGetUserSimilaritiesByEntity() {
         Interval timeInterval = new Interval(mentionDate, mentionDate.plusHours(3));
-        LabeledDenseMatrix<String> result = underTest.getUserSimilaritiesByEntity(timeInterval);
+        LabeledDenseMatrix<String> result = underTest.getUserSimilaritiesByEntity(timeInterval,
+                                                                                  true);
         assertEquals(2, result.getLabels().size());
         assertEquals(2, result.getMatrix().length);
     }
@@ -185,12 +200,12 @@ public class EntityDAOImplTest {
         Interval interval = new Interval(mentionDate.minusMillis(1), mentionDate.plusMillis(1));
 
         Map<String, Double> result =
-                underTest.getActiveRoomsByMethod(interval, ActiveMethod.ToTV, 10);
+                underTest.getActiveRoomsByMethod(interval, ActiveMethod.ToTV, 10, true);
         assertEquals(2, result.size());
         assertEquals(0.75, result.get("room1"), 0);
         assertEquals(0.25, result.get("room2"), 0);
 
-        result = underTest.getActiveRoomsByMethod(interval, ActiveMethod.ToMV, 10);
+        result = underTest.getActiveRoomsByMethod(interval, ActiveMethod.ToMV, 10, true);
         assertEquals(2, result.size());
         assertEquals(0.15, result.get("room1"), 0);
         assertEquals(0.05, result.get("room2"), 0);
@@ -201,12 +216,12 @@ public class EntityDAOImplTest {
         Interval interval = new Interval(mentionDate.minusMillis(1), mentionDate.plusMillis(1));
 
         Map<String, Double> result =
-                underTest.getActiveUsersByMethod(interval, ActiveMethod.ToTV, 10);
+                underTest.getActiveUsersByMethod(interval, ActiveMethod.ToTV, 10, true);
         assertEquals(2, result.size());
         assertEquals(0.75, result.get("giannis"), 0);
         assertEquals(0.25, result.get("jane"), 0);
 
-        result = underTest.getActiveUsersByMethod(interval, ActiveMethod.ToMV, 10);
+        result = underTest.getActiveUsersByMethod(interval, ActiveMethod.ToMV, 10, true);
         assertEquals(2, result.size());
         assertEquals(0.15, result.get("giannis"), 0);
         assertEquals(0.05, result.get("jane"), 0);

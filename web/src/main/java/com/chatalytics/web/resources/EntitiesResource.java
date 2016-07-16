@@ -12,7 +12,6 @@ import com.chatalytics.web.utils.DateTimeUtils;
 import com.chatalytics.web.utils.ResourceUtils;
 import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.databind.JsonMappingException;
-import com.google.common.base.Optional;
 
 import org.joda.time.DateTimeZone;
 import org.joda.time.Interval;
@@ -29,6 +28,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
+import static com.chatalytics.web.constant.WebConstants.BOT;
 import static com.chatalytics.web.constant.WebConstants.END_TIME;
 import static com.chatalytics.web.constant.WebConstants.ROOM;
 import static com.chatalytics.web.constant.WebConstants.START_TIME;
@@ -68,18 +68,20 @@ public class EntitiesResource {
                                                @QueryParam(END_TIME) String endTimeStr,
                                                @QueryParam(USER) List<String> users,
                                                @QueryParam(ROOM) List<String> rooms,
-                                               @QueryParam(TOP_N) String topNStr)
+                                               @QueryParam(TOP_N) String topNStr,
+                                               @QueryParam(BOT) String botStr)
                     throws JsonGenerationException, JsonMappingException, IOException {
 
-        LOG.debug("Got trending topics query for starttime={}, endtime={}, users={}, rooms={}",
-                  startTimeStr, endTimeStr, users, rooms);
+        LOG.debug("Trending topics query for starttime={}, endtime={}, users={}, rooms={}, botStr={}",
+                  startTimeStr, endTimeStr, users, rooms, botStr);
 
-        Optional<Integer> topN = ResourceUtils.getOptionalForParameterAsInt(topNStr);
+        int topN = ResourceUtils.getOptionalForParameterAsInt(topNStr).or(MAX_RESULTS);
+        boolean withBots = ResourceUtils.getOptionalForParameterAsBool(botStr).or(false);
         Interval interval = DateTimeUtils.getIntervalFromParameters(startTimeStr, endTimeStr, dtz);
         users = ResourceUtils.getListFromNullable(users);
         rooms = ResourceUtils.getListFromNullable(rooms);
 
-        return entityDao.getTopEntities(interval, rooms, users, topN.or(MAX_RESULTS));
+        return entityDao.getTopEntities(interval, rooms, users, topN, withBots);
     }
 
     @GET
@@ -87,16 +89,18 @@ public class EntitiesResource {
     public List<ChatEntity> getAllEntites(@QueryParam(START_TIME) String startTimeStr,
                                           @QueryParam(END_TIME) String endTimeStr,
                                           @QueryParam(USER) List<String> users,
-                                          @QueryParam(ROOM) List<String> rooms) {
+                                          @QueryParam(ROOM) List<String> rooms,
+                                          @QueryParam(BOT) String botStr) {
 
-        LOG.debug("Got all entities query for starttime={}, endtime={}, users={}, rooms={}",
+        LOG.debug("All entities query for starttime={}, endtime={}, users={}, rooms={}, botStr={}",
                   startTimeStr, endTimeStr, users, rooms);
 
         Interval interval = DateTimeUtils.getIntervalFromParameters(startTimeStr, endTimeStr, dtz);
+        boolean withBots = ResourceUtils.getOptionalForParameterAsBool(botStr).or(false);
         users = ResourceUtils.getListFromNullable(users);
         rooms = ResourceUtils.getListFromNullable(rooms);
 
-        return entityDao.getAllMentions(interval, rooms, users);
+        return entityDao.getAllMentions(interval, rooms, users, withBots);
     }
 
     @GET
@@ -106,19 +110,21 @@ public class EntitiesResource {
             @QueryParam(START_TIME) String startTimeStr,
             @QueryParam(END_TIME) String endTimeStr,
             @QueryParam(FIRST_SIMILARITY_DIM) String firstDimStr,
-            @QueryParam(SECOND_SIMILARITY_DIM) String secondDimStr) {
+            @QueryParam(SECOND_SIMILARITY_DIM) String secondDimStr,
+            @QueryParam(BOT) String botStr) {
 
-        LOG.debug("Got a call for dimensions {} and {} with starttime={}, endtime={}",
-                  firstDimStr, secondDimStr, startTimeStr, endTimeStr);
+        LOG.debug("Got a call for dimensions {} and {} with starttime={} endtime={} botStr={}",
+                  firstDimStr, secondDimStr, startTimeStr, endTimeStr, botStr);
 
         DimensionType firstDim = DimensionType.fromDimensionName(firstDimStr);
         DimensionType secondDim = DimensionType.fromDimensionName(secondDimStr);
         Interval interval = DateTimeUtils.getIntervalFromParameters(startTimeStr, endTimeStr, dtz);
+        boolean withBots = ResourceUtils.getOptionalForParameterAsBool(botStr).or(false);
 
         if (firstDim == DimensionType.ROOM && secondDim == DimensionType.ENTITY) {
-            return entityDao.getRoomSimilaritiesByEntity(interval);
+            return entityDao.getRoomSimilaritiesByEntity(interval, withBots);
         } else if (firstDim == DimensionType.USER && secondDim == DimensionType.ENTITY) {
-            return entityDao.getUserSimilaritiesByEntity(interval);
+            return entityDao.getUserSimilaritiesByEntity(interval, withBots);
         } else {
             String formatStr = "The dimension combination you specified (%s, %s) is not supported";
             throw new UnsupportedOperationException(String.format(formatStr, firstDimStr,
@@ -140,6 +146,9 @@ public class EntitiesResource {
      *            The method to use to compute activity. See {@link ActiveMethod}
      * @param topNStr
      *            The number of elements to return
+     * @param botStr
+     *            Set to true to include bots in computations. Defaults to false.
+     *
      * @return The most active user or room (or any other supported {@link DimensionType}
      */
     @GET
@@ -149,17 +158,19 @@ public class EntitiesResource {
                                          @QueryParam(END_TIME) String endTimeStr,
                                          @QueryParam(DIM) String dimensionStr,
                                          @QueryParam(METHOD) String methodStr,
-                                         @QueryParam(TOP_N) String topNStr) {
+                                         @QueryParam(TOP_N) String topNStr,
+                                         @QueryParam(BOT) String botStr) {
 
         Interval interval = DateTimeUtils.getIntervalFromParameters(startTimeStr, endTimeStr, dtz);
         DimensionType dimension = DimensionType.fromDimensionName(dimensionStr);
         ActiveMethod method = ActiveMethod.fromMethodName(methodStr);
-        Optional<Integer> topN = ResourceUtils.getOptionalForParameterAsInt(topNStr);
+        int topN = ResourceUtils.getOptionalForParameterAsInt(topNStr).or(MAX_RESULTS);
+        boolean withBots = ResourceUtils.getOptionalForParameterAsBool(botStr).or(false);
 
         if (dimension == DimensionType.ROOM) {
-            return entityDao.getActiveRoomsByMethod(interval, method, topN.or(MAX_RESULTS));
+            return entityDao.getActiveRoomsByMethod(interval, method, topN, withBots);
         } else if (dimension == DimensionType.USER) {
-            return entityDao.getActiveUsersByMethod(interval, method, topN.or(MAX_RESULTS));
+            return entityDao.getActiveUsersByMethod(interval, method, topN, withBots);
         } else {
             String formatMsg = "The dimension %s you provided is not supported. Pass in %s or %s";
             throw new UnsupportedOperationException(String.format(formatMsg, dimensionStr,

@@ -36,6 +36,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
+import static com.chatalytics.web.constant.WebConstants.BOT;
 import static com.chatalytics.web.constant.WebConstants.END_TIME;
 import static com.chatalytics.web.constant.WebConstants.ROOM;
 import static com.chatalytics.web.constant.WebConstants.START_TIME;
@@ -85,19 +86,21 @@ public class EmojisResource {
                                           @QueryParam(END_TIME) String endTimeStr,
                                           @QueryParam(USER) List<String> users,
                                           @QueryParam(ROOM) List<String> rooms,
-                                          @QueryParam(TOP_N) String topNStr)
+                                          @QueryParam(TOP_N) String topNStr,
+                                          @QueryParam(BOT) String botStr)
                     throws JsonGenerationException, JsonMappingException, IOException {
 
-        LOG.debug("Got query for starttime={}, endtime={}, users={}, rooms={}",
-                  startTimeStr, endTimeStr, users, rooms);
+        LOG.debug("Got query for starttime={} endtime={} users={} rooms={} botStr={}",
+                  startTimeStr, endTimeStr, users, rooms, botStr);
 
         users = ResourceUtils.getListFromNullable(users);
         rooms = ResourceUtils.getListFromNullable(rooms);
         Optional<Integer> topN = ResourceUtils.getOptionalForParameterAsInt(topNStr);
+        boolean withBots = ResourceUtils.getOptionalForParameterAsBool(botStr).or(false);
 
         Interval interval = DateTimeUtils.getIntervalFromParameters(startTimeStr, endTimeStr, dtz);
 
-        return emojiDao.getTopEmojis(interval, rooms, users, topN.or(MAX_RESULTS));
+        return emojiDao.getTopEmojis(interval, rooms, users, topN.or(MAX_RESULTS), withBots);
     }
 
     @GET
@@ -105,13 +108,15 @@ public class EmojisResource {
     public List<EmojiEntity> getAllEmojis(@QueryParam(START_TIME) String startTimeStr,
                                           @QueryParam(END_TIME) String endTimeStr,
                                           @QueryParam(USER) List<String> users,
-                                          @QueryParam(ROOM) List<String> rooms) {
+                                          @QueryParam(ROOM) List<String> rooms,
+                                          @QueryParam(BOT) String botStr) {
 
         Interval interval = DateTimeUtils.getIntervalFromParameters(startTimeStr, endTimeStr, dtz);
         users = ResourceUtils.getListFromNullable(users);
         rooms = ResourceUtils.getListFromNullable(rooms);
+        boolean withBots = ResourceUtils.getOptionalForParameterAsBool(botStr).or(false);
 
-        return emojiDao.getAllMentions(interval, rooms, users);
+        return emojiDao.getAllMentions(interval, rooms, users, withBots);
     }
 
     @GET
@@ -121,19 +126,21 @@ public class EmojisResource {
             @QueryParam(START_TIME) String startTimeStr,
             @QueryParam(END_TIME) String endTimeStr,
             @QueryParam(FIRST_SIMILARITY_DIM) String firstDimStr,
-            @QueryParam(SECOND_SIMILARITY_DIM) String secondDimStr) {
+            @QueryParam(SECOND_SIMILARITY_DIM) String secondDimStr,
+            @QueryParam(BOT) String botStr) {
 
-        LOG.debug("Got a call for dimensions {} and {} with starttime={}, endtime={}",
-                  firstDimStr, secondDimStr, startTimeStr, endTimeStr);
+        LOG.debug("Got a call for dimensions {} and {} with starttime={} endtime={} botStr={}",
+                  firstDimStr, secondDimStr, startTimeStr, endTimeStr, botStr);
 
         DimensionType firstDim = DimensionType.fromDimensionName(firstDimStr);
         DimensionType secondDim = DimensionType.fromDimensionName(secondDimStr);
         Interval interval = DateTimeUtils.getIntervalFromParameters(startTimeStr, endTimeStr, dtz);
+        boolean withBots = ResourceUtils.getOptionalForParameterAsBool(botStr).or(false);
 
         if (firstDim == DimensionType.ROOM && secondDim == DimensionType.EMOJI) {
-            return emojiDao.getRoomSimilaritiesByEmoji(interval);
+            return emojiDao.getRoomSimilaritiesByEmoji(interval, withBots);
         } else if (firstDim == DimensionType.USER && secondDim == DimensionType.EMOJI) {
-            return emojiDao.getUserSimilaritiesByEmoji(interval);
+            return emojiDao.getUserSimilaritiesByEmoji(interval, withBots);
         } else {
             String formatStr = "The dimension combination you specified (%s, %s) is not supported";
             throw new UnsupportedOperationException(String.format(formatStr, firstDimStr,
@@ -148,17 +155,19 @@ public class EmojisResource {
                                          @QueryParam(END_TIME) String endTimeStr,
                                          @QueryParam(DIM) String dimensionStr,
                                          @QueryParam(METHOD) String methodStr,
-                                         @QueryParam(TOP_N) String topNStr) {
+                                         @QueryParam(TOP_N) String topNStr,
+                                         @QueryParam(BOT) String botStr) {
 
         Interval interval = DateTimeUtils.getIntervalFromParameters(startTimeStr, endTimeStr, dtz);
         DimensionType dimension = DimensionType.fromDimensionName(dimensionStr);
         ActiveMethod method = ActiveMethod.fromMethodName(methodStr);
-        Optional<Integer> topN = ResourceUtils.getOptionalForParameterAsInt(topNStr);
+        int topN = ResourceUtils.getOptionalForParameterAsInt(topNStr).or(MAX_RESULTS);
+        boolean withBots = ResourceUtils.getOptionalForParameterAsBool(botStr).or(false);
 
         if (dimension == DimensionType.ROOM) {
-            return emojiDao.getActiveRoomsByMethod(interval, method, topN.or(MAX_RESULTS));
+            return emojiDao.getActiveRoomsByMethod(interval, method, topN, withBots);
         } else if (dimension == DimensionType.USER) {
-            return emojiDao.getActiveUsersByMethod(interval, method, topN.or(MAX_RESULTS));
+            return emojiDao.getActiveUsersByMethod(interval, method, topN, withBots);
         } else {
             String formatMsg = "The dimension %s you provided is not supported. Pass in %s or %s";
             throw new UnsupportedOperationException(String.format(formatMsg, dimensionStr,
