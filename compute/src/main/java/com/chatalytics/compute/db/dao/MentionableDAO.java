@@ -104,9 +104,9 @@ public class MentionableDAO<K extends Serializable, T extends IMentionable<K>>
 
             Path<String> username = from.get("username");
             Path<String> roomName = from.get("roomName");
-            Path<String> mentionTime = from.get("mentionTime");
-            Path<String> isBot = from.get("bot");
-            Path<String> type = from.get(TYPE_COLUMN_NAME);
+            Path<DateTime> mentionTime = from.get("mentionTime");
+            Path<Boolean> isBot = from.get("bot");
+            Path<K> type = from.get(TYPE_COLUMN_NAME);
 
             Expression<Integer> sum = cb.sum(from.get("occurrences")).as(Integer.class);
             query.multiselect(username.alias("username"),
@@ -144,7 +144,8 @@ public class MentionableDAO<K extends Serializable, T extends IMentionable<K>>
     @Override
     public List<T> getAllMentionsForValue(K value, Interval interval,
                                           List<String> roomNames, List<String> usernames) {
-        return internalGetAllMentionsForValue(Optional.of(value), interval, roomNames, usernames);
+        return internalGetAllMentionsForValue(Optional.of(value), interval, roomNames, usernames,
+                                              true);
     }
 
     /**
@@ -152,14 +153,17 @@ public class MentionableDAO<K extends Serializable, T extends IMentionable<K>>
      */
     @Override
     public List<T> getAllMentions(Interval interval, List<String> roomNames,
-                                  List<String> usernames) {
-        return internalGetAllMentionsForValue(Optional.absent(), interval, roomNames, usernames);
+                                  List<String> usernames,
+                                  boolean withBots) {
+        return internalGetAllMentionsForValue(Optional.absent(), interval, roomNames, usernames,
+                                              withBots);
     }
 
     public List<T> internalGetAllMentionsForValue(Optional<K> value,
                                                   Interval interval,
                                                   List<String> roomNames,
-                                                  List<String> usernames) {
+                                                  List<String> usernames,
+                                                  boolean withBots) {
         EntityManager entityManager = entityManagerFactory.createEntityManager();
 
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
@@ -168,10 +172,13 @@ public class MentionableDAO<K extends Serializable, T extends IMentionable<K>>
         ParameterExpression<DateTime> startDateParam = cb.parameter(DateTime.class);
         ParameterExpression<DateTime> endDateParam = cb.parameter(DateTime.class);
 
-        List<Predicate> wherePredicates = Lists.newArrayListWithCapacity(5);
+        List<Predicate> wherePredicates = Lists.newArrayListWithCapacity(6);
         Path<DateTime> mentionTime = from.get("mentionTime");
         wherePredicates.add(cb.greaterThanOrEqualTo(mentionTime, startDateParam));
         wherePredicates.add(cb.lessThan(mentionTime, endDateParam));
+        if (!withBots) {
+            wherePredicates.add(cb.equal(from.get("bot"), withBots));
+        }
 
         // Add the optional parameters
         ParameterExpression<K> valueParam = null;
@@ -219,21 +226,26 @@ public class MentionableDAO<K extends Serializable, T extends IMentionable<K>>
      * {@inheritDoc}
      */
     @Override
-    public LabeledDenseMatrix<String> getRoomSimilaritiesByValue(Interval interval) {
-        return internalGetSimilaritiesByValue(interval, mention -> mention.getRoomName());
+    public LabeledDenseMatrix<String> getRoomSimilaritiesByValue(Interval interval,
+                                                                 boolean withBots) {
+        return internalGetSimilaritiesByValue(interval, mention -> mention.getRoomName(), withBots);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public LabeledDenseMatrix<String> getUserSimilaritiesByValue(Interval interval) {
-        return internalGetSimilaritiesByValue(interval, mention -> mention.getUsername());
+    public LabeledDenseMatrix<String> getUserSimilaritiesByValue(Interval interval,
+                                                                 boolean withBots) {
+        return internalGetSimilaritiesByValue(interval, mention -> mention.getUsername(), withBots);
     }
 
     private <X extends Serializable> LabeledDenseMatrix<X>
-            internalGetSimilaritiesByValue(Interval interval, Function<T, X> funcX) {
-        List<T> mentions = getAllMentions(interval, ImmutableList.of(), ImmutableList.of());
+            internalGetSimilaritiesByValue(Interval interval,
+                                           Function<T, X> funcX,
+                                           boolean withBots) {
+        List<T> mentions = getAllMentions(interval, ImmutableList.of(), ImmutableList.of(),
+                                          withBots);
 
         if (mentions.isEmpty()) {
             return LabeledDenseMatrix.of();
@@ -251,8 +263,9 @@ public class MentionableDAO<K extends Serializable, T extends IMentionable<K>>
      */
     @Override
     public int getTotalMentionsForType(K value, Interval interval, List<String> roomNames,
-                                       List<String> usernames) {
-        return internalGetTotalMentions(interval, Optional.of(value), roomNames, usernames);
+                                       List<String> usernames, boolean withBots) {
+        return internalGetTotalMentions(interval, Optional.of(value), roomNames, usernames,
+                                        withBots);
     }
 
     /**
@@ -261,14 +274,17 @@ public class MentionableDAO<K extends Serializable, T extends IMentionable<K>>
     @Override
     public int getTotalMentionsOfType(Interval interval,
                                       List<String> roomNames,
-                                      List<String> usernames) {
-        return internalGetTotalMentions(interval, Optional.absent(), roomNames, usernames);
+                                      List<String> usernames,
+                                      boolean withBots) {
+        return internalGetTotalMentions(interval, Optional.absent(), roomNames, usernames,
+                                        withBots);
     }
 
     private int internalGetTotalMentions(Interval interval,
                                         Optional<K> value,
                                         List<String> roomNames,
-                                        List<String> usernames) {
+                                        List<String> usernames,
+                                        boolean withBots) {
         EntityManager entityManager = entityManagerFactory.createEntityManager();
 
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
@@ -280,7 +296,7 @@ public class MentionableDAO<K extends Serializable, T extends IMentionable<K>>
 
         query.select(sum.alias("occurrences"));
 
-        List<Predicate> wherePredicates = Lists.newArrayListWithCapacity(5);
+        List<Predicate> wherePredicates = Lists.newArrayListWithCapacity(6);
 
         ParameterExpression<K> valueParam = null;
         if (value.isPresent()) {
@@ -293,7 +309,9 @@ public class MentionableDAO<K extends Serializable, T extends IMentionable<K>>
         Path<DateTime> mentionTime = from.get("mentionTime");
         wherePredicates.add(cb.greaterThanOrEqualTo(mentionTime, startDateParam));
         wherePredicates.add(cb.lessThan(mentionTime, endDateParam));
-
+        if (!withBots) {
+            wherePredicates.add(cb.equal(from.get("bot"), withBots));
+        }
         // Add the optional parameters
         if (!roomNames.isEmpty()) {
             In<String> in = cb.in(from.get("roomName"));
@@ -339,7 +357,8 @@ public class MentionableDAO<K extends Serializable, T extends IMentionable<K>>
     public Map<K, Long> getTopValuesOfType(Interval interval,
                                            List<String> roomNames,
                                            List<String> usernames,
-                                           int resultSize) {
+                                           int resultSize,
+                                           boolean withBots) {
 
         EntityManager entityManager = entityManagerFactory.createEntityManager();
 
@@ -358,12 +377,14 @@ public class MentionableDAO<K extends Serializable, T extends IMentionable<K>>
         Selection<Long> occurrencesSumAlias = occurrencesSum.alias("occurrences_sum");
 
         // do where clause
-        List<Predicate> wherePredicates = Lists.newArrayListWithCapacity(5);
+        List<Predicate> wherePredicates = Lists.newArrayListWithCapacity(6);
         Path<DateTime> mentionTime = from.get("mentionTime");
         wherePredicates.add(cb.greaterThanOrEqualTo(mentionTime, startDateParam));
         wherePredicates.add(cb.lessThan(mentionTime, endDateParam));
         wherePredicates.add(cb.isNotNull(typeValuePath));
-
+        if (!withBots) {
+            wherePredicates.add(cb.equal(from.get("bot"), withBots));
+        }
         // Add the optional parameters
         if (!roomNames.isEmpty()) {
             In<String> in = cb.in(from.get("roomName"));
@@ -407,7 +428,7 @@ public class MentionableDAO<K extends Serializable, T extends IMentionable<K>>
      */
     @Override
     public Map<String, Double> getActiveColumnsByToTV(String columnName, Interval interval,
-                                                      int resultSize) {
+                                                      int resultSize, boolean withBots) {
 
         EntityManager entityManager = entityManagerFactory.createEntityManager();
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
@@ -424,8 +445,14 @@ public class MentionableDAO<K extends Serializable, T extends IMentionable<K>>
         Root<T> totalFrom = totalQuery.from(type);
         totalQuery.select(cb.sum(totalFrom.get("occurrences")));
         Path<DateTime> totalMentionTime = totalFrom.get("mentionTime");
-        totalQuery.where(cb.greaterThanOrEqualTo(totalMentionTime, startDateParam),
-                         cb.lessThan(totalMentionTime, endDateParam));
+
+        List<Predicate> wherePredicates = Lists.newArrayListWithCapacity(3);
+        wherePredicates.add(cb.greaterThanOrEqualTo(totalMentionTime, startDateParam));
+        wherePredicates.add(cb.lessThan(totalMentionTime, endDateParam));
+        if (!withBots) {
+            wherePredicates.add(cb.equal(totalFrom.get("bot"), withBots));
+        }
+        totalQuery.where(wherePredicates.toArray(new Predicate[wherePredicates.size()]));
 
         // occurrences / total occurrences
         Expression<Double> ratio = cb.quot(cb.sum(occurrences), totalQuery).as(Double.class);
@@ -433,9 +460,16 @@ public class MentionableDAO<K extends Serializable, T extends IMentionable<K>>
         Path<String> columnPath = from.get(columnName);
         query.multiselect(columnPath, ratio);
         Path<DateTime> mentionTime = from.get("mentionTime");
-        query.where(cb.greaterThanOrEqualTo(mentionTime, startDateParam),
-                    cb.lessThan(mentionTime, endDateParam),
-                    cb.isNotNull(columnPath));
+
+        wherePredicates = Lists.newArrayListWithCapacity(4);
+        wherePredicates.add(cb.greaterThanOrEqualTo(mentionTime, startDateParam));
+        wherePredicates.add(cb.lessThan(mentionTime, endDateParam));
+        wherePredicates.add(cb.isNotNull(columnPath));
+        if (!withBots) {
+            wherePredicates.add(cb.equal(from.get("bot"), withBots));
+        }
+
+        query.where(wherePredicates.toArray(new Predicate[wherePredicates.size()]));
         query.groupBy(columnPath);
         query.orderBy(cb.desc(ratio));
         List<Tuple> resultList =
@@ -461,7 +495,7 @@ public class MentionableDAO<K extends Serializable, T extends IMentionable<K>>
      */
     @Override
     public Map<String, Double> getActiveColumnsByToMV(String columnName, Interval interval,
-                                                      int resultSize) {
+                                                      int resultSize, boolean withBots) {
 
         EntityManager entityManager = entityManagerFactory.createEntityManager();
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
@@ -479,9 +513,15 @@ public class MentionableDAO<K extends Serializable, T extends IMentionable<K>>
         totalQuery.select(cb.sum(totalFrom.get("occurrences")));
         Path<DateTime> totalMentionTime = totalFrom.get("mentionTime");
         Path<MessageType> messageType = totalFrom.get("value");
-        totalQuery.where(cb.greaterThanOrEqualTo(totalMentionTime, startDateParam),
-                         cb.lessThan(totalMentionTime, endDateParam),
-                         cb.equal(messageType, MessageType.MESSAGE));
+
+        List<Predicate> wherePredicates = Lists.newArrayListWithCapacity(4);
+        wherePredicates.add(cb.greaterThanOrEqualTo(totalMentionTime, startDateParam));
+        wherePredicates.add(cb.lessThan(totalMentionTime, endDateParam));
+        wherePredicates.add(cb.equal(messageType, MessageType.MESSAGE));
+        if (!withBots) {
+            wherePredicates.add(cb.equal(totalFrom.get("bot"), withBots));
+        }
+        totalQuery.where(wherePredicates.toArray(new Predicate[wherePredicates.size()]));
 
         // occurrences / total occurrences
         Expression<Double> ratio = cb.quot(cb.sum(occurrences), totalQuery).as(Double.class);
@@ -489,8 +529,16 @@ public class MentionableDAO<K extends Serializable, T extends IMentionable<K>>
 
         query.multiselect(columnPath, ratio);
         Path<DateTime> mentionTime = from.get("mentionTime");
-        query.where(cb.greaterThanOrEqualTo(mentionTime, startDateParam),
-                    cb.lessThan(mentionTime, endDateParam), cb.isNotNull(columnPath));
+
+        wherePredicates = Lists.newArrayListWithCapacity(4);
+        wherePredicates.add(cb.greaterThanOrEqualTo(mentionTime, startDateParam));
+        wherePredicates.add(cb.lessThan(mentionTime, endDateParam));
+        wherePredicates.add(cb.isNotNull(columnPath));
+        if (!withBots) {
+            wherePredicates.add(cb.equal(from.get("bot"), withBots));
+        }
+        query.where(wherePredicates.toArray(new Predicate[wherePredicates.size()]));
+
         query.groupBy(columnPath);
         query.orderBy(cb.desc(ratio));
         List<Tuple> resultList =

@@ -26,6 +26,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
+import static com.chatalytics.web.constant.WebConstants.BOT;
 import static com.chatalytics.web.constant.WebConstants.END_TIME;
 import static com.chatalytics.web.constant.WebConstants.ROOM;
 import static com.chatalytics.web.constant.WebConstants.START_TIME;
@@ -71,6 +72,9 @@ public class MessageSummaryResource {
      *            The room to query for (optional)
      * @param msgTypeStr
      *            The type of the message. See {@link MessageType} for more info (optional)
+     * @param botStr
+     *            Set to true to include bots in computations. Defaults to false.
+     *
      * @return Returns all the {@link MessageSummary}s based on the given parameters.
      */
     @GET
@@ -79,21 +83,23 @@ public class MessageSummaryResource {
                                                        @QueryParam(END_TIME) String endTimeStr,
                                                        @QueryParam(USER) List<String> users,
                                                        @QueryParam(ROOM) List<String> rooms,
-                                                       @QueryParam(MESSAGE_TYPE) String msgTypeStr) {
+                                                       @QueryParam(MESSAGE_TYPE) String msgTypeStr,
+                                                       @QueryParam(BOT) String botStr) {
 
-        LOG.debug("Got a call for msg summaries with starttime={} endtime={} users={} rooms={}",
-                  startTimeStr, endTimeStr, users, rooms);
+        LOG.debug("Call for msg summaries with starttime={} endtime={} users={} rooms={} botStr={}",
+                  startTimeStr, endTimeStr, users, rooms, botStr);
 
         Interval interval = DateTimeUtils.getIntervalFromParameters(startTimeStr, endTimeStr, dtz);
         users = ResourceUtils.getListFromNullable(users);
         rooms = ResourceUtils.getListFromNullable(rooms);
+        boolean withBots = ResourceUtils.getOptionalForParameterAsBool(botStr).or(false);
 
         Optional<String> optMessageType = ResourceUtils.getOptionalForParameter(msgTypeStr);
         if (optMessageType.isPresent()) {
             MessageType msgType = MessageType.fromType(optMessageType.get());
             return msgSummaryDao.getAllMessageSummariesForType(msgType, interval, rooms, users);
         } else {
-            return msgSummaryDao.getAllMessageSummaries(interval, rooms, users);
+            return msgSummaryDao.getAllMessageSummaries(interval, rooms, users, withBots);
         }
     }
 
@@ -111,6 +117,9 @@ public class MessageSummaryResource {
      *            The room to query for (optional)
      * @param msgTypeStr
      *            The type of the message. See {@link MessageType} for more info (optional)
+     * @param botStr
+     *            Set to true to include bots in computations. Defaults to false.
+     *
      * @return Returns the total number of {@link MessageSummary}s based on the given parameters.
      */
     @GET
@@ -120,20 +129,23 @@ public class MessageSummaryResource {
                                         @QueryParam(END_TIME) String endTimeStr,
                                         @QueryParam(USER) List<String> users,
                                         @QueryParam(ROOM) List<String> rooms,
-                                        @QueryParam(MESSAGE_TYPE) String msgTypeStr) {
+                                        @QueryParam(MESSAGE_TYPE) String msgTypeStr,
+                                        @QueryParam(BOT) String botStr) {
 
-        LOG.debug("Got total message summaries with starttime={} endtime={} users={} rooms={}",
-                  startTimeStr, endTimeStr, users, rooms);
+        LOG.debug("Total msg summaries with starttime={} endtime={} users={} rooms={}, botStr={}",
+                  startTimeStr, endTimeStr, users, rooms, botStr);
 
         Interval interval = DateTimeUtils.getIntervalFromParameters(startTimeStr, endTimeStr, dtz);
         users = ResourceUtils.getListFromNullable(users);
         rooms = ResourceUtils.getListFromNullable(rooms);
+        boolean withBots = ResourceUtils.getOptionalForParameterAsBool(botStr).or(false);
         Optional<String> optMessageType = ResourceUtils.getOptionalForParameter(msgTypeStr);
         if (optMessageType.isPresent()) {
             MessageType msgType = MessageType.fromType(optMessageType.get());
-            return msgSummaryDao.getTotalMessageSummariesForType(msgType, interval, rooms, users);
+            return msgSummaryDao.getTotalMessageSummariesForType(msgType, interval, rooms, users,
+                                                                 withBots);
         } else {
-            return msgSummaryDao.getTotalMessageSummaries(interval, rooms, users);
+            return msgSummaryDao.getTotalMessageSummaries(interval, rooms, users, withBots);
         }
     }
 
@@ -151,6 +163,9 @@ public class MessageSummaryResource {
      *            The method to use to compute activity. See {@link ActiveMethod}
      * @param topNStr
      *            The number of elements to return
+     * @param botStr
+     *            Set to true to include bots in computations. Defaults to false.
+     *
      * @return The most active user or room (or any other supported {@link DimensionType}
      */
     @GET
@@ -160,17 +175,19 @@ public class MessageSummaryResource {
                                          @QueryParam(END_TIME) String endTimeStr,
                                          @QueryParam(DIM) String dimensionStr,
                                          @QueryParam(METHOD) String methodStr,
-                                         @QueryParam(TOP_N) String topNStr) {
+                                         @QueryParam(TOP_N) String topNStr,
+                                         @QueryParam(BOT) String botStr) {
 
         Interval interval = DateTimeUtils.getIntervalFromParameters(startTimeStr, endTimeStr, dtz);
         DimensionType dimension = DimensionType.fromDimensionName(dimensionStr);
         ActiveMethod method = ActiveMethod.fromMethodName(methodStr);
-        Optional<Integer> topN = ResourceUtils.getOptionalForParameterAsInt(topNStr);
+        int topN = ResourceUtils.getOptionalForParameterAsInt(topNStr).or(MAX_RESULTS);
+        boolean withBots = ResourceUtils.getOptionalForParameterAsBool(botStr).or(false);
 
         if (dimension == DimensionType.ROOM) {
-            return msgSummaryDao.getActiveRoomsByMethod(interval, method, topN.or(MAX_RESULTS));
+            return msgSummaryDao.getActiveRoomsByMethod(interval, method, topN, withBots);
         } else if (dimension == DimensionType.USER) {
-            return msgSummaryDao.getActiveUsersByMethod(interval, method, topN.or(MAX_RESULTS));
+            return msgSummaryDao.getActiveUsersByMethod(interval, method, topN, withBots);
         } else {
             String formatMsg = "The dimension %s you provided is not supported. Pass in %s or %s";
             throw new UnsupportedOperationException(String.format(formatMsg, dimensionStr,

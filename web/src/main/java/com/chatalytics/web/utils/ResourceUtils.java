@@ -49,6 +49,22 @@ public class ResourceUtils {
     }
 
     /**
+     * Helper method that returns an {@link Optional} with the value set if the parameter is not
+     * null or non-empty.
+     *
+     * @param parameterStr
+     *            The parameter to create the {@link Optional} for.
+     * @return An {@link Optional} with the value set or absent appropriately.
+     */
+    public static Optional<Boolean> getOptionalForParameterAsBool(String parameterStr) {
+        if (parameterStr == null || parameterStr.isEmpty()) {
+            return Optional.absent();
+        } else {
+            return Optional.of(Boolean.parseBoolean(parameterStr));
+        }
+    }
+
+    /**
      * Checks to see if the passed in list is null. If it is it creates an empty one. Note that the
      * empty list it returns is a singleton immutable list
      *

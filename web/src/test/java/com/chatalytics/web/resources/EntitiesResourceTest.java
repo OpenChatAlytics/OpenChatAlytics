@@ -87,21 +87,22 @@ public class EntitiesResourceTest {
         String endTimeStr = dtf.print(mentionTime.plusDays(1));
         Map<String, Long> response = underTest.getTrendingTopics(startTimeStr, endTimeStr,
                                                                  ImmutableList.of("u1"),
-                                                                 ImmutableList.of("r1"), null);
+                                                                 ImmutableList.of("r1"),
+                                                                 null, null);
         Map<String, Long> expected = Maps.newHashMap();
         expected.put("e1", 5L);
         expected.put("e2", 1L);
         assertEquals(expected, response);
 
         response = underTest.getTrendingTopics(startTimeStr, endTimeStr, ImmutableList.of("u1"),
-                                               null, null);
+                                               null, null, null);
         expected.clear();
         expected.put("e1", 5L);
         expected.put("e4", 3L);
         expected.put("e2", 1L);
         assertEquals(expected, response);
 
-        response = underTest.getTrendingTopics(startTimeStr, endTimeStr, null, null, null);
+        response = underTest.getTrendingTopics(startTimeStr, endTimeStr, null, null, null, null);
         expected.clear();
         expected.put("e2", 14L);
         expected.put("e1", 11L);
@@ -115,7 +116,8 @@ public class EntitiesResourceTest {
         DateTimeFormatter dtf = DateTimeUtils.PARAMETER_WITH_DAY_DTF.withZone(dtZone);
         String startTimeStr = dtf.print(mentionTime.minusDays(1));
         String endTimeStr = dtf.print(mentionTime.plusDays(1));
-        List<ChatEntity> result = underTest.getAllEntites(startTimeStr, endTimeStr, null, null);
+        List<ChatEntity> result = underTest.getAllEntites(startTimeStr, endTimeStr, null, null,
+                                                          null);
         assertEquals(entities.size(), result.size());
 
         Set<ChatEntity> resultEntitySet = Sets.newHashSet(result);
@@ -136,7 +138,7 @@ public class EntitiesResourceTest {
 
         LabeledDenseMatrix<String> ldm = underTest.getSimilarities(
                 startTimeStr, endTimeStr, DimensionType.ROOM.getDimensionName(),
-                DimensionType.ENTITY.getDimensionName());
+                DimensionType.ENTITY.getDimensionName(), null);
         assertEquals(4, ldm.getLabels().size());
         assertEquals(4, ldm.getMatrix().length);
     }
@@ -152,7 +154,7 @@ public class EntitiesResourceTest {
 
         LabeledDenseMatrix<String> ldm = underTest.getSimilarities(
                 startTimeStr, endTimeStr, DimensionType.USER.getDimensionName(),
-                DimensionType.ENTITY.getDimensionName());
+                DimensionType.ENTITY.getDimensionName(), null);
         assertEquals(4, ldm.getLabels().size());
         assertEquals(4, ldm.getMatrix().length);
     }
@@ -164,7 +166,7 @@ public class EntitiesResourceTest {
         String endTimeStr = dtf.print(mentionTime.plusDays(1));
         underTest.getSimilarities(startTimeStr, endTimeStr,
                                   DimensionType.ROOM.getDimensionName(),
-                                  DimensionType.ROOM.getDimensionName());
+                                  DimensionType.ROOM.getDimensionName(), "true");
     }
 
     @Test
@@ -174,7 +176,8 @@ public class EntitiesResourceTest {
         String endTimeStr = dtf.print(mentionTime.plusDays(1));
         Map<String, Double> scores = underTest.getActive(startTimeStr, endTimeStr,
                                                          DimensionType.USER.toString(),
-                                                         ActiveMethod.ToTV.toString(), "10");
+                                                         ActiveMethod.ToTV.toString(), "10",
+                                                         "true");
 
         assertFalse(scores.isEmpty());
     }
@@ -186,7 +189,8 @@ public class EntitiesResourceTest {
         String endTimeStr = dtf.print(mentionTime.plusDays(1));
         Map<String, Double> scores = underTest.getActive(startTimeStr, endTimeStr,
                                                          DimensionType.ROOM.toString(),
-                                                         ActiveMethod.ToTV.toString(), "10");
+                                                         ActiveMethod.ToTV.toString(), "10",
+                                                         "true");
 
         assertFalse(scores.isEmpty());
     }
@@ -198,7 +202,8 @@ public class EntitiesResourceTest {
         String endTimeStr = dtf.print(mentionTime.plusDays(1));
         Map<String, Double> scores = underTest.getActive(startTimeStr, endTimeStr,
                                                          DimensionType.USER.toString(),
-                                                         ActiveMethod.ToMV.toString(), "10");
+                                                         ActiveMethod.ToMV.toString(), "10",
+                                                         "true");
         assertFalse(scores.isEmpty());
     }
 
@@ -209,7 +214,8 @@ public class EntitiesResourceTest {
         String endTimeStr = dtf.print(mentionTime.plusDays(1));
         Map<String, Double> scores = underTest.getActive(startTimeStr, endTimeStr,
                                                          DimensionType.ROOM.toString(),
-                                                         ActiveMethod.ToMV.toString(), "10");
+                                                         ActiveMethod.ToMV.toString(), "10",
+                                                         "true");
         assertFalse(scores.isEmpty());
     }
 
@@ -219,7 +225,7 @@ public class EntitiesResourceTest {
         String startTimeStr = dtf.print(mentionTime.minusDays(1));
         String endTimeStr = dtf.print(mentionTime.plusDays(1));
         underTest.getActive(startTimeStr, endTimeStr, DimensionType.EMOJI.toString(),
-                                ActiveMethod.ToTV.toString(), "10");
+                            ActiveMethod.ToTV.toString(), "10", "true");
     }
 
     @After

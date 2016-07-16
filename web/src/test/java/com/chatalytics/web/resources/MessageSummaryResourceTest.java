@@ -57,7 +57,7 @@ public class MessageSummaryResourceTest {
         mentionTime = DateTime.now().withZone(DateTimeZone.UTC);
 
         sums = Lists.newArrayList();
-        sums.add(new MessageSummary("u1", "r1", mentionTime.minus(1), BOT_MESSAGE, 1, true));
+        sums.add(new MessageSummary("u1", "r1", mentionTime.minus(1), BOT_MESSAGE, 1, false));
         sums.add(new MessageSummary("u2", "r1", mentionTime.minus(2), MESSAGE, 1, false));
         sums.add(new MessageSummary("u2", "r2", mentionTime.minus(3), CHANNEL_JOIN, 1, false));
         sums.add(new MessageSummary("u3", "r1", mentionTime.minus(4), MESSAGE, 1, false));
@@ -74,7 +74,7 @@ public class MessageSummaryResourceTest {
         String startTimeStr = dtf.print(mentionTime.minusDays(1));
         String endTimeStr = dtf.print(mentionTime.plusDays(1));
         List<MessageSummary> result = underTest.getAllMessageSummaries(startTimeStr, endTimeStr,
-                                                                       null, null, null);
+                                                                       null, null, null, null);
         assertEquals(sums.size(), result.size());
 
         Set<MessageSummary> resultMessageSummarySet = Sets.newHashSet(result);
@@ -83,7 +83,7 @@ public class MessageSummaryResourceTest {
         }
 
         result = underTest.getAllMessageSummaries(startTimeStr, endTimeStr, null, null,
-                                                  BOT_MESSAGE.toString());
+                                                  BOT_MESSAGE.toString(), null);
         assertEquals(1, result.size());
         assertEquals(BOT_MESSAGE, result.get(0).getValue());
     }
@@ -94,19 +94,20 @@ public class MessageSummaryResourceTest {
         DateTimeFormatter dtf = DateTimeUtils.PARAMETER_WITH_DAY_DTF.withZone(dtZone);
         String startTimeStr = dtf.print(mentionTime.minusDays(1));
         String endTimeStr = dtf.print(mentionTime.plusDays(1));
-        int result = underTest.getTotalMessageSummaries(startTimeStr, endTimeStr, null, null, null);
+        int result = underTest.getTotalMessageSummaries(startTimeStr, endTimeStr, null, null, null,
+                                                        null);
         assertEquals(sums.size(), result);
 
         result = underTest.getTotalMessageSummaries(startTimeStr, endTimeStr,
-                                                    ImmutableList.of("u1"), null, null);
+                                                    ImmutableList.of("u1"), null, null, null);
         assertEquals(1, result);
 
         result = underTest.getTotalMessageSummaries(startTimeStr, endTimeStr, null,
-                                                    ImmutableList.of("r1"), null);
+                                                    ImmutableList.of("r1"), null, null);
         assertEquals(3, result);
 
         result = underTest.getTotalMessageSummaries(startTimeStr, endTimeStr, null, null,
-                                                    MESSAGE.toString());
+                                                    MESSAGE.toString(), null);
         assertEquals(2, result);
     }
 
@@ -117,7 +118,8 @@ public class MessageSummaryResourceTest {
         String endTimeStr = dtf.print(mentionTime.plusDays(1));
         Map<String, Double> scores = underTest.getActive(startTimeStr, endTimeStr,
                                                          DimensionType.USER.toString(),
-                                                         ActiveMethod.ToTV.toString(), "10");
+                                                         ActiveMethod.ToTV.toString(), "10",
+                                                         "true");
 
         assertFalse(scores.isEmpty());
     }
@@ -129,7 +131,8 @@ public class MessageSummaryResourceTest {
         String endTimeStr = dtf.print(mentionTime.plusDays(1));
         Map<String, Double> scores = underTest.getActive(startTimeStr, endTimeStr,
                                                          DimensionType.ROOM.toString(),
-                                                         ActiveMethod.ToTV.toString(), "10");
+                                                         ActiveMethod.ToTV.toString(), "10",
+                                                         "true");
 
         assertFalse(scores.isEmpty());
     }
@@ -141,7 +144,8 @@ public class MessageSummaryResourceTest {
         String endTimeStr = dtf.print(mentionTime.plusDays(1));
         Map<String, Double> scores = underTest.getActive(startTimeStr, endTimeStr,
                                                          DimensionType.USER.toString(),
-                                                         ActiveMethod.ToMV.toString(), "10");
+                                                         ActiveMethod.ToMV.toString(), "10",
+                                                         "true");
         assertFalse(scores.isEmpty());
     }
 
@@ -152,7 +156,8 @@ public class MessageSummaryResourceTest {
         String endTimeStr = dtf.print(mentionTime.plusDays(1));
         Map<String, Double> scores = underTest.getActive(startTimeStr, endTimeStr,
                                                          DimensionType.ROOM.toString(),
-                                                         ActiveMethod.ToMV.toString(), "10");
+                                                         ActiveMethod.ToMV.toString(), "10",
+                                                         "true");
         assertFalse(scores.isEmpty());
     }
 
@@ -162,7 +167,7 @@ public class MessageSummaryResourceTest {
         String startTimeStr = dtf.print(mentionTime.minusDays(1));
         String endTimeStr = dtf.print(mentionTime.plusDays(1));
         underTest.getActive(startTimeStr, endTimeStr, DimensionType.EMOJI.toString(),
-                            ActiveMethod.ToTV.toString(), "10");
+                            ActiveMethod.ToTV.toString(), "10", "true");
     }
 
     @After

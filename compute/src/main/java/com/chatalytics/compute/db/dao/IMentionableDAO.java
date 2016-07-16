@@ -75,10 +75,13 @@ public interface IMentionableDAO<K extends Serializable, T extends IMentionable<
      *            Optionally supply a list of room names. This list can be empty
      * @param usernames
      *            Optionally supply a list of user names. This list can be empty
+     * @param withBots
+     *            Set to true if the result should include mentions by bots
      * @return A list of <code>T</code> representing all the times this value was mentioned
      *         in the given time period
      */
-    List<T> getAllMentions(Interval interval, List<String> roomNames, List<String> usernames);
+    List<T> getAllMentions(Interval interval, List<String> roomNames, List<String> usernames,
+                           boolean withBots);
 
     /**
      * Returns the total number of times a type <code>T</code> was mentioned in the given
@@ -93,12 +96,15 @@ public interface IMentionableDAO<K extends Serializable, T extends IMentionable<
      *            Optionally supply a list of room names. This list can be empty
      * @param usernames
      *            Optionally supply a list of user names. This list can be empty
+     * @param withBots
+     *            Set to true if the result should include mentions by bots
      * @return The total number of times the value was mentioned in the given time interval
      */
     int getTotalMentionsForType(K value,
                                 Interval interval,
                                 List<String> roomNames,
-                                List<String> usernames);
+                                List<String> usernames,
+                                boolean withBots);
 
     /**
      * Returns the total number of mentions of a particular type this DAO represents
@@ -109,11 +115,14 @@ public interface IMentionableDAO<K extends Serializable, T extends IMentionable<
      *            Optionally supply a list of room names. This list can be empty
      * @param usernames
      *            Optionally supply a list of user names. This list can be empty
+     * @param withBots
+     *            Set to true if the result should include mentions by bots
      * @return The total number of mentions based on the given parameters
      */
     int getTotalMentionsOfType(Interval interval,
                                List<String> roomNames,
-                               List<String> usernames);
+                               List<String> usernames,
+                               boolean withBots);
 
     /**
      * Returns back the top mentioned values of a type in the given time <code>interval</code>, and
@@ -127,12 +136,15 @@ public interface IMentionableDAO<K extends Serializable, T extends IMentionable<
      *            Optionally supply a list of user names. This list can be empty
      * @param resultSize
      *            The number of top entities to return back
+     * @param withBots
+     *            Set to true if the result should include mentions by bots
      * @return Returns back a map of the value of a type to number of occurrences.
      */
     Map<K, Long> getTopValuesOfType(Interval interval,
                                     List<String> roomName,
                                     List<String> username,
-                                    int resultSize);
+                                    int resultSize,
+                                    boolean withBots);
 
     /**
      * Returns a sorted map of type to a ratio, where the ratio is the type volume over the total
@@ -145,9 +157,12 @@ public interface IMentionableDAO<K extends Serializable, T extends IMentionable<
      *            end is exclusive
      * @param resultSize
      *            The result size
+     * @param withBots
+     *            Set to true if the result should include mentions by bots
      * @return A sorted map of top column to ratio
      */
-    Map<String, Double> getActiveColumnsByToTV(String columnName, Interval interval, int resultSize);
+    Map<String, Double> getActiveColumnsByToTV(String columnName, Interval interval, int resultSize,
+                                               boolean withBots);
 
     /**
      * Returns a sorted map of type to a ratio, where the ratio is the type volume over the total
@@ -160,9 +175,12 @@ public interface IMentionableDAO<K extends Serializable, T extends IMentionable<
      *            end is exclusive
      * @param resultSize
      *            The result size
+     * @param withBots
+     *            Set to true if the result should include mentions by bots
      * @return A sorted map of top column to ratio
      */
-    Map<String, Double> getActiveColumnsByToMV(String columnName, Interval interval, int resultSize);
+    Map<String, Double> getActiveColumnsByToMV(String columnName, Interval interval, int resultSize,
+                                               boolean withBots);
 
     /**
      * Given a time interval this method will return a labeled room by room matrix with all the
@@ -171,9 +189,11 @@ public interface IMentionableDAO<K extends Serializable, T extends IMentionable<
      *
      * @param interval
      *            The interval to search in
+     * @param withBots
+     *            Set to true if the result should include mentions by bots
      * @return A labeled matrix
      */
-    LabeledDenseMatrix<String> getRoomSimilaritiesByValue(Interval interval);
+    LabeledDenseMatrix<String> getRoomSimilaritiesByValue(Interval interval, boolean withBots);
 
     /**
      * Given a time interval this method will return a labeled user by user matrix with all the
@@ -182,9 +202,11 @@ public interface IMentionableDAO<K extends Serializable, T extends IMentionable<
      *
      * @param interval
      *            The interval to search in
+     * @param withBots
+     *            Set to true if the result should include mentions by bots
      * @return A labeled matrix
      */
-    LabeledDenseMatrix<String> getUserSimilaritiesByValue(Interval interval);
+    LabeledDenseMatrix<String> getUserSimilaritiesByValue(Interval interval, boolean withBots);
 
     /**
      * Gets the type this DAO is working with

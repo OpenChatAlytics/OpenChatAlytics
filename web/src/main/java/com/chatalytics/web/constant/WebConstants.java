@@ -35,4 +35,8 @@ public class WebConstants {
      */
     public static final String TOP_N = "n";
 
+    /**
+     * Constant used in endpoints for specifying whether bots should be included in calculations
+     */
+    public static final String BOT = "bot";
 }
