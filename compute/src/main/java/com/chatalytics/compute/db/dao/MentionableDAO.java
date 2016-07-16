@@ -177,7 +177,6 @@ public class MentionableDAO<K extends Serializable, T extends IMentionable<K>>
             Class<K> valueClass = (Class<K>) value.get().getClass();
             valueParam = cb.parameter(valueClass);
             wherePredicates.add(cb.equal(from.get(TYPE_COLUMN_NAME), valueParam));
-
         }
         if (!roomNames.isEmpty()) {
             In<String> in = cb.in(from.get("roomName"));
@@ -528,7 +527,9 @@ public class MentionableDAO<K extends Serializable, T extends IMentionable<K>>
             return;
         }
         try {
-            entityManager.flush();
+            if (entityManager.isJoinedToTransaction()) {
+                entityManager.flush();
+            }
         } catch (RuntimeException e) {
             LOG.warn("Couldn't flush entity manager. Reason: {}", e.getMessage());
         }
