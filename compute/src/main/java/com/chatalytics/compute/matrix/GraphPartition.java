@@ -19,6 +19,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -73,11 +74,13 @@ public class GraphPartition {
         List<Y> dimYOrd = data.stream()
                               .map(funcY)
                               .distinct()
+                              .filter(Objects::nonNull)
                               .collect(Collectors.toList()); // need ordering
         // column
         List<X> dimXOrd = data.stream()
                               .map(funcX)
                               .distinct()
+                              .filter(Objects::nonNull)
                               .collect(Collectors.toList()); // need ordering
 
         Map<X, Integer> dimXToIdx = IntStream.range(0, dimXOrd.size())
@@ -91,8 +94,15 @@ public class GraphPartition {
         Matrix M = new LinkedSparseMatrix(dimYOrd.size(), dimXOrd.size());
 
         for (T mention : data) {
-            int rowIdx = dimYToIdx.get(funcY.apply(mention));
-            int columnIdx = dimXToIdx.get(funcX.apply(mention));
+            Y yValue = funcY.apply(mention);
+            X xValue = funcX.apply(mention);
+
+            if (yValue == null || xValue == null) {
+                continue;
+            }
+
+            int rowIdx = dimYToIdx.get(yValue);
+            int columnIdx = dimXToIdx.get(xValue);
             double existingValue = M.get(rowIdx, columnIdx);
             M.set(rowIdx, columnIdx, existingValue + mention.getOccurrences());
         }

@@ -422,18 +422,18 @@ public class MentionableDAO<K extends Serializable, T extends IMentionable<K>>
         Root<T> totalFrom = totalQuery.from(type);
         totalQuery.select(cb.sum(totalFrom.get("occurrences")));
         Path<DateTime> totalMentionTime = totalFrom.get("mentionTime");
-        Path<String> columnPath = from.get(columnName);
         totalQuery.where(cb.greaterThanOrEqualTo(totalMentionTime, startDateParam),
-                         cb.lessThan(totalMentionTime, endDateParam),
-                         cb.isNotNull(columnPath));
+                         cb.lessThan(totalMentionTime, endDateParam));
 
         // occurrences / total occurrences
         Expression<Double> ratio = cb.quot(cb.sum(occurrences), totalQuery).as(Double.class);
 
+        Path<String> columnPath = from.get(columnName);
         query.multiselect(columnPath, ratio);
         Path<DateTime> mentionTime = from.get("mentionTime");
         query.where(cb.greaterThanOrEqualTo(mentionTime, startDateParam),
-                    cb.lessThan(mentionTime, endDateParam));
+                    cb.lessThan(mentionTime, endDateParam),
+                    cb.isNotNull(columnPath));
         query.groupBy(columnPath);
         query.orderBy(cb.desc(ratio));
         List<Tuple> resultList =
@@ -477,19 +477,18 @@ public class MentionableDAO<K extends Serializable, T extends IMentionable<K>>
         totalQuery.select(cb.sum(totalFrom.get("occurrences")));
         Path<DateTime> totalMentionTime = totalFrom.get("mentionTime");
         Path<MessageType> messageType = totalFrom.get("value");
-        Path<String> columnPath = from.get(columnName);
         totalQuery.where(cb.greaterThanOrEqualTo(totalMentionTime, startDateParam),
                          cb.lessThan(totalMentionTime, endDateParam),
-                         cb.equal(messageType, MessageType.MESSAGE),
-                         cb.isNotNull(columnPath));
+                         cb.equal(messageType, MessageType.MESSAGE));
 
         // occurrences / total occurrences
         Expression<Double> ratio = cb.quot(cb.sum(occurrences), totalQuery).as(Double.class);
+        Path<String> columnPath = from.get(columnName);
 
         query.multiselect(columnPath, ratio);
         Path<DateTime> mentionTime = from.get("mentionTime");
         query.where(cb.greaterThanOrEqualTo(mentionTime, startDateParam),
-                    cb.lessThan(mentionTime, endDateParam));
+                    cb.lessThan(mentionTime, endDateParam), cb.isNotNull(columnPath));
         query.groupBy(columnPath);
         query.orderBy(cb.desc(ratio));
         List<Tuple> resultList =

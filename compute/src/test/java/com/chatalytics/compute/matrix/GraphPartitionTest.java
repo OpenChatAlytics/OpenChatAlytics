@@ -23,6 +23,7 @@ import static org.junit.Assert.assertEquals;
  */
 public class GraphPartitionTest {
 
+    @Test
     public void testGetMentionMatrix() {
         List<EmojiEntity> mentions = Lists.newArrayListWithCapacity(16);
         // make r1, r2 and r2 kind of similar
@@ -45,6 +46,24 @@ public class GraphPartitionTest {
         assertEquals(3, result.getMatrix().numRows());
         assertEquals(3, result.getMatrix().numColumns());
         assertEquals(3, result.getLabels().stream().distinct().count());
+    }
+
+    @Test
+    public void testGetMentionMatrix_withNulls() {
+        List<EmojiEntity> mentions = Lists.newArrayListWithCapacity(16);
+        // throw in some null rooms and users
+        mentions.add(new EmojiEntity(null, "r2", DateTime.now().plus(1), "a", 1));
+        mentions.add(new EmojiEntity("u1", null, DateTime.now().plus(2), "a", 1));
+
+        LabeledMTJMatrix<String> result =
+                GraphPartition.getMentionMatrix(mentions,
+                                                mention -> mention.getRoomName(),
+                                                mention -> mention.getUsername());
+
+        // there's three rooms so we expect the size of the matrix to be 3x3 with 3 labels
+        assertEquals(1, result.getMatrix().numRows());
+        assertEquals(1, result.getMatrix().numColumns());
+        assertEquals(1, result.getLabels().stream().distinct().count());
     }
 
     /**
