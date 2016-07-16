@@ -45,7 +45,7 @@ public class ChatAlyticsEventDecoderTest {
         DateTime eventTime = DateTime.now(DateTimeZone.UTC);
         MessageSummary msgSummary = new MessageSummary("user", "room",
                                                        DateTime.now(DateTimeZone.UTC),
-                                                       MessageType.BOT_MESSAGE, 1);
+                                                       MessageType.BOT_MESSAGE, 1, false);
         ChatAlyticsEvent event = new ChatAlyticsEvent(eventTime, msgSummary.getClass().getName(),
                                                       msgSummary);
         String jsonStr = new ChatAlyticsEventEncoder().encode(event);

@@ -98,13 +98,14 @@ public class MentionableDAO<K extends Serializable, T extends IMentionable<K>>
         try {
             CriteriaBuilder cb = entityManager.getCriteriaBuilder();
             CriteriaQuery<T> query = cb.createQuery(type);
-            Predicate[] wherePredicates = new Predicate[4];
+            Predicate[] wherePredicates = new Predicate[5];
 
             Root<T> from = query.from(type);
 
             Path<String> username = from.get("username");
             Path<String> roomName = from.get("roomName");
             Path<String> mentionTime = from.get("mentionTime");
+            Path<String> isBot = from.get("bot");
             Path<String> type = from.get(TYPE_COLUMN_NAME);
 
             Expression<Integer> sum = cb.sum(from.get("occurrences")).as(Integer.class);
@@ -112,7 +113,8 @@ public class MentionableDAO<K extends Serializable, T extends IMentionable<K>>
                               roomName.alias("roomName"),
                               mentionTime.alias("mentionTime"),
                               type.alias(TYPE_COLUMN_NAME),
-                              sum.alias("occurrences"));
+                              sum.alias("occurrences"),
+                              isBot.alias("bot"));
 
             query.groupBy(username, roomName, mentionTime, type);
 
@@ -120,6 +122,7 @@ public class MentionableDAO<K extends Serializable, T extends IMentionable<K>>
             wherePredicates[1] = cb.equal(from.get("username"), value.getUsername());
             wherePredicates[2] = cb.equal(from.get("roomName"), value.getRoomName());
             wherePredicates[3] = cb.equal(from.get("mentionTime"), value.getMentionTime());
+            wherePredicates[4] = cb.equal(from.get("bot"), value.isBot());
             query.where(wherePredicates);
 
             TypedQuery<T> finalQuery = entityManagerFactory.createEntityManager()

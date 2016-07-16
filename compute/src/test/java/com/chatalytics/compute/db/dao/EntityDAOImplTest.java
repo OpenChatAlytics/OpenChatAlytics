@@ -45,29 +45,29 @@ public class EntityDAOImplTest {
         mentionDate = DateTime.now(DateTimeZone.UTC);
 
         // Insert a bunch of test values
-        underTest.persistEntity(new ChatEntity("giannis", "room1", mentionDate, "entity1", 1));
-        underTest.persistEntity(new ChatEntity("giannis", "room1", mentionDate, "entity2", 1));
-        underTest.persistEntity(new ChatEntity("giannis", "room2", mentionDate, "entity1", 1));
-        underTest.persistEntity(new ChatEntity("jane", "room1", mentionDate, "entity1", 1));
+        underTest.persistEntity(new ChatEntity("giannis", "room1", mentionDate, "e1", 1, false));
+        underTest.persistEntity(new ChatEntity("giannis", "room1", mentionDate, "e2", 1, false));
+        underTest.persistEntity(new ChatEntity("giannis", "room2", mentionDate, "e1", 1, false));
+        underTest.persistEntity(new ChatEntity("jane", "room1", mentionDate, "e1", 1, false));
 
         msgSummaryDao.persistMessageSummary(new MessageSummary("giannis", "room1", mentionDate,
-                                                               MessageType.MESSAGE, 10));
+                                                               MessageType.MESSAGE, 10, false));
         msgSummaryDao.persistMessageSummary(new MessageSummary("jane", "room1", mentionDate,
-                                                               MessageType.MESSAGE, 10));
+                                                               MessageType.MESSAGE, 10, false));
         msgSummaryDao.stopAsync().awaitTerminated();
     }
 
     @Test
     public void testPersistEntity_withDuplicate() {
         DateTime mentionTime = DateTime.now();
-        ChatEntity entity = new ChatEntity("user", "testroom", mentionTime, "test_value", 1);
+        ChatEntity entity = new ChatEntity("user", "testroom", mentionTime, "test_value", 1, false);
         underTest.persistEntity(entity);
         ChatEntity existingEntity = underTest.getEntity(entity);
         assertNotNull(existingEntity);
         assertEquals(1, existingEntity.getOccurrences());
 
         // insert it again
-        entity = new ChatEntity("user", "testroom", mentionTime, "test_value", 1);
+        entity = new ChatEntity("user", "testroom", mentionTime, "test_value", 1, false);
         underTest.persistEntity(entity);
         existingEntity = underTest.getEntity(entity);
         assertEquals(2, existingEntity.getOccurrences());
@@ -88,15 +88,15 @@ public class EntityDAOImplTest {
                                                             ImmutableList.of()));
 
         // make sure that the sums are correct for a bunch of different queries
-        int result = underTest.getTotalMentionsForEntity("entity1", timeInterval,
+        int result = underTest.getTotalMentionsForEntity("e1", timeInterval,
                                                           ImmutableList.of(), ImmutableList.of());
         assertEquals(3, result);
 
-        result = underTest.getTotalMentionsForEntity("entity1", timeInterval,
+        result = underTest.getTotalMentionsForEntity("e1", timeInterval,
                                                      ImmutableList.of("room1"), ImmutableList.of());
         assertEquals(2, result);
 
-        result = underTest.getTotalMentionsForEntity("entity1", timeInterval,
+        result = underTest.getTotalMentionsForEntity("e1", timeInterval,
                                                      ImmutableList.of("room1"),
                                                      ImmutableList.of("giannis"));
         assertEquals(1, result);
@@ -108,16 +108,16 @@ public class EntityDAOImplTest {
     @Test
     public void testGetAllMentionsForEntity() {
         Interval timeInterval = new Interval(mentionDate, mentionDate.plusHours(3));
-        List<ChatEntity> result = underTest.getAllMentionsForEntity("entity1", timeInterval,
+        List<ChatEntity> result = underTest.getAllMentionsForEntity("e1", timeInterval,
                                                                     ImmutableList.of(),
                                                                     ImmutableList.of());
         assertEquals(3, result.size());
 
-        result = underTest.getAllMentionsForEntity("entity1", timeInterval,
+        result = underTest.getAllMentionsForEntity("e1", timeInterval,
                                                    ImmutableList.of("room1"), ImmutableList.of());
         assertEquals(2, result.size());
 
-        result = underTest.getAllMentionsForEntity("entity1", timeInterval,
+        result = underTest.getAllMentionsForEntity("e1", timeInterval,
                                                    ImmutableList.of("room1"),
                                                    ImmutableList.of("giannis"));
         assertEquals(1, result.size());
@@ -148,20 +148,20 @@ public class EntityDAOImplTest {
         Map<String, Long> result =
             underTest.getTopEntities(timeInterval, ImmutableList.of(), ImmutableList.of(), 10);
         assertEquals(2, result.size());
-        assertEquals(3L, result.get("entity1").longValue());
-        assertEquals(1L, result.get("entity2").longValue());
+        assertEquals(3L, result.get("e1").longValue());
+        assertEquals(1L, result.get("e2").longValue());
 
         result = underTest.getTopEntities(timeInterval, ImmutableList.of("room1"),
                                           ImmutableList.of(), 10);
         assertEquals(2, result.size());
-        assertEquals(2L, result.get("entity1").longValue());
-        assertEquals(1L, result.get("entity2").longValue());
+        assertEquals(2L, result.get("e1").longValue());
+        assertEquals(1L, result.get("e2").longValue());
 
         result = underTest.getTopEntities(timeInterval, ImmutableList.of("room1"),
                                           ImmutableList.of("giannis"), 10);
         assertEquals(2, result.size());
-        assertEquals(1L, result.get("entity1").longValue());
-        assertEquals(1L, result.get("entity2").longValue());
+        assertEquals(1L, result.get("e1").longValue());
+        assertEquals(1L, result.get("e2").longValue());
     }
 
     @Test

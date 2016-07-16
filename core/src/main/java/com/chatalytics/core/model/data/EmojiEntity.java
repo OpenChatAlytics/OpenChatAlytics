@@ -18,11 +18,18 @@ import javax.persistence.Id;
 import javax.persistence.Index;
 import javax.persistence.Table;
 
+/**
+ * Represents a mention of an emoji. This is also persisted in the database
+ *
+ * @author giannis
+ *
+ */
 @Entity
 @Table(name = EmojiEntity.EMOJI_TABLE_NAME,
        indexes = {@Index(name = "ee_idx_username", columnList = "username"),
                   @Index(name = "ee_idx_roomName", columnList = "roomName"),
-                  @Index(name = "ee_idx_value", columnList = "value")})
+                  @Index(name = "ee_idx_value", columnList = "value"),
+                  @Index(name = "ee_idx_bot", columnList = "bot")})
 @EqualsAndHashCode
 @AllArgsConstructor
 @Setter(value = AccessLevel.PROTECTED) // for hibernate
@@ -36,6 +43,7 @@ public class EmojiEntity implements IMentionable<String> {
     public static final String MENTION_TIME_COLUMN = "MENTION_TIME";
     public static final String ROOM_NAME_COLUMN = "ROOM_NAME";
     public static final String USER_NAME_COLUMN = "USER_NAME";
+    public static final String BOT_COLUMN = "BOT";
 
     /**
      * Emoji alias without ':'
@@ -45,18 +53,20 @@ public class EmojiEntity implements IMentionable<String> {
     private DateTime mentionTime;
     private String value;
     private int occurrences;
+    private boolean bot;
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
 
     public EmojiEntity(String username, String roomName, DateTime mentionTime,
-                       String value, int occurrences) {
+                       String value, int occurrences, boolean bot) {
         this.username = username;
         this.roomName = roomName;
         this.mentionTime = mentionTime;
         this.value = value;
         this.occurrences = occurrences;
+        this.bot = bot;
     }
 
     protected EmojiEntity() {} // for jackson
@@ -93,6 +103,12 @@ public class EmojiEntity implements IMentionable<String> {
     }
 
     @Override
+    @Column(name = BOT_COLUMN)
+    public boolean isBot() {
+        return bot;
+    }
+
+    @Override
     public String toString() {
         return MoreObjects.toStringHelper(this.getClass())
                           .add("value", value)
@@ -100,6 +116,7 @@ public class EmojiEntity implements IMentionable<String> {
                           .add("mentionTime", mentionTime)
                           .add("username", username)
                           .add("roomName", roomName)
+                          .add("bot", bot)
                           .toString();
     }
 }

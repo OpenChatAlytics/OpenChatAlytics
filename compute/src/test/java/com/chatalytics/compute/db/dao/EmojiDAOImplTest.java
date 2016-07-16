@@ -46,28 +46,28 @@ public class EmojiDAOImplTest {
         mentionDate = DateTime.now(DateTimeZone.UTC);
 
         // Insert a bunch of test values
-        underTest.persistEmoji(new EmojiEntity("giannis", "room1", mentionDate, "emoji1", 1));
-        underTest.persistEmoji(new EmojiEntity("giannis", "room1", mentionDate, "emoji2", 1));
-        underTest.persistEmoji(new EmojiEntity("giannis", "room2", mentionDate, "emoji1", 1));
-        underTest.persistEmoji(new EmojiEntity("jane", "room1", mentionDate, "emoji1", 1));
+        underTest.persistEmoji(new EmojiEntity("giannis", "room1", mentionDate, "e1", 1, false));
+        underTest.persistEmoji(new EmojiEntity("giannis", "room1", mentionDate, "e2", 1, false));
+        underTest.persistEmoji(new EmojiEntity("giannis", "room2", mentionDate, "e1", 1, false));
+        underTest.persistEmoji(new EmojiEntity("jane", "room1", mentionDate, "e1", 1, false));
 
         msgSummaryDao.persistMessageSummary(new MessageSummary("giannis", "room1", mentionDate,
-                                                               MessageType.MESSAGE, 10));
+                                                               MessageType.MESSAGE, 10, false));
         msgSummaryDao.persistMessageSummary(new MessageSummary("jane", "room1", mentionDate,
-                                                               MessageType.MESSAGE, 10));
+                                                               MessageType.MESSAGE, 10, false));
         msgSummaryDao.stopAsync().awaitTerminated();
     }
 
     @Test
     public void testPersistEmoji_withDuplicate() {
-        EmojiEntity emoji = new EmojiEntity("user", "testroom", mentionDate, "test_value", 1);
+        EmojiEntity emoji = new EmojiEntity("user", "testroom", mentionDate, "test", 1, false);
         underTest.persistEmoji(emoji);
         EmojiEntity existingEmoji = underTest.getEmoji(emoji);
         assertNotNull(existingEmoji);
         assertEquals(1, existingEmoji.getOccurrences());
 
         // insert it again
-        emoji = new EmojiEntity("user", "testroom", mentionDate, "test_value", 1);
+        emoji = new EmojiEntity("user", "testroom", mentionDate, "test", 1, false);
         underTest.persistEmoji(emoji);
         existingEmoji = underTest.getEmoji(emoji);
         assertEquals(2, existingEmoji.getOccurrences());
@@ -87,15 +87,15 @@ public class EmojiDAOImplTest {
                                                            ImmutableList.of()));
 
         // make sure that the sums are correct for a bunch of different queries
-        int result = underTest.getTotalMentionsForEmoji("emoji1", timeInterval,
+        int result = underTest.getTotalMentionsForEmoji("e1", timeInterval,
                                                         ImmutableList.of(), ImmutableList.of());
         assertEquals(3, result);
 
-        result = underTest.getTotalMentionsForEmoji("emoji1", timeInterval,
+        result = underTest.getTotalMentionsForEmoji("e1", timeInterval,
                                                     ImmutableList.of("room1"), ImmutableList.of());
         assertEquals(2, result);
 
-        result = underTest.getTotalMentionsForEmoji("emoji1", timeInterval,
+        result = underTest.getTotalMentionsForEmoji("e1", timeInterval,
                                                     ImmutableList.of("room1"),
                                                     ImmutableList.of("giannis"));
         assertEquals(1, result);
@@ -107,16 +107,16 @@ public class EmojiDAOImplTest {
     @Test
     public void testGetAllMentionsForEmoji() {
         Interval timeInterval = new Interval(mentionDate, mentionDate.plusHours(3));
-        List<EmojiEntity> result = underTest.getAllMentionsForEmoji("emoji1", timeInterval,
+        List<EmojiEntity> result = underTest.getAllMentionsForEmoji("e1", timeInterval,
                                                                    ImmutableList.of(),
                                                                    ImmutableList.of());
         assertEquals(3, result.size());
 
-        result = underTest.getAllMentionsForEmoji("emoji1", timeInterval, ImmutableList.of("room1"),
+        result = underTest.getAllMentionsForEmoji("e1", timeInterval, ImmutableList.of("room1"),
                                                   ImmutableList.of());
         assertEquals(2, result.size());
 
-        result = underTest.getAllMentionsForEmoji("emoji1", timeInterval, ImmutableList.of("room1"),
+        result = underTest.getAllMentionsForEmoji("e1", timeInterval, ImmutableList.of("room1"),
                                                   ImmutableList.of("giannis"));
         assertEquals(1, result.size());
     }
@@ -146,20 +146,20 @@ public class EmojiDAOImplTest {
         Map<String, Long> result = underTest.getTopEmojis(timeInterval, ImmutableList.of(),
                                                           ImmutableList.of(), 10);
         assertEquals(2, result.size());
-        assertEquals(3L, result.get("emoji1").longValue());
-        assertEquals(1L, result.get("emoji2").longValue());
+        assertEquals(3L, result.get("e1").longValue());
+        assertEquals(1L, result.get("e2").longValue());
 
         result = underTest.getTopEmojis(timeInterval, ImmutableList.of("room1"), ImmutableList.of(),
                                         10);
         assertEquals(2, result.size());
-        assertEquals(2L, result.get("emoji1").longValue());
-        assertEquals(1L, result.get("emoji2").longValue());
+        assertEquals(2L, result.get("e1").longValue());
+        assertEquals(1L, result.get("e2").longValue());
 
         result = underTest.getTopEmojis(timeInterval, ImmutableList.of("room1"),
                                         ImmutableList.of("giannis"), 10);
         assertEquals(2, result.size());
-        assertEquals(1L, result.get("emoji1").longValue());
-        assertEquals(1L, result.get("emoji2").longValue());
+        assertEquals(1L, result.get("e1").longValue());
+        assertEquals(1L, result.get("e2").longValue());
     }
 
     @Test
