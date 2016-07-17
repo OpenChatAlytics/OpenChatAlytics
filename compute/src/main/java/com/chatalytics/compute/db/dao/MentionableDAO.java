@@ -125,8 +125,7 @@ public class MentionableDAO<K extends Serializable, T extends IMentionable<K>>
             wherePredicates[4] = cb.equal(from.get("bot"), value.isBot());
             query.where(wherePredicates);
 
-            TypedQuery<T> finalQuery = entityManagerFactory.createEntityManager()
-                                                           .createQuery(query);
+            TypedQuery<T> finalQuery = entityManager.createQuery(query);
 
             try {
                 return finalQuery.getSingleResult();
@@ -164,6 +163,7 @@ public class MentionableDAO<K extends Serializable, T extends IMentionable<K>>
                                                   List<String> roomNames,
                                                   List<String> usernames,
                                                   boolean withBots) {
+
         EntityManager entityManager = entityManagerFactory.createEntityManager();
 
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
@@ -205,21 +205,19 @@ public class MentionableDAO<K extends Serializable, T extends IMentionable<K>>
 
         query.where(wherePredicates.toArray(new Predicate[wherePredicates.size()]));
 
-        TypedQuery<T> finalQuery = entityManagerFactory.createEntityManager()
-                                                       .createQuery(query)
-                                                       .setParameter(startDateParam,
-                                                                     interval.getStart())
-                                                       .setParameter(endDateParam,
-                                                                     interval.getEnd());
-        if (value.isPresent()) {
-            finalQuery.setParameter(valueParam, value.get());
+        try {
+            TypedQuery<T> finalQuery =
+                    entityManager.createQuery(query)
+                                 .setParameter(startDateParam, interval.getStart())
+                                 .setParameter(endDateParam, interval.getEnd());
+            if (value.isPresent()) {
+                finalQuery.setParameter(valueParam, value.get());
 
+            }
+            return finalQuery.getResultList();
+        } finally {
+            closeEntityManager(entityManager);
         }
-        List<T> result = finalQuery.getResultList();
-
-        closeEntityManager(entityManager);
-
-        return result;
     }
 
     /**
@@ -330,23 +328,24 @@ public class MentionableDAO<K extends Serializable, T extends IMentionable<K>>
 
         query.where(wherePredicates.toArray(new Predicate[wherePredicates.size()]));
 
-        TypedQuery<Integer> finalQuery = entityManager.createQuery(query)
-                                                      .setParameter(startDateParam,
-                                                                    interval.getStart())
-                                                      .setParameter(endDateParam,
-                                                                    interval.getEnd());
-        if (value.isPresent()) {
-            finalQuery.setParameter(valueParam, value.get());
-        }
+        try {
+            TypedQuery<Integer> finalQuery =
+                    entityManager.createQuery(query)
+                                 .setParameter(startDateParam, interval.getStart())
+                                 .setParameter(endDateParam, interval.getEnd());
+            if (value.isPresent()) {
+                finalQuery.setParameter(valueParam, value.get());
+            }
 
-        List<Integer> result = finalQuery.getResultList();
+            List<Integer> result = finalQuery.getResultList();
 
-        closeEntityManager(entityManager);
-
-        if (result == null || result.isEmpty() || result.get(0) == null) {
-            return 0;
-        } else {
-            return result.get(0);
+            if (result == null || result.isEmpty() || result.get(0) == null) {
+                return 0;
+            } else {
+                return result.get(0);
+            }
+        } finally {
+            closeEntityManager(entityManager);
         }
     }
 
@@ -405,22 +404,25 @@ public class MentionableDAO<K extends Serializable, T extends IMentionable<K>>
         query.multiselect(typeValueAlias, occurrencesSumAlias);
         query.groupBy(typeValuePath);
         query.orderBy(cb.desc(occurrencesSum));
-        TypedQuery<Tuple> finalQuery = entityManagerFactory.createEntityManager().createQuery(query)
-                                                    .setMaxResults(resultSize)
-                                                    .setParameter(startDateParam,
-                                                                  interval.getStart())
-                                                    .setParameter(endDateParam, interval.getEnd());
 
-        List<Tuple> resultList = finalQuery.getResultList();
+        try {
+            TypedQuery<Tuple> finalQuery =
+                    entityManager.createQuery(query)
+                                 .setMaxResults(resultSize)
+                                 .setParameter(startDateParam, interval.getStart())
+                                 .setParameter(endDateParam, interval.getEnd());
 
-        closeEntityManager(entityManager);
+            List<Tuple> resultList = finalQuery.getResultList();
 
-        // linked hashmap to preserve order
-        Map<K, Long> result = Maps.newLinkedHashMap();
-        for (Tuple tuple : resultList) {
-            result.put(tuple.get(typeValueAlias), tuple.get(occurrencesSumAlias));
+            // linked hashmap to preserve order
+            Map<K, Long> result = Maps.newLinkedHashMap();
+            for (Tuple tuple : resultList) {
+                result.put(tuple.get(typeValueAlias), tuple.get(occurrencesSumAlias));
+            }
+            return result;
+        } finally {
+            closeEntityManager(entityManager);
         }
-        return result;
     }
 
     /**
@@ -472,22 +474,22 @@ public class MentionableDAO<K extends Serializable, T extends IMentionable<K>>
         query.where(wherePredicates.toArray(new Predicate[wherePredicates.size()]));
         query.groupBy(columnPath);
         query.orderBy(cb.desc(ratio));
-        List<Tuple> resultList =
-                entityManagerFactory.createEntityManager()
-                                    .createQuery(query)
-                                    .setMaxResults(resultSize)
-                                    .setParameter(startDateParam, interval.getStart())
-                                    .setParameter(endDateParam, interval.getEnd())
-                                    .getResultList();
 
-        closeEntityManager(entityManager);
-
-        // linked hashmap to preserve order
-        Map<String, Double> result = Maps.newLinkedHashMap();
-        for (Tuple tuple : resultList) {
-            result.put(tuple.get(columnPath), tuple.get(ratio));
+        try {
+            List<Tuple> resultList = entityManager.createQuery(query)
+                                                  .setMaxResults(resultSize)
+                                                  .setParameter(startDateParam, interval.getStart())
+                                                  .setParameter(endDateParam, interval.getEnd())
+                                                  .getResultList();
+            // linked hashmap to preserve order
+            Map<String, Double> result = Maps.newLinkedHashMap();
+            for (Tuple tuple : resultList) {
+                result.put(tuple.get(columnPath), tuple.get(ratio));
+            }
+            return result;
+        } finally {
+            closeEntityManager(entityManager);
         }
-        return result;
     }
 
     /**
@@ -541,22 +543,23 @@ public class MentionableDAO<K extends Serializable, T extends IMentionable<K>>
 
         query.groupBy(columnPath);
         query.orderBy(cb.desc(ratio));
-        List<Tuple> resultList =
-                entityManagerFactory.createEntityManager()
-                                    .createQuery(query)
-                                    .setMaxResults(resultSize)
-                                    .setParameter(startDateParam, interval.getStart())
-                                    .setParameter(endDateParam, interval.getEnd())
-                                    .getResultList();
 
-        closeEntityManager(entityManager);
+        try {
+            List<Tuple> resultList = entityManager.createQuery(query)
+                                                  .setMaxResults(resultSize)
+                                                  .setParameter(startDateParam, interval.getStart())
+                                                  .setParameter(endDateParam, interval.getEnd())
+                                                  .getResultList();
 
-        // linked hashmap to preserve order
-        Map<String, Double> result = Maps.newLinkedHashMap();
-        for (Tuple tuple : resultList) {
-            result.put(tuple.get(columnPath), tuple.get(ratio));
+            // linked hashmap to preserve order
+            Map<String, Double> result = Maps.newLinkedHashMap();
+            for (Tuple tuple : resultList) {
+                result.put(tuple.get(columnPath), tuple.get(ratio));
+            }
+            return result;
+        } finally {
+            closeEntityManager(entityManager);
         }
-        return result;
     }
 
     /**

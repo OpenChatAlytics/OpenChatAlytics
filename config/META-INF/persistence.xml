@@ -22,10 +22,11 @@
             <property name="java.naming.factory.initial" value=""/>
             <property name="hibernate.dialect" value="org.hibernate.dialect.PostgreSQLDialect" />
             <property name="hibernate.connection.provider_class" value="org.hibernate.hikaricp.internal.HikariCPConnectionProvider" />
-            <property name="hibernate.hikari.minimumIdle" value="5" />
             <property name="hibernate.hikari.maximumPoolSize" value="32" />
-            <property name="hibernate.hikari.idleTimeout" value="40000" />
-            <property name="hibernate.hikari.connectionTimeout" value="30000" />
+            <property name="hibernate.hikari.idleTimeout" value="0" />
+            <property name="hibernate.hikari.maxLifetime" value="120000" />
+            <property name="hibernate.hikari.leakDetectionThreshold" value="8000" />
+            <property name="hibernate.hikari.connectionTimeout" value="8000" />
             <property name="hibernate.hikari.dataSourceClassName" value="org.postgresql.ds.PGSimpleDataSource" />
             <property name="hibernate.hikari.dataSource.url" value="jdbc:postgresql://localhost:5432/chatalytics" />
             <property name="hibernate.hikari.dataSource.user" value="chat_user" />
