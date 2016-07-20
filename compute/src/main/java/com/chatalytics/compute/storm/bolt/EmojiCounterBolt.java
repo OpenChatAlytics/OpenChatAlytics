@@ -33,7 +33,7 @@ public class EmojiCounterBolt extends ChatAlyticsBaseBolt {
     private static final String EMOJI_ENTITY_FIELD_STR = "emoji-entity";
     private static final Logger LOG = LoggerFactory.getLogger(EmojiCounterBolt.class);
     private static Set<Character> BLACKLISTED_CHARS = ImmutableSet.of(' ', ',', '{', '}', '\t',
-                                                                      '\n', '/');
+                                                                      '\n', '/', '\\');
 
     private IEmojiDAO emojiDao;
     private OutputCollector collector;
