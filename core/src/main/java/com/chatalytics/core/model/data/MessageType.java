@@ -13,9 +13,13 @@ public enum MessageType {
 
     MESSAGE("message"),
     CHANNEL_JOIN("channel_join"),
+    CHANNEL_LEAVE("channel_leave"),
     MESSAGE_CHANGED("message_changed"),
     BOT_MESSAGE("bot_message"),
     PINNED_ITEM("pinned_item"),
+    FILE_SHARE("file_share"),
+    MESSAGE_SHARE("message_share"),
+    MESSAGE_DELETED("message_deleted"),
     UNKNOWN("unknown");
 
     private String type;

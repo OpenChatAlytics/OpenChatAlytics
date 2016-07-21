@@ -29,32 +29,45 @@ public class MessageDeserializer extends JsonChatDeserializer<Message> {
         JsonNode node = oc.readTree(jp);
 
         String channelId = getAsTextOrNull(node.get("channel"));
+        if (channelId != null && channelId.equals("C0G1JEKRU")) {
+            System.out.println("here");
+        }
         String timestampStr = node.get("ts").asText();
         String[] timestampElementsArr = timestampStr.split("\\.");
         long seconds = Long.parseLong(timestampElementsArr[0]);
         long nanos = Long.parseLong(timestampElementsArr[1]);
         long timeInMillis = seconds * 1000 + nanos / 1000;
         DateTime date = new DateTime(timeInMillis);
+        String fromName = getAsTextOrNull(node.get("username"));
 
         MessageType messageType = getMessageType(node);
         JsonNode fromUserIdNode = null;
+
         if (messageType == MessageType.MESSAGE_CHANGED) {
             node = node.get("message");
         } else if (messageType == MessageType.BOT_MESSAGE) {
             fromUserIdNode = node.get("bot_id");
-
-            JsonNode attachmentNode = node.get("attachments");
-            if (attachmentNode != null) {
-                // just get the first one
-                node = attachmentNode.iterator().next();
-            }
         }
 
-        String fromName = getAsTextOrNull(node.get("username"));
+        JsonNode attachmentNode = node.get("attachments");
+        boolean isShare = false;
+        if (attachmentNode != null) {
+            // just get the first one
+            attachmentNode = attachmentNode.iterator().next();
+            JsonNode isShareNode = attachmentNode.get("is_share");
+            if (isShareNode != null) {
+                isShare = isShareNode.asBoolean();
+            }
+        }
 
         if (messageType != MessageType.BOT_MESSAGE) {
             fromUserIdNode = node.get("user");
         }
+
+        if (messageType == MessageType.MESSAGE && isShare) {
+            messageType = MessageType.MESSAGE_SHARE;
+        }
+
         String fromUserId;
         if (fromUserIdNode == null) {
             fromUserId = fromName;
@@ -64,9 +77,13 @@ public class MessageDeserializer extends JsonChatDeserializer<Message> {
 
         String message = getAsTextOrNull(node.get("text"));
 
-        if (message == null) {
-            message = getAsTextOrNull(node.get("pretext"));
+        if ((message == null || message.isEmpty()) && attachmentNode != null) {
+            message = getAsTextOrNull(attachmentNode.get("pretext"));
         }
+        if ((message == null || message.isEmpty()) && attachmentNode != null) {
+            message = getAsTextOrNull(attachmentNode.get("fallback"));
+        }
+
         return new Message(date, fromName, fromUserId, message, channelId, messageType);
     }
 

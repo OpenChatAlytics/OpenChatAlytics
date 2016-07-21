@@ -69,6 +69,21 @@ public class MessageDeserializerTest {
     }
 
     /**
+     * Tests deserialize with an attachment message type
+     */
+    @Test
+    public void testDeserialize_withShare() throws Exception {
+        Message msg = objMapper.readValue(shareStr, Message.class);
+        assertEquals("U023BECGF", msg.getFromUserId());
+        assertEquals("C0WE24FDS", msg.getRoomId());
+        assertEquals("[July 1st, 2016 9:00 PM] user: ms", msg.getMessage());
+        // the deserializer drops the nanoseconds
+        assertEquals(new DateTime(1464723427000L), msg.getDate());
+        assertEquals(null, msg.getFromName());
+        assertEquals(MessageType.MESSAGE_SHARE, msg.getType());
+    }
+
+    /**
      * Tests deserialize with a message changed type
      */
     @Test
@@ -150,6 +165,42 @@ public class MessageDeserializerTest {
                                        "\"subtype\": \"bot_message\"," +
                                        "\"ts\": \"1464723327.000002\"" +
                                    "}";
+
+    private final String shareStr = "{" +
+                                        "\"type\":\"message\"," +
+                                        "\"user\":\"U023BECGF\"," +
+                                        "\"text\":\"\"," +
+                                        "\"team\":\"T0234DFAA\"," +
+                                        "\"user_team\":\"T0234DFAA\"," +
+                                        "\"user_profile\":{" +
+                                            "\"avatar_hash\":\"61b73f16baff\"," +
+                                            "\"image_72\":\"https://image.jpg\"," +
+                                            "\"first_name\":\"User\"," +
+                                            "\"real_name\":\"User N\"," +
+                                            "\"name\":\"user\"" +
+                                        "}," +
+                                        "\"attachments\":[{" +
+                                            "\"fallback\":\"[July 1st, 2016 9:00 PM] user: ms\","+
+                                            "\"author_subname\":\"user\"," +
+                                            "\"ts\":\"1464723327.000022\"," +
+                                            "\"channel_id\":\"C0G1JEKRU\"," +
+                                            "\"channel_name\":\"room\"," +
+                                            "\"is_msg_unfurl\":true," +
+                                            "\"text\":\"test\"," +
+                                            "\"author_name\":\"User N\"," +
+                                            "\"author_link\":\"https://slack.com/team/user\"," +
+                                            "\"author_icon\":\"https://icon.jpg\"," +
+                                            "\"mrkdwn_in\":[" +
+                                                "\"text\"" +
+                                            "]," +
+                                            "\"color\":\"D0D0D0\"," +
+                                            "\"from_url\":\"https://archives/room/32344\"," +
+                                            "\"is_share\":true," +
+                                            "\"footer\":\"Posted in #room\"" +
+                                        "}]," +
+                                        "\"channel\":\"C0WE24FDS\"," +
+                                        "\"ts\":\"1464723427.000022\"" +
+                                    "}";
 
     private final String msgChangedStr = "{" +
                                              "\"type\": \"message\"," +
