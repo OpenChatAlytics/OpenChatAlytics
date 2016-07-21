@@ -9,6 +9,7 @@ import com.chatalytics.web.resources.EmojisResource;
 import com.chatalytics.web.resources.EntitiesResource;
 import com.chatalytics.web.resources.EventsResource;
 import com.chatalytics.web.resources.MessageSummaryResource;
+import com.chatalytics.web.resources.StatusResource;
 import com.chatalytics.web.resources.UsersResource;
 import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
 import com.google.common.collect.Sets;
@@ -98,6 +99,7 @@ public class ServerMain extends Application {
                                new EmojisResource(config),
                                new UsersResource(config),
                                new MessageSummaryResource(config),
+                               new StatusResource(),
                                new ApiListingResource(),
                                jsonProvider);
     }
