@@ -1,4 +1,4 @@
-package com.chatalytics.compute.realtime;
+package com.chatalytics.compute.web.realtime;
 
 import com.chatalytics.core.model.data.ChatAlyticsEvent;
 import com.chatalytics.core.realtime.ChatAlyticsEventDecoder;

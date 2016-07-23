@@ -13,7 +13,7 @@ import javax.websocket.CloseReason;
 import javax.websocket.RemoteEndpoint.Async;
 import javax.websocket.Session;
 
-import static com.chatalytics.compute.realtime.RealtimeResource.RT_COMPUTE_ENDPOINT;
+import static com.chatalytics.compute.web.realtime.RealtimeResource.RT_COMPUTE_ENDPOINT;
 import static com.chatalytics.web.resources.EventsResource.RT_EVENT_ENDPOINT;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;

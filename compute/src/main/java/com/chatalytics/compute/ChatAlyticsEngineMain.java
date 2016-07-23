@@ -1,10 +1,10 @@
 package com.chatalytics.compute;
 
 import com.chatalytics.compute.db.dao.ChatAlyticsDAOFactory;
-import com.chatalytics.compute.realtime.ComputeRealtimeServer;
-import com.chatalytics.compute.realtime.ComputeRealtimeServerFactory;
 import com.chatalytics.compute.storm.ChatAlyticsService;
 import com.chatalytics.compute.storm.ChatAlyticsStormTopology;
+import com.chatalytics.compute.web.realtime.ComputeRealtimeServer;
+import com.chatalytics.compute.web.realtime.ComputeRealtimeServerFactory;
 import com.chatalytics.core.CommonCLIBuilder;
 import com.chatalytics.core.config.ChatAlyticsConfig;
 import com.chatalytics.core.util.YamlUtils;
