@@ -72,6 +72,8 @@ public class ServerMain extends Application {
         EventsResource eventResource = new EventsResource();
         RealtimeComputeClient computeClient = new RealtimeComputeClient(config, eventResource);
         ServerMain serverMain = new ServerMain(config, computeClient);
+
+        LOG.info("Starting compute client");
         serverMain.startComputeClient();
 
         // Start the server
@@ -85,6 +87,7 @@ public class ServerMain extends Application {
 
         addShutdownHook(computeClient);
 
+        LOG.info("Starting web server");
         server.start();
         server.join();
     }

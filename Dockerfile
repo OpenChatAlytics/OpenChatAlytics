@@ -17,4 +17,4 @@ RUN cp web/target/chatalytics-web-0.3-with-dependencies.jar ${CHATALYTICSDIR}
 RUN cp compute/target/chatalytics-compute-0.3-with-dependencies.jar ${CHATALYTICSDIR}
 
 # Run ChatAlytics
-CMD ./bin/start-web-compute.sh
+CMD ./bin/start-web-compute.sh chatalytics-local.yaml

@@ -1,9 +1,6 @@
 #!/bin/sh
 set -e
 
-# Kill all child processes if the main process exits
-trap 'jobs -p | xargs kill' EXIT
-
 if [ "$#" -ne 1 ]
 then
     echo "You haven't specified the configuration file"
@@ -12,16 +9,24 @@ fi
 
 config_file=$1
 
-echo "Starting web server with configuration: $config_file..."
-
-nohup java -cp\
-    chatalytics-web-0.3-with-dependencies.jar:config\
-    -Dlogback.configurationFile=config/web/logback.xml com.chatalytics.web.ServerMain\
-    -c $config_file > /dev/null 2>&1 &
-
 echo "Starting compute server with configuration: $config_file..."
 
-java -cp\
+sleep 15
+
+nohup java -cp\
     chatalytics-compute-0.3-with-dependencies.jar:config\
     -Dlogback.configurationFile=config/compute/logback.xml com.chatalytics.compute.ChatAlyticsEngineMain\
-    -c $config_file 2>&1 > /dev/null
+    -c $config_file 2>&1 > /dev/null &
+
+sleep_time_secs=5
+
+echo "Sleeping for $sleep_time_secs waiting for compute to start up"
+
+sleep $sleep_time_secs
+
+echo "Starting web server with configuration: $config_file..."
+
+java -cp\
+    chatalytics-web-0.3-with-dependencies.jar:config\
+    -Dlogback.configurationFile=config/web/logback.xml com.chatalytics.web.ServerMain\
+    -c $config_file

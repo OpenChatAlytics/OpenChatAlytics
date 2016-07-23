@@ -27,13 +27,13 @@ To start the container in the backgroung based on that image run:
 `docker run -d --name chatalytics chatalytics`
 
 You should be able to see the container running by executing:
-`docker ps`
+`docker ps -f name=chatalytics -a`
 
 To ssh into the container run:
 `docker exec -i -t chatalytics bash`
 
 To stop the container run:
-`docker stop`
+`docker stop chatalytics`
 
 To remove old containers run:
 `docker rm chatalytics`
