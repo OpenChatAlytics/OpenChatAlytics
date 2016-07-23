@@ -7,6 +7,6 @@ computeConfig:
         'com.chatalytics.bolts.sentiment.words': files/sentiment_words.csv
     chatConfig: !!com.chatalytics.core.config.LocalTestConfig
         randomSeed: 0
-        messageCorpusFile: corpus/test_corpus.txt
+        messageCorpusFile: compute/corpus/test_corpus.txt
 webConfig:
     port: 8080
