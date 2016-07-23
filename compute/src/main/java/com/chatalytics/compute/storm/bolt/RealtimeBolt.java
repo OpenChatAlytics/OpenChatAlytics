@@ -27,7 +27,7 @@ import javax.websocket.EncodeException;
 import javax.websocket.Session;
 import javax.websocket.WebSocketContainer;
 
-import static com.chatalytics.compute.realtime.RealtimeResource.RT_COMPUTE_ENDPOINT;
+import static com.chatalytics.compute.web.realtime.RealtimeResource.RT_COMPUTE_ENDPOINT;
 import static com.google.common.base.CaseFormat.LOWER_UNDERSCORE;
 import static com.google.common.base.CaseFormat.UPPER_CAMEL;
 

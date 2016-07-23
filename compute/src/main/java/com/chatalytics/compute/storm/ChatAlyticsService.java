@@ -2,7 +2,7 @@ package com.chatalytics.compute.storm;
 
 import com.chatalytics.compute.ChatAlyticsEngineMain;
 import com.chatalytics.compute.config.ConfigurationConstants;
-import com.chatalytics.compute.realtime.ComputeRealtimeServer;
+import com.chatalytics.compute.web.realtime.ComputeRealtimeServer;
 import com.chatalytics.core.config.ChatAlyticsConfig;
 import com.chatalytics.core.util.YamlUtils;
 import com.google.common.util.concurrent.AbstractIdleService;

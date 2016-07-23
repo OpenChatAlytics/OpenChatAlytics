@@ -1,4 +1,4 @@
-package com.chatalytics.compute.realtime;
+package com.chatalytics.compute.web.realtime;
 
 import com.chatalytics.compute.web.resources.StatusResource;
 import com.chatalytics.core.config.ChatAlyticsConfig;

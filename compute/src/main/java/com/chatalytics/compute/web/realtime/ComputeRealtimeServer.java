@@ -1,4 +1,4 @@
-package com.chatalytics.compute.realtime;
+package com.chatalytics.compute.web.realtime;
 
 import com.google.common.util.concurrent.AbstractIdleService;
 
