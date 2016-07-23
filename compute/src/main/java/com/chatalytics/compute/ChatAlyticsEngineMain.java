@@ -16,6 +16,8 @@ import org.slf4j.LoggerFactory;
 
 import java.io.FileNotFoundException;
 import java.net.URISyntaxException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 /**
  * Entry point for running the Storm topology.
@@ -57,7 +59,12 @@ public class ChatAlyticsEngineMain {
         Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override
             public void run() {
-                chatalyticsService.stopAsync().awaitTerminated();
+                LOG.info("Shutting down ChatAlytics Compute...");
+                try {
+                    chatalyticsService.stopAsync().awaitTerminated(10, TimeUnit.SECONDS);
+                } catch (TimeoutException e) {
+                    LOG.error("Shutting down chatalytics service timed out...");
+                }
                 ChatAlyticsDAOFactory.closeEntityManagerFactory();
             }
         });
