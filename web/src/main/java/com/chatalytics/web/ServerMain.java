@@ -17,7 +17,10 @@ import com.sun.jersey.spi.container.servlet.ServletContainer;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Options;
+import org.apache.storm.shade.com.google.common.io.Resources;
 import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.handler.HandlerList;
+import org.eclipse.jetty.server.handler.ResourceHandler;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.websocket.jsr356.server.deploy.WebSocketServerContainerInitializer;
@@ -81,8 +84,16 @@ public class ServerMain extends Application {
         ServletContainer servletContainer = new ServletContainer(serverMain);
         ServletHolder servletHolder = new ServletHolder("/*", servletContainer);
         ServletContextHandler context = new ServletContextHandler();
+
+        ResourceHandler resourceHandler = new ResourceHandler();
+        resourceHandler.setDirectoriesListed(true);
+        resourceHandler.setResourceBase(Resources.getResource("public").toString());
+        HandlerList handlers = new HandlerList();
+        handlers.addHandler(resourceHandler);
+        handlers.addHandler(context);
+
         context.addServlet(servletHolder, "/*");
-        server.setHandler(context);
+        server.setHandler(handlers);
         setWebSocketEndpoints(context, eventResource);
 
         addShutdownHook(computeClient);

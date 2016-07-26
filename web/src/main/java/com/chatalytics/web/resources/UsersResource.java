@@ -60,6 +60,8 @@ public class UsersResource {
     public Map<String, String> getUserPhotoURLs() {
         LOG.debug("Got a call to get user photo URLs");
         return chatApiDao.getUsers().values().stream()
+                                             .filter(u -> u.getMentionName() != null
+                                                          && u.getPhotoUrl() != null)
                                              .collect(Collectors.toMap(User::getMentionName,
                                                                        User::getPhotoUrl));
     }
