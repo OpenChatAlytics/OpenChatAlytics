@@ -28,8 +28,11 @@ import java.util.Random;
  */
 public class LocalChatDao implements IChatApiDAO {
 
+    private static final String PHOTO_PATH = "/static/person_48.png";
+
     private final Map<String, User> users;
     private final Map<String, Room> rooms;
+    private final String baseUrl;
 
     public LocalChatDao(ChatAlyticsConfig config) {
         LocalTestConfig localConfig = (LocalTestConfig) config.computeConfig.chatConfig;
@@ -42,6 +45,7 @@ public class LocalChatDao implements IChatApiDAO {
             seed = localConfig.randomSeed;
         }
         Random rand = new Random(seed);
+        this.baseUrl = "http://localhost:" + config.webConfig.port;
 
         this.users = createRandomUsers(localConfig.numUsers, rand);
         this.rooms = createRandomRooms(localConfig.numRooms, rand);
@@ -105,7 +109,8 @@ public class LocalChatDao implements IChatApiDAO {
             String name = String.format("name-%s", namePostfix);
             String mentionName = RandomStringUtils.generateRandomAlphaNumericString(6, rand);
 
-            User randomUser = new User(userId, email, false, false, false, name, mentionName, null,
+            User randomUser = new User(userId, email, false, false, false, name, mentionName,
+                                       baseUrl + PHOTO_PATH,
                                        DateTime.now(DateTimeZone.UTC),
                                        DateTime.now(DateTimeZone.UTC), null, null, "UTC", null);
 
