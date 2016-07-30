@@ -45,7 +45,7 @@ To initialize the database run:
 `initdb /mnt/postgres/chatalytics`
 
 Then start postgres by running
-`pg_ctl  start`
+`pg_ctl start`
 
 You then need to create a user by running
 `createuser chat_user`
