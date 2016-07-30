@@ -11,14 +11,12 @@ config_file=$1
 
 echo "Starting compute server with configuration: $config_file..."
 
-sleep 15
-
 nohup java -cp\
     chatalytics-compute-0.3-with-dependencies.jar:config\
     -Dlogback.configurationFile=config/compute/logback.xml com.chatalytics.compute.ChatAlyticsEngineMain\
     -c $config_file 2>&1 > /dev/null &
 
-sleep_time_secs=5
+sleep_time_secs=15
 
 echo "Sleeping for $sleep_time_secs waiting for compute to start up"
 
