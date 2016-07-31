@@ -9,6 +9,7 @@ import com.chatalytics.web.resources.EmojisResource;
 import com.chatalytics.web.resources.EntitiesResource;
 import com.chatalytics.web.resources.EventsResource;
 import com.chatalytics.web.resources.MessageSummaryResource;
+import com.chatalytics.web.resources.RoomsResource;
 import com.chatalytics.web.resources.StatusResource;
 import com.chatalytics.web.resources.UsersResource;
 import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
@@ -112,6 +113,7 @@ public class ServerMain extends Application {
         return Sets.newHashSet(new EntitiesResource(config),
                                new EmojisResource(config),
                                new UsersResource(config),
+                               new RoomsResource(config),
                                new MessageSummaryResource(config),
                                new StatusResource(),
                                new ApiListingResource(),
