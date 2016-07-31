@@ -274,7 +274,7 @@ public class SlackBackfillSpoutTest {
     }
 
     @Test
-    public void testGetRunInterval() {
+    public void testGetRunInterval_noEndDate() {
         DateTime startDate = DateTime.now(DateTimeZone.UTC).minusDays(1);
         chatConfig.startDate = startDate.toString();
         stormConf.put(ConfigurationConstants.CHATALYTICS_CONFIG.txt, YamlUtils.writeYaml(config));
@@ -308,6 +308,55 @@ public class SlackBackfillSpoutTest {
         // approximately now
         assertEquals(DateTime.now(DateTimeZone.UTC).withMillisOfSecond(0),
                      returnInterval.getEnd().withMillisOfSecond(0));
+        verify(dbDao).getLastMessagePullTime();
+        verifyNoMoreInteractions(dbDao);
+    }
+
+    @Test
+    public void testGetRunInterval_withEndDate() {
+        DateTime startDate = DateTime.now(DateTimeZone.UTC).minusDays(1);
+        DateTime endDate = startDate.plusHours(3);
+        chatConfig.startDate = startDate.toString();
+        chatConfig.endDate = endDate.toString();
+        chatConfig.granularityMins = 60;
+        stormConf.put(ConfigurationConstants.CHATALYTICS_CONFIG.txt, YamlUtils.writeYaml(config));
+        IChatAlyticsDAO dbDao = mock(IChatAlyticsDAO.class);
+        IChatApiDAO slackDao = mock(IChatApiDAO.class);
+        underTest.open(chatConfig, slackDao, dbDao, context, collector);
+
+        // last pull time is in the past
+        when(dbDao.getLastMessagePullTime()).thenReturn(DateTime.now().minusDays(100));
+        Interval returnInterval = underTest.getRunInterval().get();
+        assertEquals(startDate, returnInterval.getStart());
+        // this is end date
+        assertEquals(endDate.withMillisOfSecond(0), returnInterval.getEnd().withMillisOfSecond(0));
+        assertEquals(startDate, returnInterval.getStart());
+        verify(dbDao).getLastMessagePullTime();
+        verifyNoMoreInteractions(dbDao);
+
+        // last pull time is in the future
+        reset(dbDao);
+        when(dbDao.getLastMessagePullTime()).thenReturn(DateTime.now().plusDays(100));
+        assertFalse(underTest.getRunInterval().isPresent());
+        verify(dbDao).getLastMessagePullTime();
+        verifyNoMoreInteractions(dbDao);
+
+        // init time is before last pull time but next start is after end time
+        reset(dbDao);
+        DateTime lastPullTime = startDate.plusDays(1);
+        when(dbDao.getLastMessagePullTime()).thenReturn(lastPullTime);
+        assertFalse(underTest.getRunInterval().isPresent());
+        verify(dbDao).getLastMessagePullTime();
+        verifyNoMoreInteractions(dbDao);
+
+        // last run time + granularity is after the end date
+        reset(dbDao);
+        // a minute after the end date plus granularity
+        lastPullTime = endDate.minusMinutes(chatConfig.granularityMins - 1);
+        when(dbDao.getLastMessagePullTime()).thenReturn(lastPullTime);
+        returnInterval = underTest.getRunInterval().get();
+        assertEquals(lastPullTime, returnInterval.getStart());
+        assertEquals(endDate, returnInterval.getEnd());
         verify(dbDao).getLastMessagePullTime();
         verifyNoMoreInteractions(dbDao);
     }

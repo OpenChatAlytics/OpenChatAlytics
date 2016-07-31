@@ -49,6 +49,7 @@ public class SlackBackfillSpout extends BaseRichSpout {
     public static final String BACKFILL_SLACK_MESSAGE_FIELD_STR = "slack-message";
 
     private DateTime initDate;
+    private DateTime endDate;
     private SpoutOutputCollector collector;
     private int granularityMins;
     private IChatApiDAO slackDao;
@@ -77,13 +78,19 @@ public class SlackBackfillSpout extends BaseRichSpout {
         this.slackDao = slackApiDao;
         this.dbDao = dbDao;
 
+        // get start date
         if (chatConfig.startDate == null) {
             // go back a day
             this.initDate = new DateTime(DateTimeZone.UTC).withHourOfDay(0)
-                                                           .withMinuteOfHour(0)
-                                                           .minusDays(1);
+                                                          .withMinuteOfHour(0)
+                                                          .minusDays(1);
         } else {
             this.initDate = DateTime.parse(chatConfig.startDate);
+        }
+
+        // get end date, if there is one
+        if (chatConfig.endDate != null) {
+            this.endDate = DateTime.parse(chatConfig.endDate);
         }
     }
 
@@ -176,7 +183,10 @@ public class SlackBackfillSpout extends BaseRichSpout {
     @VisibleForTesting
     protected Optional<Interval> getRunInterval() {
         DateTime startDate;
-        DateTime endDate = new DateTime(System.currentTimeMillis(), DateTimeZone.UTC);
+        DateTime nextEndDate = new DateTime(System.currentTimeMillis(), DateTimeZone.UTC);
+        if (nextEndDate.isAfter(endDate)) {
+            nextEndDate = endDate;
+        }
         DateTime lastRunDate = dbDao.getLastMessagePullTime();
 
         if (initDate.isAfter(lastRunDate)) {
@@ -185,12 +195,14 @@ public class SlackBackfillSpout extends BaseRichSpout {
             startDate = lastRunDate;
         }
 
-        if (startDate.plusMinutes(granularityMins).isAfter(endDate)) {
+        if (startDate.isBefore(endDate) &&
+                startDate.plusMinutes(granularityMins).isAfter(nextEndDate)) {
+            return Optional.of(new Interval(startDate, endDate));
+        } else if (startDate.plusMinutes(granularityMins).isAfter(nextEndDate)) {
             return Optional.absent();
+        } else {
+            return Optional.of(new Interval(startDate, nextEndDate));
         }
-
-        Interval runInterval = new Interval(startDate, endDate);
-        return Optional.of(runInterval);
     }
 
     @Override
