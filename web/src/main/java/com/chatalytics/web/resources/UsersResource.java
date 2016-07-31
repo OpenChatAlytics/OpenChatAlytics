@@ -26,7 +26,7 @@ import javax.ws.rs.core.MediaType;
 public class UsersResource {
 
     public static final String USER_ENDPOINT = WebConstants.API_PATH + "users";
-    private static final Logger LOG = LoggerFactory.getLogger(EmojisResource.class);
+    private static final Logger LOG = LoggerFactory.getLogger(UsersResource.class);
 
     private final IChatApiDAO chatApiDao;
 
