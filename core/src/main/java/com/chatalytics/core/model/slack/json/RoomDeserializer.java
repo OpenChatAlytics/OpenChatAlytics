@@ -34,7 +34,7 @@ public class RoomDeserializer extends JsonChatDeserializer<Room> {
         DateTime creationDate = new DateTime(node.get("created").asLong() * 1000L);
         String ownerUserId = node.get("creator").asText();
         boolean archived = node.get("is_archived").asBoolean();
-        boolean privateRoom = false;
+        boolean privateRoom = roomId.startsWith("G");
         return new Room(roomId, name, topic, null, creationDate, ownerUserId, archived,
                         privateRoom, null, null);
     }

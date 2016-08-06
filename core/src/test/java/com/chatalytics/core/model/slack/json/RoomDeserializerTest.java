@@ -44,6 +44,19 @@ public class RoomDeserializerTest {
         assertNull(r.getXmppJid());
         assertNull(r.getGuestAccessURL());
         assertNull(r.getLastActiveDate());
+
+        r = objMapper.readValue(privateRoomJsonStr, Room.class);
+        assertEquals("G024BE91L", r.getRoomId());
+        assertEquals(new DateTime(1360782804L * 1000), r.getCreationDate());
+        assertEquals("fun", r.getName());
+        assertEquals("U024BE7LH", r.getOwnerUserId());
+        assertEquals("G024BE91L", r.getRoomId());
+        assertEquals("Fun times", r.getTopic());
+        assertTrue(r.isArchived());
+        assertTrue(r.isPrivateRoom());
+        assertNull(r.getXmppJid());
+        assertNull(r.getGuestAccessURL());
+        assertNull(r.getLastActiveDate());
     }
 
     private final String roomJsonStr = "{" +
@@ -64,6 +77,26 @@ public class RoomDeserializerTest {
                                                "\"creator\": \"U024BE7LH\"," +
                                                "\"last_set\": 1360782804" +
                                            "}" +
-                                       "},";
+                                       "}";
+
+    private final String privateRoomJsonStr = "{" +
+                                                  "\"id\": \"G024BE91L\"," +
+                                                  "\"name\": \"fun\"," +
+                                                  "\"created\": 1360782804," +
+                                                  "\"creator\": \"U024BE7LH\"," +
+                                                  "\"is_archived\": true," +
+                                                  "\"is_member\": false," +
+                                                  "\"num_members\": 6," +
+                                                  "\"topic\": {" +
+                                                      "\"value\": \"Fun times\"," +
+                                                      "\"creator\": \"U024BE7LV\"," +
+                                                      "\"last_set\": 1369677212" +
+                                                  "}," +
+                                                  "\"purpose\": {" +
+                                                      "\"value\": \"This channel is for fun\"," +
+                                                      "\"creator\": \"U024BE7LH\"," +
+                                                      "\"last_set\": 1360782804" +
+                                                  "}" +
+                                              "}";
 
 }

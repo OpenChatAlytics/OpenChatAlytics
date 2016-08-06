@@ -52,17 +52,18 @@ public class JsonSlackDAOTest {
     private ChatAlyticsConfig config;
     private int apiRetries;
     private SlackConfig chatConfig;
+    private Client mockClient;
 
     @Before
     public void setUp() throws Exception {
         this.config = new ChatAlyticsConfig();
         this.config.inputType = InputSourceType.SLACK;
         this.chatConfig = new SlackConfig();
-        chatConfig.authTokens = Lists.newArrayList("0");
+        this.chatConfig.authTokens = Lists.newArrayList("0");
         this.config.computeConfig.chatConfig = chatConfig;
         this.apiRetries = config.computeConfig.apiRetries;
-        Client mockClient = mock(Client.class);
-        mockResource = mock(WebResource.class);
+        this.mockClient = mock(Client.class);
+        this.mockResource = mock(WebResource.class);
         when(mockClient.resource(chatConfig.getBaseAPIURL())).thenReturn(mockResource);
         underTest = spy(new JsonSlackDAO(config, mockClient));
     }
@@ -87,6 +88,39 @@ public class JsonSlackDAOTest {
         for (Room room : rooms.values()) {
             assertNotNull(room);
         }
+    }
+
+    /**
+     * Make sure private rooms are also returned along with the non-private ones
+     */
+    @Test
+    public void testGetRooms_withPrivateRooms() throws Exception {
+        chatConfig.includePrivateRooms = true;
+        underTest = spy(new JsonSlackDAO(config, mockClient));
+
+        // channels.list
+        WebResource mockChanResource = mock(WebResource.class);
+        when(mockResource.path("channels.list")).thenReturn(mockChanResource);
+        URI channelListURI = Resources.getResource("slack_api_responses/channels.list.txt").toURI();
+        Path channelsPath = Paths.get(channelListURI);
+        String channelsResponseStr = new String(Files.readAllBytes(channelsPath));
+        doReturn(channelsResponseStr).when(underTest).getJsonResultWithRetries(mockChanResource,
+                                                                               apiRetries);
+        // groups.list
+        WebResource mockGroupsResource = mock(WebResource.class);
+        when(mockResource.path("groups.list")).thenReturn(mockGroupsResource);
+        URI groupsListURI = Resources.getResource("slack_api_responses/groups.list.txt").toURI();
+        Path groupsPath = Paths.get(groupsListURI);
+        String groupsResponseStr = new String(Files.readAllBytes(groupsPath));
+        doReturn(groupsResponseStr).when(underTest).getJsonResultWithRetries(mockGroupsResource,
+                                                                             apiRetries);
+
+        Map<String, Room> rooms = underTest.getRooms();
+        assertEquals(3, rooms.size());
+        for (Room room : rooms.values()) {
+            assertNotNull(room);
+        }
+
     }
 
     /**
@@ -158,6 +192,53 @@ public class JsonSlackDAOTest {
     }
 
     /**
+     * Makes sure users for a private room are returned
+     */
+    @Test
+    public void testGetUsersForRoom_privateRoom() throws Exception {
+
+        // channels.info
+        WebResource mockChanInfoResrc = mock(WebResource.class);
+        when(mockResource.path("groups.info")).thenReturn(mockChanInfoResrc);
+        when(mockChanInfoResrc.queryParam(anyString(), anyString())).thenReturn(mockChanInfoResrc);
+        URI chanInfoURI = Resources.getResource("slack_api_responses/groups.info.txt").toURI();
+        Path channelsInfoPath = Paths.get(chanInfoURI);
+        String chanInfoResponseStr = new String(Files.readAllBytes(channelsInfoPath));
+        doReturn(chanInfoResponseStr).when(underTest).getJsonResultWithRetries(mockChanInfoResrc,
+                                                                               apiRetries);
+
+        // users.info
+        WebResource mockUserInfoResource = mock(WebResource.class);
+        when(mockResource.path("users.info")).thenReturn(mockUserInfoResource);
+        // user 1
+        WebResource user1InfoResource = mock(WebResource.class);
+        when(mockUserInfoResource.queryParam("user", "U023BECGF")).thenReturn(user1InfoResource);
+        URI userInfoURI = Resources.getResource("slack_api_responses/users.info.1.txt").toURI();
+        Path usersInfoPath = Paths.get(userInfoURI);
+        String userInfoResponseStr = new String(Files.readAllBytes(usersInfoPath));
+        doReturn(userInfoResponseStr).when(underTest).getJsonResultWithRetries(user1InfoResource,
+                                                                               apiRetries);
+
+        // user 2
+        WebResource user2InfoResource = mock(WebResource.class);
+        when(mockUserInfoResource.queryParam("user", "U023TY454")).thenReturn(user2InfoResource);
+        userInfoURI = Resources.getResource("slack_api_responses/users.info.2.txt").toURI();
+        usersInfoPath = Paths.get(userInfoURI);
+        userInfoResponseStr = new String(Files.readAllBytes(usersInfoPath));
+        doReturn(userInfoResponseStr).when(underTest).getJsonResultWithRetries(user2InfoResource,
+                                                                               apiRetries);
+
+        Room mockRoom = mock(Room.class);
+        when(mockRoom.getRoomId()).thenReturn("G024BE91L");
+        when(mockRoom.isPrivateRoom()).thenReturn(true);
+        Map<String, User> usersForRoom = underTest.getUsersForRoom(mockRoom);
+        assertEquals(2, usersForRoom.size());
+        for (User user : usersForRoom.values()) {
+            assertNotNull(user);
+        }
+    }
+
+    /**
      * Makes sure messages for a given room and time interval are properly returned
      */
     @Test
@@ -175,6 +256,34 @@ public class JsonSlackDAOTest {
 
         Room mockRoom = mock(Room.class);
         when(mockRoom.getRoomId()).thenReturn("C0SDFG423");
+        DateTime now = DateTime.now();
+
+        List<Message> messages = underTest.getMessages(now.minusDays(1), now, mockRoom);
+        assertEquals(7, messages.size());
+        for (Message message : messages) {
+            assertNotNull(message);
+        }
+    }
+
+    /**
+     * Makes sure messages for a given private channel are returned
+     */
+    @Test
+    public void testGetMessages_privateChannel() throws Exception {
+
+        // channels.history
+        WebResource mockHistoryResrc = mock(WebResource.class);
+        when(mockResource.path("groups.history")).thenReturn(mockHistoryResrc);
+        when(mockHistoryResrc.queryParam(anyString(), anyString())).thenReturn(mockHistoryResrc);
+        URI historyURI = Resources.getResource("slack_api_responses/groups.history.txt").toURI();
+        Path historyPath = Paths.get(historyURI);
+        String historyResponseStr = new String(Files.readAllBytes(historyPath));
+        doReturn(historyResponseStr).when(underTest).getJsonResultWithRetries(mockHistoryResrc,
+                                                                              apiRetries);
+
+        Room mockRoom = mock(Room.class);
+        when(mockRoom.getRoomId()).thenReturn("G0SDFG423");
+        when(mockRoom.isPrivateRoom()).thenReturn(true);
         DateTime now = DateTime.now();
 
         List<Message> messages = underTest.getMessages(now.minusDays(1), now, mockRoom);

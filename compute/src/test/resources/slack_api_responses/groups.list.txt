@@ -1,0 +1,24 @@
+{
+  "ok": true,
+  "groups": [
+    {
+      "id": "G024BE91L",
+      "name": "secret",
+      "created": 1360782804,
+      "creator": "U087BY7FG",
+      "is_archived": false,
+      "is_member": false,
+      "num_members": 6,
+      "topic": {
+        "value": "This is private",
+        "creator": "U057OP7ER",
+        "last_set": 1369677212
+      },
+      "purpose": {
+        "value": "This channel is for secrets",
+        "creator": "U017RY7PP",
+        "last_set": 1360782804
+      }
+    }
+  ]
+}

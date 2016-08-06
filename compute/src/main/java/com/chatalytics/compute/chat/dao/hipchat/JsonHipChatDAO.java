@@ -48,6 +48,7 @@ public class JsonHipChatDAO extends AbstractJSONChatApiDAO {
     public final DateTimeFormatter apiDateFormat;
     private final int apiRetries;
     private final String timeZoneStr;
+    private final boolean includePrivateRooms;
 
     public JsonHipChatDAO(ChatAlyticsConfig config, Client client) {
         super(config.computeConfig.chatConfig.getAuthTokens(), AUTH_TOKEN_PARAM);
@@ -58,6 +59,7 @@ public class JsonHipChatDAO extends AbstractJSONChatApiDAO {
         this.apiDateFormat = DateTimeFormat.forPattern(config.computeConfig.apiDateFormat)
                                            .withZone(dtz);
         this.objMapper = JsonObjectMapperFactory.createObjectMapper(config.inputType);
+        this.includePrivateRooms = config.computeConfig.chatConfig.includePrivateRooms();
     }
 
     /**
@@ -70,6 +72,9 @@ public class JsonHipChatDAO extends AbstractJSONChatApiDAO {
         Collection<Room> roomCol = deserializeJsonStr(jsonStr, "rooms", Room.class, objMapper);
         Map<String, Room> result = Maps.newHashMapWithExpectedSize(roomCol.size());
         for (Room room : roomCol) {
+            if (room.isPrivateRoom() && !includePrivateRooms) {
+                continue;
+            }
             result.put(room.getRoomId(), room);
         }
         return result;

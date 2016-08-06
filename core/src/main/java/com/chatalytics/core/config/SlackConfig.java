@@ -14,6 +14,8 @@ public class SlackConfig implements ChatConfig {
 
     public char emojiEndChar = ':';
 
+    public boolean includePrivateRooms = false;
+
     /**
      * Optional start date. The spout will start processing records on and after this date. That
      * means that it's inclusive of the date
@@ -38,6 +40,11 @@ public class SlackConfig implements ChatConfig {
     @Override
     public char getEmojiEndChar() {
         return emojiEndChar;
+    }
+
+    @Override
+    public boolean includePrivateRooms() {
+        return includePrivateRooms;
     }
 
 }

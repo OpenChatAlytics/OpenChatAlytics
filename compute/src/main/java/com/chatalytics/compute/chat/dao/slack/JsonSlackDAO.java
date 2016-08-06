@@ -46,12 +46,14 @@ public class JsonSlackDAO extends AbstractJSONChatApiDAO {
     private final WebResource resource;
     private final ObjectMapper objMapper;
     private final int apiRetries;
+    private final boolean includePrivateRooms;
 
     public JsonSlackDAO(ChatAlyticsConfig config, Client client) {
         super(config.computeConfig.chatConfig.getAuthTokens(), AUTH_TOKEN_PARAM);
         this.resource = client.resource(config.computeConfig.chatConfig.getBaseAPIURL());
         this.apiRetries = config.computeConfig.apiRetries;
         this.objMapper = JsonObjectMapperFactory.createObjectMapper(config.inputType);
+        this.includePrivateRooms = config.computeConfig.chatConfig.includePrivateRooms();
     }
 
     @Override
@@ -59,6 +61,15 @@ public class JsonSlackDAO extends AbstractJSONChatApiDAO {
         WebResource roomResource = resource.path("channels.list");
         String jsonStr = getJsonResultWithRetries(roomResource, apiRetries);
         Collection<Room> roomCol = deserializeJsonStr(jsonStr, "channels", Room.class, objMapper);
+
+        if (includePrivateRooms) {
+            roomResource = resource.path("groups.list");
+            jsonStr = getJsonResultWithRetries(roomResource, apiRetries);
+            Collection<Room> privateRoomCol = deserializeJsonStr(jsonStr, "groups", Room.class,
+                                                                 objMapper);
+            roomCol.addAll(privateRoomCol);
+        }
+
         Map<String, Room> result = Maps.newHashMapWithExpectedSize(roomCol.size());
         for (Room room : roomCol) {
             result.put(room.getRoomId(), room);
@@ -80,11 +91,20 @@ public class JsonSlackDAO extends AbstractJSONChatApiDAO {
 
     @Override
     public Map<String, User> getUsersForRoom(Room room) {
-        WebResource roomResource = resource.path("channels.info");
+        String pathStr;
+        String listElem;
+        if (room.isPrivateRoom()) {
+            pathStr = "groups.info";
+            listElem = "group";
+        } else {
+            pathStr = "channels.info";
+            listElem = "channel";
+        }
+        WebResource roomResource = resource.path(pathStr);
         roomResource = roomResource.queryParam("channel", room.getRoomId());
         String jsonStr = getJsonResultWithRetries(roomResource, apiRetries);
         Collection<String> userIdCol = deserializeJsonStr(jsonStr,
-                                                          Lists.newArrayList("channel", "members"),
+                                                          Lists.newArrayList(listElem, "members"),
                                                           String.class,
                                                           objMapper);
         // get info for user IDs
@@ -131,7 +151,13 @@ public class JsonSlackDAO extends AbstractJSONChatApiDAO {
 
     @Override
     public List<Message> getMessages(DateTime start, DateTime end, Room room) {
-        WebResource historyResource = resource.path("channels.history");
+        String pathName;
+        if (room.isPrivateRoom()) {
+            pathName = "groups.history";
+        } else {
+            pathName = "channels.history";
+        }
+        WebResource historyResource = resource.path(pathName);
         List<Message> result = Lists.newArrayList();
         boolean hasNext = true;
 

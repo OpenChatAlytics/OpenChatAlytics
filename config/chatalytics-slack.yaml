@@ -9,5 +9,6 @@ computeConfig:
     chatConfig: !!com.chatalytics.core.config.SlackConfig
         baseAPIURL: https://slack.com/api/
         authTokens: ['0']
+        includePrivateRooms: true
 webConfig:
     port: 8080
