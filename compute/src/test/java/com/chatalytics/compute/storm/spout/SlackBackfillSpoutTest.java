@@ -172,26 +172,6 @@ public class SlackBackfillSpoutTest {
     }
 
     @Test
-    public void testBackfillRooms_archivedRoom() {
-        stormConf.put(ConfigurationConstants.CHATALYTICS_CONFIG.txt, YamlUtils.writeYaml(config));
-        IChatAlyticsDAO dbDao = mock(IChatAlyticsDAO.class);
-        IChatApiDAO slackDao = mock(IChatApiDAO.class);
-        underTest.open(chatConfig, slackDao, dbDao, context, collector);
-
-        Map<String, User> users = ImmutableMap.of("u1", new User("u1", "email", false, false, false,
-                                                                 "name", "mention_name", null,
-                                                                 DateTime.now(), DateTime.now(),
-                                                                 null, null, null, null));
-        Map<String, Room> rooms = ImmutableMap.of("r1", new Room("r1", "room", null, DateTime.now(),
-                                                                 DateTime.now(), null, true, false,
-                                                                 null, null));
-        Interval interval = new Interval(DateTime.now().minusDays(1), DateTime.now());
-
-        underTest.backfillRooms(users, rooms, interval);
-        verifyZeroInteractions(collector, slackDao);
-    }
-
-    @Test
     public void testBackfillRooms_unknownMessageType() {
         stormConf.put(ConfigurationConstants.CHATALYTICS_CONFIG.txt, YamlUtils.writeYaml(config));
         IChatAlyticsDAO dbDao = mock(IChatAlyticsDAO.class);

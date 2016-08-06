@@ -66,4 +66,9 @@ public class LocalTestConfig implements ChatConfig {
         return true;
     }
 
+    @Override
+    public boolean includeArchivedRooms() {
+        return true;
+    }
+
 }

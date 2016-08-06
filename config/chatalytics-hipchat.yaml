@@ -10,5 +10,6 @@ computeConfig:
         baseAPIURL: https://api.hipchat.com/v1/
         authTokens: ['0']
         includePrivateRooms: true
+        includeArchivedRooms: true
 webConfig:
     port: 8080
