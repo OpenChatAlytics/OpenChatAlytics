@@ -16,6 +16,8 @@ public class HipChatConfig implements ChatConfig {
 
     public boolean includePrivateRooms = false;
 
+    public boolean includeArchivedRooms = false;
+
     @Override
     public List<String> getAuthTokens() {
         return authTokens;
@@ -41,4 +43,8 @@ public class HipChatConfig implements ChatConfig {
         return includePrivateRooms;
     }
 
+    @Override
+    public boolean includeArchivedRooms() {
+        return includeArchivedRooms;
+    }
 }

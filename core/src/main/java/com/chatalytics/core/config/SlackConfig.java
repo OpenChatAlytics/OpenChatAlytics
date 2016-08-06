@@ -16,6 +16,8 @@ public class SlackConfig implements ChatConfig {
 
     public boolean includePrivateRooms = false;
 
+    public boolean includeArchivedRooms = false;
+
     /**
      * Optional start date. The spout will start processing records on and after this date. That
      * means that it's inclusive of the date
@@ -45,6 +47,11 @@ public class SlackConfig implements ChatConfig {
     @Override
     public boolean includePrivateRooms() {
         return includePrivateRooms;
+    }
+
+    @Override
+    public boolean includeArchivedRooms() {
+        return includeArchivedRooms;
     }
 
 }

@@ -30,4 +30,9 @@ public interface ChatConfig extends Serializable {
      */
     boolean includePrivateRooms();
 
+    /**
+     * @return True if archived rooms should also be processed
+     */
+    boolean includeArchivedRooms();
+
 }

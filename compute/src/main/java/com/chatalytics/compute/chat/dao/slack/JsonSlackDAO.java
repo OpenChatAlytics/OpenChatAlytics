@@ -47,6 +47,7 @@ public class JsonSlackDAO extends AbstractJSONChatApiDAO {
     private final ObjectMapper objMapper;
     private final int apiRetries;
     private final boolean includePrivateRooms;
+    private final boolean includeArchivedRooms;
 
     public JsonSlackDAO(ChatAlyticsConfig config, Client client) {
         super(config.computeConfig.chatConfig.getAuthTokens(), AUTH_TOKEN_PARAM);
@@ -54,16 +55,19 @@ public class JsonSlackDAO extends AbstractJSONChatApiDAO {
         this.apiRetries = config.computeConfig.apiRetries;
         this.objMapper = JsonObjectMapperFactory.createObjectMapper(config.inputType);
         this.includePrivateRooms = config.computeConfig.chatConfig.includePrivateRooms();
+        this.includeArchivedRooms = config.computeConfig.chatConfig.includeArchivedRooms();
     }
 
     @Override
     public Map<String, Room> getRooms() {
         WebResource roomResource = resource.path("channels.list");
+        roomResource.queryParam("exclude_archived", includeArchivedRooms ? "0" : "1");
         String jsonStr = getJsonResultWithRetries(roomResource, apiRetries);
         Collection<Room> roomCol = deserializeJsonStr(jsonStr, "channels", Room.class, objMapper);
 
         if (includePrivateRooms) {
             roomResource = resource.path("groups.list");
+            roomResource.queryParam("exclude_archived", includeArchivedRooms ? "0" : "1");
             jsonStr = getJsonResultWithRetries(roomResource, apiRetries);
             Collection<Room> privateRoomCol = deserializeJsonStr(jsonStr, "groups", Room.class,
                                                                  objMapper);

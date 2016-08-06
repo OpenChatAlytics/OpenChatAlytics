@@ -10,5 +10,6 @@ computeConfig:
         baseAPIURL: https://slack.com/api/
         authTokens: ['0']
         includePrivateRooms: true
+        includeArchivedRooms: true
 webConfig:
     port: 8080

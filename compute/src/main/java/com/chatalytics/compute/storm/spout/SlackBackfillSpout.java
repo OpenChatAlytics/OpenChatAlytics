@@ -125,18 +125,13 @@ public class SlackBackfillSpout extends BaseRichSpout {
     @VisibleForTesting
     protected void backfillRooms(Map<String, User> users, Map<String, Room> rooms,
                                  Interval runInterval) {
-        Set<String> skippedRoomNames = Sets.newHashSet();
+        Set<String> processedRoomNames = Sets.newHashSet(rooms.keySet());
         int skippedUnknownMessages = 0;
         LOG.info("Backfilling {} rooms", rooms.size());
         int roomNum = 0;
         for (Room room : rooms.values()) {
             roomNum++;
-
-            if (room.isArchived()) {
-                LOG.debug("Skipping archived room {}", room.getName());
-                skippedRoomNames.add(room.getName());
-                continue;
-            }
+            processedRoomNames.add(room.getName());
 
             List<Message> messages = slackDao.getMessages(runInterval.getStart(),
                                                           runInterval.getEnd(),
@@ -162,8 +157,8 @@ public class SlackBackfillSpout extends BaseRichSpout {
             logProgress(roomNum, rooms.size());
 
         }
-        LOG.info("Finished backfilling. Skipped {} unknown msgs. Skipped {} rooms. They were: {}",
-                 skippedUnknownMessages, skippedRoomNames.size(), skippedRoomNames);
+        LOG.info("Finished backfilling. Skipped {} unknown msgs. Processed {} rooms. They were: {}",
+                 skippedUnknownMessages, processedRoomNames.size(), processedRoomNames);
     }
 
     private void logProgress(int roomNum, int totalRooms) {

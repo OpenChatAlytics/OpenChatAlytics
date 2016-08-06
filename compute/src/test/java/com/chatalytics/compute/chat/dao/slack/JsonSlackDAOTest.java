@@ -60,6 +60,8 @@ public class JsonSlackDAOTest {
         this.config.inputType = InputSourceType.SLACK;
         this.chatConfig = new SlackConfig();
         this.chatConfig.authTokens = Lists.newArrayList("0");
+        this.chatConfig.includeArchivedRooms = false;
+        this.chatConfig.includePrivateRooms = false;
         this.config.computeConfig.chatConfig = chatConfig;
         this.apiRetries = config.computeConfig.apiRetries;
         this.mockClient = mock(Client.class);
@@ -78,6 +80,31 @@ public class JsonSlackDAOTest {
         WebResource mockChanResource = mock(WebResource.class);
         when(mockResource.path("channels.list")).thenReturn(mockChanResource);
         URI channelListURI = Resources.getResource("slack_api_responses/channels.list.txt").toURI();
+        Path channelsPath = Paths.get(channelListURI);
+        String channelsResponseStr = new String(Files.readAllBytes(channelsPath));
+        doReturn(channelsResponseStr).when(underTest).getJsonResultWithRetries(mockChanResource,
+                                                                               apiRetries);
+
+        Map<String, Room> rooms = underTest.getRooms();
+        assertEquals(1, rooms.size());
+        for (Room room : rooms.values()) {
+            assertNotNull(room);
+        }
+    }
+
+    /**
+     * Makes sure archived rooms can be returned
+     */
+    @Test
+    public void testGetRooms_withArchivedRooms() throws Exception {
+        chatConfig.includeArchivedRooms = true;
+        underTest = spy(new JsonSlackDAO(config, mockClient));
+
+        // channels.list
+        WebResource mockChanResource = mock(WebResource.class);
+        when(mockResource.path("channels.list")).thenReturn(mockChanResource);
+        URI channelListURI =
+            Resources.getResource("slack_api_responses/channels.list.archived.txt").toURI();
         Path channelsPath = Paths.get(channelListURI);
         String channelsResponseStr = new String(Files.readAllBytes(channelsPath));
         doReturn(channelsResponseStr).when(underTest).getJsonResultWithRetries(mockChanResource,
@@ -116,11 +143,46 @@ public class JsonSlackDAOTest {
                                                                              apiRetries);
 
         Map<String, Room> rooms = underTest.getRooms();
-        assertEquals(3, rooms.size());
+        assertEquals(2, rooms.size());
         for (Room room : rooms.values()) {
             assertNotNull(room);
         }
+    }
 
+    /**
+     * Make sure private and archived rooms are also returned along with the non-private and
+     * non-archived ones
+     */
+    @Test
+    public void testGetRooms_withPrivateAndArhivedRooms() throws Exception {
+        chatConfig.includePrivateRooms = true;
+        chatConfig.includeArchivedRooms = true;
+        underTest = spy(new JsonSlackDAO(config, mockClient));
+
+        // channels.list
+        WebResource mockChanResource = mock(WebResource.class);
+        when(mockResource.path("channels.list")).thenReturn(mockChanResource);
+        URI channelListURI =
+            Resources.getResource("slack_api_responses/channels.list.archived.txt").toURI();
+        Path channelsPath = Paths.get(channelListURI);
+        String channelsResponseStr = new String(Files.readAllBytes(channelsPath));
+        doReturn(channelsResponseStr).when(underTest).getJsonResultWithRetries(mockChanResource,
+                                                                               apiRetries);
+        // groups.list
+        WebResource mockGroupsResource = mock(WebResource.class);
+        when(mockResource.path("groups.list")).thenReturn(mockGroupsResource);
+        URI groupsListURI =
+            Resources.getResource("slack_api_responses/groups.list.archived.txt").toURI();
+        Path groupsPath = Paths.get(groupsListURI);
+        String groupsResponseStr = new String(Files.readAllBytes(groupsPath));
+        doReturn(groupsResponseStr).when(underTest).getJsonResultWithRetries(mockGroupsResource,
+                                                                             apiRetries);
+
+        Map<String, Room> rooms = underTest.getRooms();
+        assertEquals(4, rooms.size());
+        for (Room room : rooms.values()) {
+            assertNotNull(room);
+        }
     }
 
     /**
