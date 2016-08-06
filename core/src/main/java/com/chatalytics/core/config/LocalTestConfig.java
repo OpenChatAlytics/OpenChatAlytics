@@ -61,4 +61,9 @@ public class LocalTestConfig implements ChatConfig {
         return emojiEndChar;
     }
 
+    @Override
+    public boolean includePrivateRooms() {
+        return true;
+    }
+
 }

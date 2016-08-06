@@ -1,0 +1,54 @@
+{
+  "ok": true,
+  "messages": [
+    {
+      "text": "Check this URL out: *<http:\/\/test.com|Test URL>. Isn't it cool?",
+      "username": "bot",
+      "bot_id": "B0N8R69KR",
+      "icons": {
+        "emoji": ":boom:",
+        "image_64": "https:\/\/image.com"
+      },
+      "type": "message",
+      "subtype": "bot_message",
+      "ts": "1431719027.000187"
+    },
+    {
+      "type": "message",
+      "user": "U023BECGF",
+      "text": "What a cool website",
+      "ts": "1431708451.000186"
+    },
+    {
+      "type": "message",
+      "user": "U023TY454",
+      "text": "Yes it is",
+      "ts": "1431708403.000185"
+    },
+    {
+      "type": "message",
+      "user": "U023BECGF",
+      "text": "Another test message from me.",
+      "ts": "1431708382.000184"
+    },
+    {
+      "type": "message",
+      "user": "U023TY454",
+      "text": "Mentioning users <@U023BECGF> <@U023BECGG>\nAnd a new line",
+      "ts": "1431708203.000183"
+    },
+    {
+      "type": "message",
+      "user": "U023BECGF",
+      "text": "Another plain message",
+      "ts": "1431707531.000182"
+    },
+    {
+      "type": "message",
+      "user": "U023TY454",
+      "text": "A message with random numbers 1 2 3 4.",
+      "ts": "1431706792.000180"
+    }
+  ],
+  "has_more": false
+}

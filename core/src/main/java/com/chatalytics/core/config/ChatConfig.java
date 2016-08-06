@@ -25,4 +25,9 @@ public interface ChatConfig extends Serializable {
      */
     char getEmojiEndChar();
 
+    /**
+     * @return True if private rooms should also be processed
+     */
+    boolean includePrivateRooms();
+
 }

@@ -14,6 +14,8 @@ public class HipChatConfig implements ChatConfig {
 
     public char emojiEndChar = ')';
 
+    public boolean includePrivateRooms = false;
+
     @Override
     public List<String> getAuthTokens() {
         return authTokens;
@@ -32,6 +34,11 @@ public class HipChatConfig implements ChatConfig {
     @Override
     public char getEmojiEndChar() {
         return emojiEndChar;
+    }
+
+    @Override
+    public boolean includePrivateRooms() {
+        return includePrivateRooms;
     }
 
 }

@@ -1,0 +1,29 @@
+{
+  "ok": true,
+  "group": {
+    "id": "G024BE91L",
+    "name": "secretplans",
+    "is_group": "true",
+    "created": 1360782804,
+    "creator": "U024BE7LH",
+    "is_archived": false,
+    "members": [
+      "U023BECGF",
+      "U023TY454"
+    ],
+    "topic": {
+      "value": "This is private",
+      "creator": "U057OP7ER",
+      "last_set": 1369677212
+    },
+    "purpose": {
+      "value": "This channel is for secrets",
+      "creator": "U017RY7PP",
+      "last_set": 1360782804
+    },
+    "last_read": "1401383885.000061",
+    "latest": { },
+    "unread_count": 0,
+    "unread_count_display": 0
+  }
+}
