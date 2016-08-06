@@ -5,6 +5,7 @@ import com.chatalytics.compute.chat.dao.IChatApiDAO;
 import com.chatalytics.compute.chat.dao.slack.JsonSlackDAO;
 import com.chatalytics.compute.config.ConfigurationConstants;
 import com.chatalytics.core.config.ChatAlyticsConfig;
+import com.chatalytics.core.config.SlackConfig;
 import com.chatalytics.core.model.data.FatMessage;
 import com.chatalytics.core.model.data.Message;
 import com.chatalytics.core.model.data.MessageType;
@@ -12,6 +13,7 @@ import com.chatalytics.core.model.data.Room;
 import com.chatalytics.core.model.data.User;
 import com.chatalytics.core.util.YamlUtils;
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Optional;
 import com.google.common.base.Throwables;
 
 import org.apache.storm.spout.SpoutOutputCollector;
@@ -56,6 +58,7 @@ public class SlackMessageSpout extends BaseRichSpout {
 
     private final ConcurrentLinkedQueue<FatMessage> unemittedMessages;
     private Session session;
+    private Optional<DateTime> startDate;
 
     public SlackMessageSpout() {
         unemittedMessages = new ConcurrentLinkedQueue<>();
@@ -79,6 +82,13 @@ public class SlackMessageSpout extends BaseRichSpout {
                         SpoutOutputCollector collector) {
         this.slackDao = slackDao;
         this.collector = collector;
+
+        String startDateNullable = ((SlackConfig)config.computeConfig.chatConfig).startDate;
+        // get end date, if there is one
+        if (startDateNullable != null) {
+            this.startDate = Optional.of(DateTime.parse(startDateNullable));
+        }
+
         URI webSocketUri = getRealtimeWebSocketURI();
         openRealtimeConnection(config, webSocketUri, webSocketContainer);
     }
@@ -127,6 +137,12 @@ public class SlackMessageSpout extends BaseRichSpout {
     @OnMessage
     public void onMessageEvent(Message message, Session session) {
         LOG.debug("Got event {}", message);
+
+        if (filterMessage(message)) {
+            LOG.debug("Filtering message dated {}", message.getDate());
+            return;
+        }
+
         Map<String, User> users = slackDao.getUsers();
         Map<String, Room> rooms = slackDao.getRooms();
 
@@ -149,6 +165,27 @@ public class SlackMessageSpout extends BaseRichSpout {
         }
         FatMessage fatMessage = new FatMessage(message, fromUser, room);
         unemittedMessages.add(fatMessage);
+    }
+
+    /**
+     * Filters messages that dont meet certain criteria. Right now the only reason why a message
+     * would get filtered is if it occurred before the configured start date
+     *
+     * @param message
+     *            The message to inspect and potentially filter
+     *
+     * @return True if the message should get filtered, false otherwise
+     */
+    private boolean filterMessage(Message message) {
+        if (!startDate.isPresent()) {
+            return false;
+        }
+        DateTime messageDate = message.getDate();
+        if (startDate.get().equals(messageDate) || startDate.get().isAfter(messageDate)) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     /**

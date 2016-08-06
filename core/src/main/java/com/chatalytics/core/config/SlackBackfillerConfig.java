@@ -23,5 +23,4 @@ public class SlackBackfillerConfig extends SlackConfig {
      * Optional end date if you want the backfiller to stop emitting messages beyond this date
      */
     public String endDate;
-
 }
