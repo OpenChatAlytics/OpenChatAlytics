@@ -87,6 +87,8 @@ public class SlackMessageSpout extends BaseRichSpout {
         // get end date, if there is one
         if (startDateNullable != null) {
             this.startDate = Optional.of(DateTime.parse(startDateNullable));
+        } else {
+            this.startDate = Optional.absent();
         }
 
         URI webSocketUri = getRealtimeWebSocketURI();
