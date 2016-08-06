@@ -31,8 +31,10 @@ import javax.websocket.DeploymentException;
 import javax.websocket.Session;
 import javax.websocket.WebSocketContainer;
 
+import static com.chatalytics.core.model.data.MessageType.MESSAGE;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.verifyZeroInteractions;
@@ -121,7 +123,7 @@ public class SlackMessageSpoutTest {
         when(slackDao.getUsers()).thenReturn(users);
 
         Message triggerMessage = new Message(DateTime.now(), "Test User", userId, "test msg",
-                                             "C09ADF43", MessageType.MESSAGE);
+                                             "C09ADF43", MESSAGE);
 
         underTest.onMessageEvent(triggerMessage, mock(Session.class));
         verify(slackDao).getUsers();
@@ -187,8 +189,8 @@ public class SlackMessageSpoutTest {
         when(webSocket.connectToServer(underTest, WEB_SOCKET_TEST_URI)).thenReturn(session);
         underTest.open(config, slackDao, webSocket, mockContext, mockCollector);
 
-        Message triggerMessage = new Message(DateTime.now(), "BotUser", "u2", "test msg",
-                                             "r1", MessageType.MESSAGE);
+        Message triggerMessage = new Message(DateTime.now(), "BotUser", "u2", "test msg", "r1",
+                                             MESSAGE);
         underTest.onMessageEvent(triggerMessage, mock(Session.class));
         verify(slackDao).getUsers();
         verify(slackDao).getRooms();
@@ -217,7 +219,7 @@ public class SlackMessageSpoutTest {
 
         // this was a direct chat message
         Message triggerMessage = new Message(DateTime.now(), "name", "u1", "test msg",
-                                             "D1R3CTM355", MessageType.MESSAGE);
+                                             "D1R3CTM355", MESSAGE);
         underTest.onMessageEvent(triggerMessage, mock(Session.class));
 
         verify(slackDao).getUsers();
@@ -230,6 +232,62 @@ public class SlackMessageSpoutTest {
 
         // make sure nothing got emitted
         underTest.nextTuple();
+        verifyNoMoreInteractions(mockCollector);
+    }
+
+    @Test
+    public void testOnMessageEvent_withStatDate() throws Exception {
+        JsonSlackDAO slackDao = mock(JsonSlackDAO.class);
+        Session session = mock(Session.class);
+        when(session.getId()).thenReturn("id");
+        when(slackDao.getRealtimeWebSocketURI()).thenReturn(WEB_SOCKET_TEST_URI);
+        WebSocketContainer webSocket = mock(WebSocketContainer.class);
+        when(webSocket.connectToServer(underTest, WEB_SOCKET_TEST_URI)).thenReturn(session);
+
+        DateTime startDate = DateTime.now();
+        chatConfig.startDate = startDate.toString();
+
+        // open with a start date
+        underTest.open(config, slackDao, webSocket, mockContext, mockCollector);
+
+        DateTime messageDate = startDate.minusHours(1);
+        Message triggerMessage = new Message(messageDate, "name", "u1", "test msg", "D1R3CTM355",
+                                             MESSAGE);
+        underTest.onMessageEvent(triggerMessage, session);
+        verify(slackDao).getRealtimeWebSocketURI();
+        verifyNoMoreInteractions(slackDao);
+        underTest.nextTuple();
+        verifyZeroInteractions(mockCollector);
+
+        // try again with a message date that's after the start date
+        messageDate = startDate.plusHours(1);
+        Map<String, User> users = ImmutableMap.of("u1", new User("u1", "email", false, false, false,
+                                                                 "name", "mention_name", null,
+                                                                 DateTime.now(), DateTime.now(),
+                                                                 null, null, null, null));
+        Map<String, Room> rooms = ImmutableMap.of();
+        when(slackDao.getUsers()).thenReturn(users);
+        when(slackDao.getRooms()).thenReturn(rooms);
+        triggerMessage = new Message(messageDate, "name", "u1", "test msg", "D1R3CTM355", MESSAGE);
+        underTest.onMessageEvent(triggerMessage, session);
+        verify(slackDao).getUsers();
+        verify(slackDao).getRooms();
+        verify(slackDao).getRealtimeWebSocketURI();
+        verifyNoMoreInteractions(slackDao);
+        underTest.nextTuple();
+        verify(mockCollector).emit(any(Values.class));
+        verifyNoMoreInteractions(mockCollector);
+
+        // try again with a message date that is equal to the start date
+        reset(slackDao);
+        messageDate = startDate;
+        triggerMessage = new Message(messageDate, "name", "u1", "test msg", "D1R3CTM355", MESSAGE);
+        underTest.onMessageEvent(triggerMessage, session);
+        verify(slackDao).getUsers();
+        verify(slackDao).getRooms();
+        verifyNoMoreInteractions(slackDao);
+        underTest.nextTuple();
+        verify(mockCollector).emit(any(Values.class));
         verifyNoMoreInteractions(mockCollector);
     }
 

@@ -5,6 +5,7 @@ computeConfig:
     classifier: compute/classifiers/english.all.3class.distsim.crf.ser.gz
     filesToRead:
         'com.chatalytics.bolts.sentiment.words': files/sentiment_words.csv
+    rtComputePort: 9001
     chatConfig: !!com.chatalytics.core.config.SlackBackfillerConfig
         baseAPIURL: https://slack.com/api/
         authTokens: ['0']

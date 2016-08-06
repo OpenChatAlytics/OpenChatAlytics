@@ -14,6 +14,12 @@ public class SlackConfig implements ChatConfig {
 
     public char emojiEndChar = ':';
 
+    /**
+     * Optional start date. The spout will start processing records on and after this date. That
+     * means that it's inclusive of the date
+     */
+    public String startDate;
+
     @Override
     public List<String> getAuthTokens() {
         return authTokens;

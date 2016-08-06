@@ -66,13 +66,12 @@ public class SlackBackfillSpout extends BaseRichSpout {
 
         open(chatConfig, SlackApiDAOFactory.getSlackApiDao(config),
              ChatAlyticsDAOFactory.createChatAlyticsDao(config), context, collector);
-
     }
 
     @VisibleForTesting
     protected void open(SlackBackfillerConfig chatConfig, IChatApiDAO slackApiDao,
-                      IChatAlyticsDAO dbDao, TopologyContext context,
-                      SpoutOutputCollector collector) {
+                        IChatAlyticsDAO dbDao, TopologyContext context,
+                        SpoutOutputCollector collector) {
         this.granularityMins = chatConfig.granularityMins;
         this.collector = collector;
         this.slackDao = slackApiDao;
