@@ -20,7 +20,7 @@ public class SlackConfig implements ChatConfig {
 
     /**
      * Optional start date. The spout will start processing records on and after this date. That
-     * means that it's inclusive of the date
+     * means that it's inclusive of the date. The format is ISO 8601.
      */
     public String startDate;
 

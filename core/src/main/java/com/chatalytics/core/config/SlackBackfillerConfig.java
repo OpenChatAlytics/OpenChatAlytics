@@ -15,11 +15,6 @@ public class SlackBackfillerConfig extends SlackConfig {
     public int granularityMins;
 
     /**
-     * The backfilling start date. Supports up to millisecond granularity. The format is ISO 8601.
-     */
-    public String startDate;
-
-    /**
      * Optional end date if you want the backfiller to stop emitting messages beyond this date
      */
     public String endDate;
