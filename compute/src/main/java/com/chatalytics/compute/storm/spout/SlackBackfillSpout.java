@@ -78,12 +78,7 @@ public class SlackBackfillSpout extends BaseRichSpout {
         this.dbDao = dbDao;
 
         // get start date
-        if (chatConfig.startDate == null) {
-            // go back a day
-            this.initDate = new DateTime(DateTimeZone.UTC).withHourOfDay(0)
-                                                          .withMinuteOfHour(0)
-                                                          .minusDays(1);
-        } else {
+        if (chatConfig.startDate != null) {
             this.initDate = DateTime.parse(chatConfig.startDate);
         }
 
@@ -183,7 +178,7 @@ public class SlackBackfillSpout extends BaseRichSpout {
         }
         DateTime lastRunDate = dbDao.getLastMessagePullTime();
 
-        if (initDate.isAfter(lastRunDate)) {
+        if (initDate != null && initDate.isAfter(lastRunDate)) {
             startDate = initDate;
         } else {
             startDate = lastRunDate;
