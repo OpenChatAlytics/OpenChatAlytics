@@ -2,6 +2,9 @@ package com.chatalytics.compute.db.dao;
 
 import com.chatalytics.core.config.ChatAlyticsConfig;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
@@ -14,6 +17,7 @@ import javax.persistence.Persistence;
  */
 public class ChatAlyticsDAOFactory {
 
+    private static final Logger LOG = LoggerFactory.getLogger(ChatAlyticsDAOFactory.class);
     /**
      * There should only be one instance of the factory across the application
      */
@@ -52,8 +56,9 @@ public class ChatAlyticsDAOFactory {
         }
     }
 
-    public static EntityManagerFactory getEntityManagerFactory(ChatAlyticsConfig config) {
+    public synchronized static EntityManagerFactory getEntityManagerFactory(ChatAlyticsConfig config) {
         if (entityManagerFactory == null) {
+            LOG.info("Initializing entity manager factory...");
             String persistenceName = config.persistenceUnitName;
             entityManagerFactory = Persistence.createEntityManagerFactory(persistenceName);
         }
