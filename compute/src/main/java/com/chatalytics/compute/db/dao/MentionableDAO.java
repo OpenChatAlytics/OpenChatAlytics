@@ -116,7 +116,7 @@ public class MentionableDAO<K extends Serializable, T extends IMentionable<K>>
                               sum.alias("occurrences"),
                               isBot.alias("bot"));
 
-            query.groupBy(username, roomName, mentionTime, type);
+            query.groupBy(username, roomName, mentionTime, type, isBot);
 
             wherePredicates[0] = cb.equal(from.get(TYPE_COLUMN_NAME), value.getValue());
             wherePredicates[1] = cb.equal(from.get("username"), value.getUsername());
