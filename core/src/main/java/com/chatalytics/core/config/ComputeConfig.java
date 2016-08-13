@@ -17,6 +17,8 @@ public class ComputeConfig implements Serializable {
 
     public int rtComputePort = 9000;
 
+    public boolean enableRealtimeEvents = true;
+
     public ChatConfig chatConfig;
 
     /**

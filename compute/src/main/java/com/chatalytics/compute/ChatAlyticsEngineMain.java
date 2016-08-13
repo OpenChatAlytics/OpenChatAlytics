@@ -1,9 +1,7 @@
 package com.chatalytics.compute;
 
 import com.chatalytics.compute.db.dao.ChatAlyticsDAOFactory;
-import com.chatalytics.compute.storm.ChatAlyticsService;
 import com.chatalytics.compute.storm.ChatAlyticsStormTopology;
-import com.chatalytics.compute.web.realtime.ComputeRealtimeServer;
 import com.chatalytics.compute.web.realtime.ComputeRealtimeServerFactory;
 import com.chatalytics.core.CommonCLIBuilder;
 import com.chatalytics.core.config.ChatAlyticsConfig;
@@ -39,11 +37,10 @@ public class ChatAlyticsEngineMain {
         LOG.info("Loading config {}", configName);
         ChatAlyticsConfig config = YamlUtils.readChatAlyticsConfig(configName);
 
-        StormTopology stormTopology = ChatAlyticsStormTopology.create(config.inputType);
-        ComputeRealtimeServer rtServer =
-            ComputeRealtimeServerFactory.createComputeRealtimeServer(config);
-        ChatAlyticsService chatalyticsService = new ChatAlyticsService(stormTopology, rtServer,
-                                                                       config);
+        StormTopology stormTopology = ChatAlyticsStormTopology.create(config);
+        ComputeRealtimeServerFactory rtServerFactory = new ComputeRealtimeServerFactory(config);
+        ChatAlyticsService chatalyticsService =
+                new ChatAlyticsService(stormTopology, rtServerFactory, config);
 
         addShutdownHook(chatalyticsService);
         chatalyticsService.startAsync().awaitRunning();

@@ -9,6 +9,7 @@ import com.chatalytics.compute.storm.spout.LocalTestSpout;
 import com.chatalytics.compute.storm.spout.SlackBackfillSpout;
 import com.chatalytics.compute.storm.spout.SlackMessageSpout;
 import com.chatalytics.core.InputSourceType;
+import com.chatalytics.core.config.ChatAlyticsConfig;
 
 import org.apache.storm.generated.StormTopology;
 import org.apache.storm.topology.TopologyBuilder;
@@ -21,7 +22,8 @@ import org.apache.storm.topology.TopologyBuilder;
  */
 public class ChatAlyticsStormTopology {
 
-    public static StormTopology create(InputSourceType type) {
+    public static StormTopology create(ChatAlyticsConfig config) {
+        InputSourceType type = config.inputType;
         TopologyBuilder topologyBuilder = new TopologyBuilder();
         String inputSpoutId;
         if (type == InputSourceType.HIPCHAT) {
@@ -52,11 +54,13 @@ public class ChatAlyticsStormTopology {
         topologyBuilder.setBolt(MessageSummaryBolt.BOLT_ID, new MessageSummaryBolt())
                        .shuffleGrouping(inputSpoutId);
 
-        // realtime bolt
-        topologyBuilder.setBolt(RealtimeBolt.BOLT_ID, new RealtimeBolt())
-                       .shuffleGrouping(EmojiCounterBolt.BOLT_ID)
-                       .shuffleGrouping(EntityExtractionBolt.BOLT_ID)
-                       .shuffleGrouping(MessageSummaryBolt.BOLT_ID);
+        if (config.computeConfig.enableRealtimeEvents) {
+            // realtime bolt
+            topologyBuilder.setBolt(RealtimeBolt.BOLT_ID, new RealtimeBolt())
+                           .shuffleGrouping(EmojiCounterBolt.BOLT_ID)
+                           .shuffleGrouping(EntityExtractionBolt.BOLT_ID)
+                           .shuffleGrouping(MessageSummaryBolt.BOLT_ID);
+        }
 
         return topologyBuilder.createTopology();
     }

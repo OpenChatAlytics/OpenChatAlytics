@@ -21,6 +21,12 @@ import javax.websocket.server.ServerContainer;
  */
 public class ComputeRealtimeServerFactory {
 
+    private final ChatAlyticsConfig config;
+
+    public ComputeRealtimeServerFactory(ChatAlyticsConfig config) {
+        this.config = config;
+    }
+
     /**
      * Creates a new {@link ComputeRealtimeServer}
      *
@@ -28,7 +34,7 @@ public class ComputeRealtimeServerFactory {
      *            The chatalytics config
      * @return A newly created {@link ComputeRealtimeServer}
      */
-    public static ComputeRealtimeServer createComputeRealtimeServer(ChatAlyticsConfig config) {
+    public ComputeRealtimeServer createComputeRealtimeServer() {
         Server server = new Server(config.computeConfig.rtComputePort);
         ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
         context.setContextPath("/");
