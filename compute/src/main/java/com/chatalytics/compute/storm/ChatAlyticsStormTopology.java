@@ -21,13 +21,7 @@ import org.apache.storm.topology.TopologyBuilder;
  */
 public class ChatAlyticsStormTopology {
 
-    private final InputSourceType type;
-
-    public ChatAlyticsStormTopology(InputSourceType type) {
-        this.type = type;
-    }
-
-    public StormTopology get() {
+    public static StormTopology create(InputSourceType type) {
         TopologyBuilder topologyBuilder = new TopologyBuilder();
         String inputSpoutId;
         if (type == InputSourceType.HIPCHAT) {

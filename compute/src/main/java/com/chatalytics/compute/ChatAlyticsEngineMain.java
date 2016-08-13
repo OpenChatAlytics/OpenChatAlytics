@@ -11,6 +11,7 @@ import com.chatalytics.core.util.YamlUtils;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Options;
+import org.apache.storm.generated.StormTopology;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,12 +39,10 @@ public class ChatAlyticsEngineMain {
         LOG.info("Loading config {}", configName);
         ChatAlyticsConfig config = YamlUtils.readChatAlyticsConfig(configName);
 
-        ChatAlyticsStormTopology chatTopology = new ChatAlyticsStormTopology(config.inputType);
-
+        StormTopology stormTopology = ChatAlyticsStormTopology.create(config.inputType);
         ComputeRealtimeServer rtServer =
             ComputeRealtimeServerFactory.createComputeRealtimeServer(config);
-        ChatAlyticsService chatalyticsService = new ChatAlyticsService(chatTopology.get(),
-                                                                       rtServer,
+        ChatAlyticsService chatalyticsService = new ChatAlyticsService(stormTopology, rtServer,
                                                                        config);
 
         addShutdownHook(chatalyticsService);
