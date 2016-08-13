@@ -81,6 +81,7 @@ public class EventsResourceTest {
         underTest.onOpen(computeSession);
         assertEquals(0, underTest.getSessions().size());
         verify(computeSession).getRequestURI();
+        verify(computeSession).setMaxIdleTimeout(0);
         verifyNoMoreInteractions(computeSession);
         assertTrue(underTest.isConnectedToCompute());
 
@@ -91,6 +92,7 @@ public class EventsResourceTest {
         underTest.onOpen(firstClientSession);
         verify(firstClientSession).getRequestURI();
         verify(firstClientSession).getId();
+        verify(firstClientSession).setMaxIdleTimeout(0);
         verifyNoMoreInteractions(firstClientSession);
         assertEquals(1, underTest.getSessions().size());
         assertEquals(firstClientSession, underTest.getSessions().iterator().next());
@@ -103,6 +105,7 @@ public class EventsResourceTest {
         underTest.onOpen(secondClientSession);
         verify(secondClientSession).getRequestURI();
         verify(secondClientSession).getId();
+        verify(secondClientSession).setMaxIdleTimeout(0);
         verifyNoMoreInteractions(secondClientSession);
         assertEquals(1, underTest.getSessions().size());
         assertEquals(secondClientSession, underTest.getSessions().iterator().next());
@@ -116,6 +119,7 @@ public class EventsResourceTest {
         verifyNoMoreInteractions(secondClientSession);
         verify(thirdClientSession).getRequestURI();
         verify(thirdClientSession).getId();
+        verify(thirdClientSession).setMaxIdleTimeout(0);
         verifyNoMoreInteractions(thirdClientSession);
         assertEquals(2, underTest.getSessions().size());
 
@@ -140,6 +144,7 @@ public class EventsResourceTest {
         assertFalse(underTest.isConnectedToCompute());
 
         verify(computeSession, times(2)).getRequestURI();
+        verify(computeSession).setMaxIdleTimeout(0);
         verifyNoMoreInteractions(computeSession);
     }
 
@@ -155,6 +160,7 @@ public class EventsResourceTest {
         underTest.onOpen(computeSession);
         assertEquals(0, underTest.getSessions().size());
         verify(computeSession).getRequestURI();
+        verify(computeSession).setMaxIdleTimeout(0);
         verifyNoMoreInteractions(computeSession);
         assertTrue(underTest.isConnectedToCompute());
 
@@ -165,6 +171,7 @@ public class EventsResourceTest {
         underTest.onOpen(firstClientSession);
         verify(firstClientSession).getRequestURI();
         verify(firstClientSession).getId();
+        verify(firstClientSession).setMaxIdleTimeout(0);
         verifyNoMoreInteractions(firstClientSession);
         assertEquals(1, underTest.getSessions().size());
         assertEquals(firstClientSession, underTest.getSessions().iterator().next());
@@ -173,6 +180,7 @@ public class EventsResourceTest {
         verify(firstClientSession, times(2)).getRequestURI();
         verify(firstClientSession, times(2)).getId();
         verify(firstClientSession).close();
+        verify(firstClientSession).setMaxIdleTimeout(0);
         verifyNoMoreInteractions(firstClientSession);
         assertEquals(0, underTest.getSessions().size());
     }
@@ -189,6 +197,7 @@ public class EventsResourceTest {
         underTest.onOpen(computeSession);
         assertEquals(0, underTest.getSessions().size());
         verify(computeSession).getRequestURI();
+        verify(computeSession).setMaxIdleTimeout(0);
         verifyNoMoreInteractions(computeSession);
         assertTrue(underTest.isConnectedToCompute());
 
@@ -199,6 +208,7 @@ public class EventsResourceTest {
         underTest.onOpen(firstClientSession);
         verify(firstClientSession).getRequestURI();
         verify(firstClientSession).getId();
+        verify(firstClientSession).setMaxIdleTimeout(0);
         verifyNoMoreInteractions(firstClientSession);
         assertEquals(1, underTest.getSessions().size());
         assertEquals(firstClientSession, underTest.getSessions().iterator().next());
@@ -208,6 +218,7 @@ public class EventsResourceTest {
         verify(firstClientSession, times(2)).getRequestURI();
         verify(firstClientSession, times(3)).getId();
         verify(firstClientSession).close();
+        verify(firstClientSession).setMaxIdleTimeout(0);
         verifyNoMoreInteractions(firstClientSession);
         assertEquals(0, underTest.getSessions().size());
     }
@@ -226,6 +237,7 @@ public class EventsResourceTest {
         underTest.onOpen(computeSession);
         assertEquals(0, underTest.getSessions().size());
         verify(computeSession).getRequestURI();
+        verify(computeSession).setMaxIdleTimeout(0);
         verifyNoMoreInteractions(computeSession);
         assertTrue(underTest.isConnectedToCompute());
 
@@ -241,6 +253,7 @@ public class EventsResourceTest {
         underTest.onOpen(firstClientSession);
         verify(firstClientSession).getRequestURI();
         verify(firstClientSession).getId();
+        verify(firstClientSession).setMaxIdleTimeout(0);
         verifyNoMoreInteractions(firstClientSession);
         assertEquals(1, underTest.getSessions().size());
 
@@ -252,6 +265,7 @@ public class EventsResourceTest {
         underTest.onOpen(secondClientSession);
         verify(secondClientSession).getRequestURI();
         verify(secondClientSession).getId();
+        verify(secondClientSession).setMaxIdleTimeout(0);
         verifyNoMoreInteractions(secondClientSession);
         assertEquals(2, underTest.getSessions().size());
 

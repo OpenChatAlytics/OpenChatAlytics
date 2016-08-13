@@ -55,10 +55,10 @@ public class RealtimeResource {
     @OnOpen
     public void openSocket(@PathParam(RT_COMPUTE_ENDPOINT_PARAM) ConnectionType type,
                            Session session) {
+        session.setMaxIdleTimeout(0);
         if (type == ConnectionType.SUBSCRIBER) {
             LOG.info("Got a new subscriber connection request with ID {}. Saving session",
                      session.getId());
-
             // cleanup sessions
             Set<Session> closedSessions = Sets.newHashSet();
             for (Session existingSession : sessions) {
