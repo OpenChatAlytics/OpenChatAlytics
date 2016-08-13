@@ -12,7 +12,7 @@ computeConfig:
         granularityMins: 5
         startDate: '2013-11-01T00:00:00Z'
         endDate: null
-        includePrivateRooms: true
+        includePrivateRooms: false
         includeArchivedRooms: true
 webConfig:
     port: 8080
