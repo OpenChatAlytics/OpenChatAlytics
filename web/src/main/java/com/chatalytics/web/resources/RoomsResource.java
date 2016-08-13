@@ -17,7 +17,10 @@ import java.util.stream.Collectors;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
+
+import static com.chatalytics.web.constant.WebConstants.ROOM;
 
 /**
  * REST endpoint for ChatAlytics rooms
@@ -40,7 +43,7 @@ public class RoomsResource {
     }
 
     /**
-     * @return A map of mention names to Room objects
+     * @return A map of room names to Room objects
      */
     @GET
     @Produces(MediaType.APPLICATION_JSON)
@@ -50,4 +53,20 @@ public class RoomsResource {
                          .collect(Collectors.toMap(Room::getName,
                                                    Function.identity()));
     }
+
+    /**
+     * Returns a {@link Room} with the given <code>roomName</code>
+     *
+     * @param roomName
+     *            The room name of the room to be returned
+     * @return A {@link Room} with the given <code>roomName</code>
+     */
+    @GET
+    @Path("room")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Room getRoom(@QueryParam(ROOM) String roomName) {
+        Map<String, Room> rooms = getRooms();
+        return rooms.get(roomName);
+    }
+
 }

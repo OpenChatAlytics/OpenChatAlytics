@@ -43,4 +43,17 @@ public class RoomsResourceTest {
         Map<String, Room> result = underTest.getRooms();
         assertEquals(expectedResult, result);
     }
+
+    @Test
+    public void testGetRoom() {
+        Room room1 = new Room("r1", "r1channel", "r1topic", null ,null, "owner1", false, false,
+                              null, null);
+        Room room2 = new Room("r2", "r2channel", "r2topic", null ,null, "owner2", false, false,
+                              null, null);
+        Map<String, Room> rooms = ImmutableMap.of("r1", room1, "r2", room2);
+        when(chatApiDao.getRooms()).thenReturn(rooms);
+
+        Room result = underTest.getRoom("r1channel");
+        assertEquals(rooms.get("r1"), result);
+    }
 }
