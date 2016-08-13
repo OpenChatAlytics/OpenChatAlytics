@@ -98,7 +98,9 @@ public class RealtimeBolt extends ChatAlyticsBaseBolt {
                                              ConnectionType.PUBLISHER));
         try {
             LOG.info("Connecting to {}", rtURI);
-            return webSocketContainer.connectToServer(this, rtURI);
+            Session session = webSocketContainer.connectToServer(this, rtURI);
+            session.setMaxIdleTimeout(0);
+            return session;
         } catch (DeploymentException | IOException e) {
             throw new RuntimeException("Unable to connect to RT compute server. Is it up?");
         }
