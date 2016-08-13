@@ -54,6 +54,9 @@ Make sure you don't have a previous version of the database and re-create it by 
 `dropdb chatalytics`
 `createdb chatalytics`
 
+## Architecture Diagram
+![architecture](https://github.com/OpenChatAlytics/OpenChatAlytics/raw/master/static/architecture_diagram.png)
+
 ##Author
 Giannis Neokleous
 
