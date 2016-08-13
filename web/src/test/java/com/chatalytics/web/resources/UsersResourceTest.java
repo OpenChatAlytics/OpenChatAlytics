@@ -49,6 +49,22 @@ public class UsersResourceTest {
     }
 
     @Test
+    public void testGetUser() {
+        String url1 = "http://u1.com";
+        String url2 = "http://u1.com";
+        User user1 = new User("u1", "u1@email.com", false, false, false, "name", "mu1", url1,
+                              DateTime.now(), DateTime.now(), null, null, null, null);
+        User user2 = new User("u2", "u2@email.com", false, false, false, "name", "mu2", url2,
+                              DateTime.now(), DateTime.now(), null, null, null, null);
+
+        Map<String, User> users = ImmutableMap.of("id1", user1, "id2", user2);
+        when(chatApiDao.getUsers()).thenReturn(users);
+
+        User result = underTest.getUser("mu1");
+        assertEquals(users.get("id1"), result);
+    }
+
+    @Test
     public void testGetUserPhotoURLs() {
         String url1 = "http://u1.com";
         String url2 = "http://u1.com";
