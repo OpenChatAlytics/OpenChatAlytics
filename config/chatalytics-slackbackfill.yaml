@@ -6,6 +6,7 @@ computeConfig:
     filesToRead:
         'com.chatalytics.bolts.sentiment.words': files/sentiment_words.csv
     rtComputePort: 9001
+    enableRealtimeEvents: false
     chatConfig: !!com.chatalytics.core.config.SlackBackfillerConfig
         baseAPIURL: https://slack.com/api/
         authTokens: ['0']
