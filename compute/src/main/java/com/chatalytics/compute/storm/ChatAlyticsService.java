@@ -46,6 +46,12 @@ public class ChatAlyticsService extends AbstractIdleService {
         stormConfig.setDebug(false);
         stormConfig.setFallBackOnJavaSerialization(true);
         stormConfig.setNumWorkers(1);
+
+        // enable backpressure since the spouts can move at a much faster speed than the bolts
+        stormConfig.put(Config.TOPOLOGY_BACKPRESSURE_ENABLE, true);
+        stormConfig.put(Config.TOPOLOGY_EXECUTOR_RECEIVE_BUFFER_SIZE, 256);
+        stormConfig.put(Config.TOPOLOGY_EXECUTOR_SEND_BUFFER_SIZE, 128);
+
         stormConfig.setSkipMissingKryoRegistrations(true);
         stormConfig.put(ConfigurationConstants.CHATALYTICS_CONFIG.txt,
                         YamlUtils.writeYaml(chatalyticsConfig));

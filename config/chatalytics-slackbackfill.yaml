@@ -10,7 +10,8 @@ computeConfig:
         baseAPIURL: https://slack.com/api/
         authTokens: ['0']
         granularityMins: 5
-        startDate: '2015-11-01T00:00:00Z'
+        startDate: '2013-11-01T00:00:00Z'
+        endDate: null
         includePrivateRooms: true
         includeArchivedRooms: true
 webConfig:
