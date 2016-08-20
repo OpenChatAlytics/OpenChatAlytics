@@ -12,8 +12,8 @@ import com.chatalytics.core.util.YamlUtils;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
-import org.apache.storm.task.OutputCollector;
 import org.apache.storm.task.TopologyContext;
+import org.apache.storm.topology.BasicOutputCollector;
 import org.apache.storm.topology.OutputFieldsDeclarer;
 import org.apache.storm.tuple.Fields;
 import org.apache.storm.tuple.Tuple;
@@ -74,7 +74,7 @@ public class EmojiCounterBoltTest {
         when(fields.size()).thenReturn(1);
         when(context.getComponentOutputFields(anyString(), anyString())).thenReturn(fields);
         Tuple input = new TupleImpl(context, values, 0, "stream-id");
-        OutputCollector collector = mock(OutputCollector.class);
+        BasicOutputCollector collector = mock(BasicOutputCollector.class);
 
         ChatAlyticsConfig config = new ChatAlyticsConfig();
         config.computeConfig.apiRetries = 0;
@@ -82,8 +82,8 @@ public class EmojiCounterBoltTest {
         Map<Object, Object> stormConf = Maps.newHashMapWithExpectedSize(1);
         stormConf.put(ConfigurationConstants.CHATALYTICS_CONFIG.txt, YamlUtils.writeYaml(config));
 
-        underTest.prepare(stormConf, context, collector);
-        underTest.execute(input);
+        underTest.prepare(stormConf, context);
+        underTest.execute(input, collector);
         verify(collector).emit(any(Values.class));
     }
 
@@ -226,9 +226,9 @@ public class EmojiCounterBoltTest {
         stormConf.put(ConfigurationConstants.CHATALYTICS_CONFIG.txt, YamlUtils.writeYaml(config));
 
         TopologyContext context = mock(TopologyContext.class);
-        OutputCollector collector = mock(OutputCollector.class);
+        BasicOutputCollector collector = mock(BasicOutputCollector.class);
 
-        underTest.prepare(stormConf, context, collector);
+        underTest.prepare(stormConf, context);
         verifyZeroInteractions(context);
         verifyZeroInteractions(collector);
     }

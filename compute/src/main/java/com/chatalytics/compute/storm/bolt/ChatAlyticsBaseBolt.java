@@ -4,9 +4,8 @@ import com.chatalytics.compute.config.ConfigurationConstants;
 import com.chatalytics.core.config.ChatAlyticsConfig;
 import com.chatalytics.core.util.YamlUtils;
 
-import org.apache.storm.task.OutputCollector;
 import org.apache.storm.task.TopologyContext;
-import org.apache.storm.topology.base.BaseRichBolt;
+import org.apache.storm.topology.base.BaseBasicBolt;
 
 import java.util.Map;
 
@@ -16,16 +15,15 @@ import java.util.Map;
  *
  * @author giannis
  */
-public abstract class ChatAlyticsBaseBolt extends BaseRichBolt {
+public abstract class ChatAlyticsBaseBolt extends BaseBasicBolt {
 
     private static final long serialVersionUID = -7961960405946887688L;
 
     @Override
-    public void prepare(@SuppressWarnings("rawtypes") Map stormConf, TopologyContext context,
-                        OutputCollector collector) {
+    public void prepare(@SuppressWarnings("rawtypes") Map stormConf, TopologyContext context) {
         String configStr = (String) stormConf.get(ConfigurationConstants.CHATALYTICS_CONFIG.txt);
         ChatAlyticsConfig config = YamlUtils.readChatAlyticsConfigFromString(configStr);
-        prepare(config, stormConf, context, collector);
+        prepare(config, stormConf, context);
     }
 
     /**
@@ -34,11 +32,9 @@ public abstract class ChatAlyticsBaseBolt extends BaseRichBolt {
      * @param config The {@link ChatAlyticsConfig}
      * @param stormConf The storm config
      * @param context Topology context
-     * @param collector The storm collector
      */
     public abstract void prepare(ChatAlyticsConfig config,
                                  @SuppressWarnings("rawtypes") Map stormConf,
-                                 TopologyContext context,
-                                 OutputCollector collector);
+                                 TopologyContext context);
 
 }

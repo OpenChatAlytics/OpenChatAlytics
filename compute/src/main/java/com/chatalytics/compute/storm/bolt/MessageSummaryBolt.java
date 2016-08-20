@@ -7,8 +7,8 @@ import com.chatalytics.core.model.data.FatMessage;
 import com.chatalytics.core.model.data.MessageSummary;
 import com.chatalytics.core.model.data.MessageType;
 
-import org.apache.storm.task.OutputCollector;
 import org.apache.storm.task.TopologyContext;
+import org.apache.storm.topology.BasicOutputCollector;
 import org.apache.storm.topology.OutputFieldsDeclarer;
 import org.apache.storm.tuple.Fields;
 import org.apache.storm.tuple.Tuple;
@@ -29,18 +29,16 @@ public class MessageSummaryBolt extends ChatAlyticsBaseBolt {
     public static final String BOLT_ID = "MESSAGE_COUNTER_BOLT_ID";
     private static final String MESSAGE_SUMMARY_FIELD_STR = "message-summary";
 
-    private OutputCollector collector;
     private IMessageSummaryDAO messageSummaryDao;
 
     @Override
     public void prepare(ChatAlyticsConfig config, @SuppressWarnings("rawtypes") Map stormConf,
-                        TopologyContext context, OutputCollector collector) {
-        this.collector = collector;
+                        TopologyContext context) {
         this.messageSummaryDao = ChatAlyticsDAOFactory.createMessageSummaryDAO(config);
     }
 
     @Override
-    public void execute(Tuple input) {
+    public void execute(Tuple input, BasicOutputCollector collector) {
         FatMessage fatMessage = (FatMessage) input.getValue(0);
         String username = null;
         String roomName = null;

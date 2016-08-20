@@ -12,8 +12,8 @@ import com.google.common.collect.Maps;
 
 import org.apache.storm.shade.com.google.common.collect.ImmutableList;
 import org.apache.storm.shade.com.google.common.collect.Lists;
-import org.apache.storm.task.OutputCollector;
 import org.apache.storm.task.TopologyContext;
+import org.apache.storm.topology.BasicOutputCollector;
 import org.apache.storm.topology.OutputFieldsDeclarer;
 import org.apache.storm.tuple.Fields;
 import org.apache.storm.tuple.Tuple;
@@ -36,17 +36,15 @@ public class EmojiCounterBolt extends ChatAlyticsBaseBolt {
                                                                       '\n', '/', '\\');
 
     private IEmojiDAO emojiDao;
-    private OutputCollector collector;
 
     @Override
     public void prepare(ChatAlyticsConfig config, @SuppressWarnings("rawtypes") Map conf,
-                        TopologyContext context, OutputCollector collector) {
+                        TopologyContext context) {
         this.emojiDao = ChatAlyticsDAOFactory.createEmojiDAO(config);
-        this.collector = collector;
     }
 
     @Override
-    public void execute(Tuple input) {
+    public void execute(Tuple input, BasicOutputCollector collector) {
         LOG.debug("Got tuple: {}", input);
         FatMessage fatMessage = (FatMessage) input.getValue(0);
 

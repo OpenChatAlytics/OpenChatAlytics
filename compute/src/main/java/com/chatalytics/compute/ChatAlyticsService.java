@@ -57,6 +57,7 @@ public class ChatAlyticsService extends AbstractIdleService {
         stormConfig.put(Config.TOPOLOGY_EXECUTOR_RECEIVE_BUFFER_SIZE, 32);
         stormConfig.put(Config.TOPOLOGY_EXECUTOR_SEND_BUFFER_SIZE, 32);
         stormConfig.put(Config.TOPOLOGY_SLEEP_SPOUT_WAIT_STRATEGY_TIME_MS, 10 * 1000);
+        stormConfig.put(Config.TOPOLOGY_MAX_SPOUT_PENDING, 10);
 
         stormConfig.setSkipMissingKryoRegistrations(true);
         stormConfig.put(ConfigurationConstants.CHATALYTICS_CONFIG.txt,

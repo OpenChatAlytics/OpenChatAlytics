@@ -12,8 +12,8 @@ import com.chatalytics.core.util.YamlUtils;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
-import org.apache.storm.task.OutputCollector;
 import org.apache.storm.task.TopologyContext;
+import org.apache.storm.topology.BasicOutputCollector;
 import org.apache.storm.tuple.Fields;
 import org.apache.storm.tuple.Tuple;
 import org.apache.storm.tuple.TupleImpl;
@@ -49,7 +49,7 @@ public class EntityExtractionBoltTest {
     private User user;
     private Room room;
     private TopologyContext context;
-    private OutputCollector collector;
+    private BasicOutputCollector collector;
 
     @Before
     public void setUp() throws Exception {
@@ -62,9 +62,9 @@ public class EntityExtractionBoltTest {
         Map<Object, Object> stormConf = Maps.newHashMapWithExpectedSize(1);
         stormConf.put(ConfigurationConstants.CHATALYTICS_CONFIG.txt, YamlUtils.writeYaml(config));
 
-        collector = mock(OutputCollector.class);
+        collector = mock(BasicOutputCollector.class);
         context = mock(TopologyContext.class);
-        underTest.prepare(stormConf, context, collector);
+        underTest.prepare(stormConf, context);
 
         Fields fields = mock(Fields.class);
         when(fields.size()).thenReturn(1);
@@ -87,7 +87,7 @@ public class EntityExtractionBoltTest {
         List<Object> values = Lists.newArrayList(fatMessage);
         Tuple input = new TupleImpl(context, values, 0, "stream-id");
 
-        underTest.execute(input);
+        underTest.execute(input, collector);
 
         verify(collector, times(2)).emit(any(Values.class));
     }

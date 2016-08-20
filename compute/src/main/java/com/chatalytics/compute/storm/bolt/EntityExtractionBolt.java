@@ -13,8 +13,8 @@ import com.google.common.collect.Maps;
 import com.google.common.io.Resources;
 
 import org.apache.storm.shade.com.google.common.collect.ImmutableList;
-import org.apache.storm.task.OutputCollector;
 import org.apache.storm.task.TopologyContext;
+import org.apache.storm.topology.BasicOutputCollector;
 import org.apache.storm.topology.OutputFieldsDeclarer;
 import org.apache.storm.tuple.Fields;
 import org.apache.storm.tuple.Tuple;
@@ -50,17 +50,15 @@ public class EntityExtractionBolt extends ChatAlyticsBaseBolt {
 
     private AbstractSequenceClassifier<CoreLabel> classifier;
     private IEntityDAO entityDao;
-    private OutputCollector collector;
 
     @Override
     public void prepare(ChatAlyticsConfig config, @SuppressWarnings("rawtypes") Map conf,
-                        TopologyContext context, OutputCollector collector) {
+                        TopologyContext context) {
         classifier = getClassifier(config.computeConfig.classifier);
         entityDao = ChatAlyticsDAOFactory.createEntityDAO(config);
         if (!entityDao.isRunning()) {
             entityDao.startAsync().awaitRunning();
         }
-        this.collector = collector;
     }
 
     /**
@@ -78,7 +76,7 @@ public class EntityExtractionBolt extends ChatAlyticsBaseBolt {
     }
 
     @Override
-    public void execute(Tuple input) {
+    public void execute(Tuple input, BasicOutputCollector collector) {
         LOG.debug("Got tuple: {}", input);
         FatMessage fatMessage = (FatMessage) input.getValue(0);
 
