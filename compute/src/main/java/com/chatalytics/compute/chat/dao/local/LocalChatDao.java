@@ -1,12 +1,12 @@
 package com.chatalytics.compute.chat.dao.local;
 
 import com.chatalytics.compute.chat.dao.IChatApiDAO;
-import com.chatalytics.core.RandomStringUtils;
 import com.chatalytics.core.config.ChatAlyticsConfig;
 import com.chatalytics.core.config.LocalTestConfig;
 import com.chatalytics.core.model.data.Message;
 import com.chatalytics.core.model.data.Room;
 import com.chatalytics.core.model.data.User;
+import com.chatalytics.core.util.RandomStringUtils;
 import com.google.common.collect.ImmutableMap;
 
 import org.apache.storm.shade.com.google.common.collect.Maps;

@@ -1,4 +1,4 @@
-package com.chatalytics.core;
+package com.chatalytics.core.util;
 
 import java.util.Random;
 
