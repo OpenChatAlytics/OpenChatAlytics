@@ -19,6 +19,20 @@ public class SlackConfig implements ChatConfig {
     public boolean includeArchivedRooms = false;
 
     /**
+     * Specifies the initial sleep timeout for connecting to the realtime slack API
+     */
+    public int sourceConnectionSleepIntervalMs = 1000;
+    /**
+     * Specifies the maximum sleep time when retrying
+     */
+    public int sourceConnectionBackoffMaxSleepMs = 10 * 1000 * 60; // 10 mins
+    /**
+     * Specifies the global max time for the initial connection to the slack API before giving up
+     * and propagating an exception up.
+     */
+    public int sourceConnectionMaxMs = 48 * 60 * 1000;
+
+    /**
      * Optional start date. The spout will start processing records on and after this date. That
      * means that it's inclusive of the date. The format is ISO 8601.
      */
