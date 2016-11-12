@@ -50,6 +50,7 @@ public class EventsResource {
 
     @OnOpen
     public void onOpen(Session session) {
+        session.setMaxIdleTimeout(0);
         if (session.getRequestURI().getPath().startsWith(RT_EVENT_ENDPOINT)) {
             LOG.info("Got a new web subscription connection request with ID {}", session.getId());
             if (!connectedToCompute) {

@@ -6,8 +6,8 @@ import com.chatalytics.core.realtime.ChatAlyticsEventEncoder;
 import com.chatalytics.core.realtime.ConnectionType;
 import com.chatalytics.core.realtime.ConnectionTypeEncoderDecoder;
 
-import org.apache.storm.task.OutputCollector;
 import org.apache.storm.task.TopologyContext;
+import org.apache.storm.topology.BasicOutputCollector;
 import org.apache.storm.topology.OutputFieldsDeclarer;
 import org.apache.storm.tuple.Tuple;
 import org.joda.time.DateTime;
@@ -47,14 +47,14 @@ public class RealtimeBolt extends ChatAlyticsBaseBolt {
 
     @Override
     public void prepare(ChatAlyticsConfig config, @SuppressWarnings("rawtypes") Map conf,
-                        TopologyContext context, OutputCollector collector) {
+                        TopologyContext context) {
         WebSocketContainer webSocketContainer = getWebSocketContainer();
         this.session = openRealtimeConnection(webSocketContainer,
                                               config.computeConfig.rtComputePort);
     }
 
     @Override
-    public void execute(Tuple input) {
+    public void execute(Tuple input, BasicOutputCollector collector) {
         for (Object obj : input.getValues()) {
             Serializable serObj;
             if (obj instanceof Serializable) {
@@ -98,7 +98,9 @@ public class RealtimeBolt extends ChatAlyticsBaseBolt {
                                              ConnectionType.PUBLISHER));
         try {
             LOG.info("Connecting to {}", rtURI);
-            return webSocketContainer.connectToServer(this, rtURI);
+            Session session = webSocketContainer.connectToServer(this, rtURI);
+            session.setMaxIdleTimeout(0);
+            return session;
         } catch (DeploymentException | IOException e) {
             throw new RuntimeException("Unable to connect to RT compute server. Is it up?");
         }

@@ -34,7 +34,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import javax.websocket.ClientEndpoint;
-import javax.websocket.DeploymentException;
 import javax.websocket.OnError;
 import javax.websocket.OnMessage;
 import javax.websocket.Session;
@@ -73,17 +72,18 @@ public class SlackMessageSpout extends BaseRichSpout {
         LOG.info("Loaded config...");
         WebSocketContainer webSocketContainer = JdkContainerProvider.getWebSocketContainer();
         IChatApiDAO slackDao = ChatAPIFactory.getChatApiDao(config);
-        open(config, slackDao, webSocketContainer, context, collector);
+        SlackConfig slackConfig = (SlackConfig) config.computeConfig.chatConfig;
+        open(slackConfig, slackDao, webSocketContainer, context, collector);
     }
 
     @VisibleForTesting
-    protected void open(ChatAlyticsConfig config, IChatApiDAO slackDao,
+    protected void open(SlackConfig slackConfig, IChatApiDAO slackDao,
                         WebSocketContainer webSocketContainer, TopologyContext context,
                         SpoutOutputCollector collector) {
         this.slackDao = slackDao;
         this.collector = collector;
 
-        String startDateNullable = ((SlackConfig)config.computeConfig.chatConfig).startDate;
+        String startDateNullable = slackConfig.startDate;
         // get end date, if there is one
         if (startDateNullable != null) {
             this.startDate = Optional.of(DateTime.parse(startDateNullable));
@@ -91,29 +91,46 @@ public class SlackMessageSpout extends BaseRichSpout {
             this.startDate = Optional.absent();
         }
 
-        URI webSocketUri = getRealtimeWebSocketURI();
-        openRealtimeConnection(config, webSocketUri, webSocketContainer);
+        openRealtimeConnection(slackConfig, webSocketContainer);
     }
 
     /**
-     * Opens the websocket and connects to the slack realtime server
+     * Tries to initiate the realtime connection with retries
      *
-     * @param config
-     *            The application configuration
-     * @param webSocketUri
-     *            The URI to connect to
-     * @param webSocket
-     *            The websocket to be used for connecting
+     * @param slackConfig The slack config
+     * @param webSocketContainer The web socket container to connect with
      */
-    protected void openRealtimeConnection(ChatAlyticsConfig config, URI webSocketUri,
-                                          WebSocketContainer webSocket) {
-        try {
-            session = webSocket.connectToServer(this, webSocketUri);
-            LOG.info("RTM session created with id {}", session.getId());
-        } catch (DeploymentException | IOException e) {
-            String errMsg = String.format("Unable to connect to %s", webSocketUri);
-            LOG.error(errMsg);
-            throw new RuntimeException(errMsg, e);
+    private void openRealtimeConnection(SlackConfig slackConfig,
+                                          WebSocketContainer webSocketContainer) {
+        boolean connected = false;
+        int retryCount = 0;
+        int sleepIntervalMs = slackConfig.sourceConnectionSleepIntervalMs;
+        int retryBackoffMaxSleepMs = slackConfig.sourceConnectionBackoffMaxSleepMs;
+        int globalMaxMs = slackConfig.sourceConnectionMaxMs;
+        long connectionStartTimeMs = System.currentTimeMillis();
+
+        URI webSocketUri = null;
+        while (!connected) {
+            try {
+                webSocketUri = getRealtimeWebSocketURI();
+                session = webSocketContainer.connectToServer(this, webSocketUri);
+                connected = true;
+                LOG.info("RTM session created with id {}", session.getId());
+            } catch (Exception e) {
+                LOG.error("Unable to connect to {}. Retrying {}...", webSocketUri, ++retryCount, e);
+                long timePassedMs = System.currentTimeMillis() - connectionStartTimeMs;
+                if (timePassedMs > globalMaxMs) {
+                    throw new RuntimeException("Can't connect to " + webSocketUri, e);
+                }
+                int sleepTimeMs = Math.min(retryBackoffMaxSleepMs, retryCount * sleepIntervalMs);
+                long timeLeft = globalMaxMs-timePassedMs;
+                LOG.info("Sleeping for {}ms. {}ms before giving up", sleepTimeMs, timeLeft);
+                try {
+                    Thread.sleep(sleepTimeMs);
+                } catch (InterruptedException ie) {
+                    LOG.error("Interrupted while sleeping...", ie);
+                }
+            }
         }
     }
 

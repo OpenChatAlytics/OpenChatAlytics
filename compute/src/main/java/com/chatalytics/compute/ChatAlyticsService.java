@@ -1,8 +1,8 @@
-package com.chatalytics.compute.storm;
+package com.chatalytics.compute;
 
-import com.chatalytics.compute.ChatAlyticsEngineMain;
 import com.chatalytics.compute.config.ConfigurationConstants;
 import com.chatalytics.compute.web.realtime.ComputeRealtimeServer;
+import com.chatalytics.compute.web.realtime.ComputeRealtimeServerFactory;
 import com.chatalytics.core.config.ChatAlyticsConfig;
 import com.chatalytics.core.util.YamlUtils;
 import com.google.common.util.concurrent.AbstractIdleService;
@@ -12,6 +12,7 @@ import org.apache.storm.LocalCluster;
 import org.apache.storm.generated.AlreadyAliveException;
 import org.apache.storm.generated.InvalidTopologyException;
 import org.apache.storm.generated.StormTopology;
+import org.apache.storm.shade.com.google.common.base.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,14 +31,18 @@ public class ChatAlyticsService extends AbstractIdleService {
     private final StormTopology chatTopology;
     private LocalCluster cluster;
     private final ChatAlyticsConfig chatalyticsConfig;
-    private final ComputeRealtimeServer rtServer;
+    private final Optional<ComputeRealtimeServer> rtServer;
 
     public ChatAlyticsService(StormTopology chatTopology,
-                              ComputeRealtimeServer rtServer,
+                              ComputeRealtimeServerFactory rtServerFactory,
                               ChatAlyticsConfig chatalyticsConfig) {
         this.chatTopology = chatTopology;
         this.chatalyticsConfig = chatalyticsConfig;
-        this.rtServer = rtServer;
+        if (chatalyticsConfig.computeConfig.enableRealtimeEvents) {
+            this.rtServer = Optional.of(rtServerFactory.createComputeRealtimeServer());
+        } else {
+            this.rtServer = Optional.absent();
+        }
     }
 
     private LocalCluster submitTopology() throws AlreadyAliveException,
@@ -49,8 +54,10 @@ public class ChatAlyticsService extends AbstractIdleService {
 
         // enable backpressure since the spouts can move at a much faster speed than the bolts
         stormConfig.put(Config.TOPOLOGY_BACKPRESSURE_ENABLE, true);
-        stormConfig.put(Config.TOPOLOGY_EXECUTOR_RECEIVE_BUFFER_SIZE, 256);
-        stormConfig.put(Config.TOPOLOGY_EXECUTOR_SEND_BUFFER_SIZE, 128);
+        stormConfig.put(Config.TOPOLOGY_EXECUTOR_RECEIVE_BUFFER_SIZE, 32);
+        stormConfig.put(Config.TOPOLOGY_EXECUTOR_SEND_BUFFER_SIZE, 32);
+        stormConfig.put(Config.TOPOLOGY_SLEEP_SPOUT_WAIT_STRATEGY_TIME_MS, 10 * 1000);
+        stormConfig.put(Config.TOPOLOGY_MAX_SPOUT_PENDING, 10);
 
         stormConfig.setSkipMissingKryoRegistrations(true);
         stormConfig.put(ConfigurationConstants.CHATALYTICS_CONFIG.txt,
@@ -64,7 +71,10 @@ public class ChatAlyticsService extends AbstractIdleService {
     @Override
     protected void startUp() throws Exception {
         LOG.info("Starting up...");
-        rtServer.startAsync().awaitRunning();
+        if (rtServer.isPresent()) {
+            LOG.info("Starting realtime event server...");
+            rtServer.get().startAsync().awaitRunning();
+        }
         LOG.info("Submitting storm topology...");
         cluster = submitTopology();
     }
@@ -77,6 +87,9 @@ public class ChatAlyticsService extends AbstractIdleService {
         Thread.sleep(2000L);
         LOG.info("Shutting down storm cluster...");
         cluster.shutdown();
-        rtServer.stopAsync().awaitTerminated();
+        if (rtServer.isPresent()) {
+            LOG.info("Shutting down realtime event server...");
+            rtServer.get().stopAsync().awaitTerminated();
+        }
     }
 }

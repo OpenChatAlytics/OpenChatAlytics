@@ -11,5 +11,8 @@ computeConfig:
         authTokens: ['0']
         includePrivateRooms: true
         includeArchivedRooms: true
+        sourceConnectionSleepIntervalMs: 1000
+        sourceConnectionBackoffMaxSleepMs: 600000 # 10mins
+        sourceConnectionMaxMs: 2880000 # 48hours
 webConfig:
     port: 8080

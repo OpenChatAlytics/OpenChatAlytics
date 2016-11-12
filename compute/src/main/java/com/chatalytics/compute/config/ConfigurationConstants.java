@@ -1,5 +1,7 @@
 package com.chatalytics.compute.config;
 
+import com.chatalytics.core.config.ChatAlyticsConfig;
+
 /**
  * Enum that contains configuration property names found in the storm configuration object.
  *
@@ -9,7 +11,7 @@ package com.chatalytics.compute.config;
 public enum ConfigurationConstants {
 
     /**
-     * Property for the {@link HipChalyticsConfig} object.
+     * Property for the {@link ChatAlyticsConfig} object.
      */
     CHATALYTICS_CONFIG("com.chatalytics.config"),
 

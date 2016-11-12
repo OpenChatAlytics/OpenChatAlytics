@@ -8,5 +8,8 @@ computeConfig:
     chatConfig: !!com.chatalytics.core.config.SlackConfig
         baseAPIURL: https://slack.com/api/
         authTokens: ['0']
+        sourceConnectionSleepIntervalMs: 1000
+        sourceConnectionBackoffMaxSleepMs: 600000 # 10mins
+        sourceConnectionMaxMs: 2880000 # 48hours
 webConfig:
     port: 8080

@@ -32,6 +32,7 @@ import javax.websocket.Session;
 import javax.websocket.WebSocketContainer;
 
 import static com.chatalytics.core.model.data.MessageType.MESSAGE;
+import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
@@ -39,7 +40,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
-
 
 /**
  * Tests the {@link SlackMessageSpout}.
@@ -68,14 +68,20 @@ public class SlackMessageSpoutTest {
         stormConf = Maps.newHashMapWithExpectedSize(1);
         config = new ChatAlyticsConfig();
         chatConfig = new SlackConfig();
+        chatConfig.sourceConnectionMaxMs = 0;
+        chatConfig.sourceConnectionSleepIntervalMs = 1;
         config.computeConfig.chatConfig = chatConfig;
-
     }
 
     @Test(expected = NotConnectedException.class)
     public void testOpen_withAuthException() throws Exception {
         stormConf.put(ConfigurationConstants.CHATALYTICS_CONFIG.txt, YamlUtils.writeYaml(config));
-        underTest.open(stormConf, mockContext, mockCollector);
+        try {
+            underTest.open(stormConf, mockContext, mockCollector);
+            fail();
+        } catch (Exception e) {
+            throw (Exception) e.getCause();
+        }
     }
 
     /**
@@ -83,14 +89,30 @@ public class SlackMessageSpoutTest {
      * to the slack server
      */
     @Test(expected = DeploymentException.class)
-    public void testOpenRealtimeConnection_withException() throws Exception {
+    public void testOpen_withDeploymentException() throws Exception {
         WebSocketContainer webSocket = mock(WebSocketContainer.class);
+        JsonSlackDAO slackDao = mock(JsonSlackDAO.class);
+        when(slackDao.getRealtimeWebSocketURI()).thenReturn(WEB_SOCKET_TEST_URI);
         when(webSocket.connectToServer(underTest, WEB_SOCKET_TEST_URI))
                 .thenThrow(new DeploymentException("broken"));
         try {
-            underTest.openRealtimeConnection(config, WEB_SOCKET_TEST_URI, webSocket);
+            underTest.open(chatConfig, slackDao, webSocket, mockContext, mockCollector);
+            fail();
         } catch (Exception e) {
-            throw (DeploymentException) e.getCause();
+            throw (Exception) e.getCause();
+        }
+    }
+
+    @Test(expected = NotConnectedException.class)
+    public void testOpen_withExceptionAndRetries() throws Exception {
+        chatConfig.sourceConnectionSleepIntervalMs = 1000;
+        chatConfig.sourceConnectionMaxMs = 1000;
+        stormConf.put(ConfigurationConstants.CHATALYTICS_CONFIG.txt, YamlUtils.writeYaml(config));
+        try {
+            underTest.open(stormConf, mockContext, mockCollector);
+            fail();
+        } catch (Exception e) {
+            throw (Exception) e.getCause();
         }
     }
 
@@ -102,15 +124,13 @@ public class SlackMessageSpoutTest {
      */
     @Test
     public void testOnMessageEvent() throws Exception {
-
         // setup mocks
         WebSocketContainer mockSocketContainer = mock(WebSocketContainer.class);
         when(mockSocketContainer.connectToServer(underTest, WEB_SOCKET_TEST_URI))
             .thenReturn(mock(Session.class));
         JsonSlackDAO slackDao = mock(JsonSlackDAO.class);
         when(slackDao.getRealtimeWebSocketURI()).thenReturn(WEB_SOCKET_TEST_URI);
-
-        underTest.open(config, slackDao, mockSocketContainer, mockContext, mockCollector);
+        underTest.open(chatConfig, slackDao, mockSocketContainer, mockContext, mockCollector);
 
         String userId = "U03AFSSD";
 
@@ -156,7 +176,7 @@ public class SlackMessageSpoutTest {
         when(slackDao.getRealtimeWebSocketURI()).thenReturn(WEB_SOCKET_TEST_URI);
         WebSocketContainer webSocket = mock(WebSocketContainer.class);
         when(webSocket.connectToServer(underTest, WEB_SOCKET_TEST_URI)).thenReturn(session);
-        underTest.open(config, slackDao, webSocket, mockContext, mockCollector);
+        underTest.open(chatConfig, slackDao, webSocket, mockContext, mockCollector);
 
         Message triggerMessage = new Message(DateTime.now(), "BotUser", "b1", "test msg",
                                              "r1", MessageType.BOT_MESSAGE);
@@ -187,7 +207,7 @@ public class SlackMessageSpoutTest {
         when(slackDao.getRealtimeWebSocketURI()).thenReturn(WEB_SOCKET_TEST_URI);
         WebSocketContainer webSocket = mock(WebSocketContainer.class);
         when(webSocket.connectToServer(underTest, WEB_SOCKET_TEST_URI)).thenReturn(session);
-        underTest.open(config, slackDao, webSocket, mockContext, mockCollector);
+        underTest.open(chatConfig, slackDao, webSocket, mockContext, mockCollector);
 
         Message triggerMessage = new Message(DateTime.now(), "BotUser", "u2", "test msg", "r1",
                                              MESSAGE);
@@ -215,7 +235,7 @@ public class SlackMessageSpoutTest {
         when(slackDao.getRealtimeWebSocketURI()).thenReturn(WEB_SOCKET_TEST_URI);
         WebSocketContainer webSocket = mock(WebSocketContainer.class);
         when(webSocket.connectToServer(underTest, WEB_SOCKET_TEST_URI)).thenReturn(session);
-        underTest.open(config, slackDao, webSocket, mockContext, mockCollector);
+        underTest.open(chatConfig, slackDao, webSocket, mockContext, mockCollector);
 
         // this was a direct chat message
         Message triggerMessage = new Message(DateTime.now(), "name", "u1", "test msg",
@@ -248,7 +268,7 @@ public class SlackMessageSpoutTest {
         chatConfig.startDate = startDate.toString();
 
         // open with a start date
-        underTest.open(config, slackDao, webSocket, mockContext, mockCollector);
+        underTest.open(chatConfig, slackDao, webSocket, mockContext, mockCollector);
 
         DateTime messageDate = startDate.minusHours(1);
         Message triggerMessage = new Message(messageDate, "name", "u1", "test msg", "D1R3CTM355",

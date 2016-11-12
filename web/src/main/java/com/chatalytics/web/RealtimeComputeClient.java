@@ -62,6 +62,7 @@ public class RealtimeComputeClient extends AbstractIdleService {
                                              config.computeConfig.rtComputePath,
                                              ConnectionType.SUBSCRIBER));
         Session session = webSocketContainer.connectToServer(eventResource, rtURI);
+        session.setMaxIdleTimeout(0);
         LOG.info("Connected to realtime compute server");
         return session;
     }
