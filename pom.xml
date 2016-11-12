@@ -193,7 +193,7 @@
       <dependency>
         <groupId>org.glassfish.tyrus</groupId>
         <artifactId>tyrus-container-jdk-client</artifactId>
-        <version>1.10</version>
+        <version>1.13</version>
       </dependency>
       <dependency>
         <groupId>javax.websocket</groupId>
