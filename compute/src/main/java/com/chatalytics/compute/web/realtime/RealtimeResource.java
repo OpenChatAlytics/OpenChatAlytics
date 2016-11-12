@@ -56,9 +56,9 @@ public class RealtimeResource {
     public void openSocket(@PathParam(RT_COMPUTE_ENDPOINT_PARAM) ConnectionType type,
                            Session session) {
         session.setMaxIdleTimeout(0);
+        String sessionId = session.getId();
         if (type == ConnectionType.SUBSCRIBER) {
-            LOG.info("Got a new subscriber connection request with ID {}. Saving session",
-                     session.getId());
+            LOG.info("Got a new subscriber connection request with ID {}. Saving session", sessionId);
             // cleanup sessions
             Set<Session> closedSessions = Sets.newHashSet();
             for (Session existingSession : sessions) {
@@ -69,8 +69,11 @@ public class RealtimeResource {
             sessions.removeAll(closedSessions);
 
             sessions.add(session);
+            LOG.info("Active sessions {}. Collecting {} sessions",
+                     sessions.size(), closedSessions.size());
+
         } else {
-            LOG.info("Got a new publisher connection request with ID {}", session.getId());
+            LOG.info("Got a new publisher connection request with ID {}", sessionId);
         }
     }
 
@@ -101,10 +104,10 @@ public class RealtimeResource {
         LOG.info("Closing session {}. Reason {}", session.getId(), reason);
         try {
             session.close();
-            sessions.remove(session);
         } catch (IOException e) {
-            LOG.warn("Couldn't close {}", session.getId());
+            LOG.warn("Couldn't close {}. Reason {}", session.getId(), e.getMessage());
         }
+        sessions.remove(session);
     }
 
     /**
@@ -116,6 +119,10 @@ public class RealtimeResource {
     @OnError
     public void onError(Throwable t) {
         LOG.error("Uncought exception in realtime resource", t);
+    }
+
+    public int numSessions() {
+        return sessions.size();
     }
 
 }
