@@ -1,13 +1,12 @@
 package com.chatalytics.core.model.data;
 
-import com.google.common.base.MoreObjects;
-
 import org.hibernate.annotations.Type;
 import org.joda.time.DateTime;
 
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Setter;
+import lombok.ToString;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -30,6 +29,7 @@ import javax.persistence.Table;
                   @Index(name = "ce_idx_value", columnList = "value"),
                   @Index(name = "ce_idx_bot", columnList = "bot")})
 @EqualsAndHashCode
+@ToString
 @Setter(value = AccessLevel.PROTECTED) // for hibernate
 public class ChatEntity implements IMentionable<String> {
 
@@ -102,17 +102,4 @@ public class ChatEntity implements IMentionable<String> {
     public boolean isBot() {
         return bot;
     }
-
-    @Override
-    public String toString() {
-        return MoreObjects.toStringHelper(this.getClass())
-                          .add("value", value)
-                          .add("occurrences", occurrences)
-                          .add("mentionTime", mentionTime)
-                          .add("username", username)
-                          .add("roomName", roomName)
-                          .add("bot", bot)
-                          .toString();
-    }
-
 }

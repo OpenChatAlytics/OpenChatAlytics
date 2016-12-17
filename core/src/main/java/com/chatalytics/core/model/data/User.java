@@ -1,12 +1,8 @@
 package com.chatalytics.core.model.data;
 
-import com.google.common.base.MoreObjects;
-
 import org.joda.time.DateTime;
 
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
+import lombok.Data;
 
 /**
  * Chat user
@@ -14,9 +10,7 @@ import lombok.Getter;
  * @author giannis
  *
  */
-@AllArgsConstructor
-@EqualsAndHashCode
-@Getter
+@Data
 public class User {
 
     private final String userId;
@@ -33,25 +27,5 @@ public class User {
     private final String statusMessage;
     private final String timezone;
     private final String title;
-
-    @Override
-    public String toString() {
-        return MoreObjects.toStringHelper(this.getClass())
-                          .add("userId", userId)
-                          .add("email", email)
-                          .add("deleted", deleted)
-                          .add("groupAdmin", groupAdmin)
-                          .add("bot", bot)
-                          .add("name", name)
-                          .add("mentionName", mentionName)
-                          .add("photoUrl", photoUrl)
-                          .add("lastActiveDate", lastActiveDate)
-                          .add("creationDate", creationDate)
-                          .add("status", status)
-                          .add("statusMessage", statusMessage)
-                          .add("timezone", timezone)
-                          .add("title", title)
-                          .toString();
-    }
 
 }

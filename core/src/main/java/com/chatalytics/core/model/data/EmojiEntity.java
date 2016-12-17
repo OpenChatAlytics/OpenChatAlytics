@@ -1,7 +1,5 @@
 package com.chatalytics.core.model.data;
 
-import com.google.common.base.MoreObjects;
-
 import org.hibernate.annotations.Type;
 import org.joda.time.DateTime;
 
@@ -9,6 +7,7 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Setter;
+import lombok.ToString;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -32,10 +31,9 @@ import javax.persistence.Table;
                   @Index(name = "ee_idx_bot", columnList = "bot")})
 @EqualsAndHashCode
 @AllArgsConstructor
+@ToString
 @Setter(value = AccessLevel.PROTECTED) // for hibernate
 public class EmojiEntity implements IMentionable<String> {
-
-    private static final long serialVersionUID = 7180644692083145769L;
 
     public static final String EMOJI_TABLE_NAME = "EMOJI";
     public static final String EMOJI_COLUMN = "VALUE";
@@ -106,17 +104,5 @@ public class EmojiEntity implements IMentionable<String> {
     @Column(name = BOT_COLUMN)
     public boolean isBot() {
         return bot;
-    }
-
-    @Override
-    public String toString() {
-        return MoreObjects.toStringHelper(this.getClass())
-                          .add("value", value)
-                          .add("occurrences", occurrences)
-                          .add("mentionTime", mentionTime)
-                          .add("username", username)
-                          .add("roomName", roomName)
-                          .add("bot", bot)
-                          .toString();
     }
 }

@@ -1,10 +1,9 @@
 package com.chatalytics.core.model.data;
 
-import com.google.common.base.MoreObjects;
-
 import org.joda.time.DateTime;
 
 import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -20,6 +19,7 @@ import javax.persistence.Table;
 @Entity
 @Table(name = LastPullTime.LAST_PULL_TIME_TABLE_NAME)
 @EqualsAndHashCode
+@ToString
 public class LastPullTime {
 
     public static final String LAST_PULL_TIME_TABLE_NAME = "LAST_PULL_TIME";
@@ -52,11 +52,6 @@ public class LastPullTime {
 
     protected void setId(int id) {
         // do nothing
-    }
-
-    @Override
-    public String toString() {
-        return MoreObjects.toStringHelper(this.getClass()).add("time", time).toString();
     }
 
 }

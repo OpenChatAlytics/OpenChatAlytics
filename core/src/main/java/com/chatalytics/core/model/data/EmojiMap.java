@@ -1,8 +1,6 @@
 package com.chatalytics.core.model.data;
 
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
+import lombok.Data;
 
 import java.util.Map;
 
@@ -11,9 +9,7 @@ import java.util.Map;
  *
  * @author giannis
  */
-@Getter
-@AllArgsConstructor
-@EqualsAndHashCode
+@Data
 public class EmojiMap {
     /**
      * Emoji name to emoji URL
