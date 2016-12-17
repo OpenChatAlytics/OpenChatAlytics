@@ -1,7 +1,5 @@
 package com.chatalytics.core.model.data;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import org.joda.time.DateTime;
 
 import lombok.Data;
@@ -22,6 +20,5 @@ public class ChatAlyticsEvent {
     }
 
     @Setter // null out clazz when it leaves the service
-    @JsonIgnore
     private Class<?> clazz;
 }
