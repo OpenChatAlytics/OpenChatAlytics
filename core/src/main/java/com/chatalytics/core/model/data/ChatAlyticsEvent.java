@@ -1,30 +1,27 @@
 package com.chatalytics.core.model.data;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import org.joda.time.DateTime;
 
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
+import lombok.Data;
 import lombok.Setter;
-import lombok.ToString;
 
-import java.io.Serializable;
-
-@Getter
-@EqualsAndHashCode
-@ToString
+@Data
 public class ChatAlyticsEvent {
 
-    public ChatAlyticsEvent(DateTime eventTime, String type, Serializable event) {
+    private final DateTime eventTime;
+    private final String type;
+    private final Object event;
+
+    public ChatAlyticsEvent(DateTime eventTime, String type, Object event) {
         this.eventTime = eventTime;
         this.type = type;
         this.event = event;
         this.clazz = event.getClass();
     }
 
-    private final DateTime eventTime;
-    private final String type;
-    private final Serializable event;
-
     @Setter // null out clazz when it leaves the service
-    private Class<? extends Serializable> clazz;
+    @JsonIgnore
+    private Class<?> clazz;
 }
