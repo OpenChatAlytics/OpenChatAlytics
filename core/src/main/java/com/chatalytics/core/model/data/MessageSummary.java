@@ -1,12 +1,11 @@
 package com.chatalytics.core.model.data;
 
-import com.google.common.base.MoreObjects;
-
 import org.joda.time.DateTime;
 
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Setter;
+import lombok.ToString;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -30,9 +29,9 @@ import javax.persistence.Table;
                   @Index(name = "ms_idx_bot", columnList = "bot")})
 @EqualsAndHashCode
 @Setter(value = AccessLevel.PROTECTED) // for hibernate
+@ToString
 public class MessageSummary implements IMentionable<MessageType> {
 
-    private static final long serialVersionUID = 4610523559744723974L;
     public static final String MESSAGE_SUMMARY_TABLE_NAME = "MESSAGE_SUMMARY";
     public static final String OCCURENCES_COLUMN = "OCCURRENCES";
     public static final String MENTION_TIME_COLUMN = "MENTION_TIME";
@@ -98,17 +97,5 @@ public class MessageSummary implements IMentionable<MessageType> {
     @Column(name = BOT_COLUMN)
     public boolean isBot() {
         return bot;
-    }
-
-    @Override
-    public String toString() {
-        return MoreObjects.toStringHelper(this.getClass())
-                          .add("value", value)
-                          .add("occurrences", occurrences)
-                          .add("mentionTime", mentionTime)
-                          .add("username", username)
-                          .add("roomName", roomName)
-                          .add("bot", bot)
-                          .toString();
     }
 }

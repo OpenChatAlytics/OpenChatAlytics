@@ -12,9 +12,7 @@ import java.io.Serializable;
 @Getter
 @EqualsAndHashCode
 @ToString
-public class ChatAlyticsEvent implements Serializable {
-
-    private static final long serialVersionUID = -6818683976977394757L;
+public class ChatAlyticsEvent {
 
     public ChatAlyticsEvent(DateTime eventTime, String type, Serializable event) {
         this.eventTime = eventTime;

@@ -1,11 +1,6 @@
 package com.chatalytics.core.model.data;
 
-import com.google.common.base.MoreObjects;
-
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-
-import java.io.Serializable;
+import lombok.Data;
 
 /**
  * Bean that represents a chat message. This bean contains actual {@link Room} and {@link User}
@@ -14,28 +9,11 @@ import java.io.Serializable;
  * @author giannis
  *
  */
-@EqualsAndHashCode
-@Getter
-public class FatMessage implements Serializable {
+@Data
+public class FatMessage {
 
     private final Message message;
     private final User user;
     private final Room room;
-
-    private static final long serialVersionUID = 6236626325756335748L;
-
-    public FatMessage(Message message, User user, Room room) {
-        this.message = message;
-        this.user = user;
-        this.room = room;
-    }
-
-    @Override
-    public String toString() {
-        return MoreObjects.toStringHelper(this.getClass())
-                          .add("message", message)
-                          .add("user", user)
-                          .add("room", room).toString();
-    }
 
 }
