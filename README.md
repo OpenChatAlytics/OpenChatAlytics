@@ -1,4 +1,4 @@
-#ChatAlytics
+# ChatAlytics
 
 [![Build Status](https://travis-ci.org/OpenChatAlytics/OpenChatAlytics.svg?branch=master)](https://travis-ci.org/OpenChatAlytics/OpenChatAlytics)
 [![Coverage Status](https://coveralls.io/repos/github/OpenChatAlytics/OpenChatAlytics/badge.svg?branch=master)](https://coveralls.io/github/OpenChatAlytics/OpenChatAlytics?branch=master)
@@ -6,17 +6,17 @@
 
 [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/OpenChatAlytics?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-##Short Summary
+## Short Summary
 ChatAlytics is a realtime platform for processing HipChat and Slack messages using Storm as the processing framework. Implementors can connect their own models into the topology for coming up with metrics. Those metrics can then be accessed through a REST API that ChatAlytics provides. This project also contains [HuBot](https://github.com/hipchat/hubot-hipchat) coffee scripts that hit the endpoints in ChatAlytics.
 
-##Building the Project
+## Building the Project
 To build the example you can just run
 
 `mvn clean package`
 
 You may need to also download the caseless models from the [Stanford Core NLP](http://nlp.stanford.edu/software/corenlp.shtml) website. The default one used in the config is named: english.all.3class.distsim.crf.ser.gz.
 
-##Running in Docker mode
+## Running in Docker mode
 Navigate to the top level directory where the Dockerfile is and run the following command:
 `docker build -t chatalytics ./`
 
@@ -38,7 +38,7 @@ To stop the container run:
 To remove old containers run:
 `docker rm chatalytics`
 
-##Running with PostgreSQL
+## Running with PostgreSQL
 install postgres on your computer. If you're running on MacOS you can type brew install postgres
 
 To initialize the database run:
@@ -57,7 +57,7 @@ Make sure you don't have a previous version of the database and re-create it by 
 ## Architecture Diagram
 ![architecture](https://github.com/OpenChatAlytics/OpenChatAlytics/raw/master/static/architecture_diagram.png)
 
-##Author
+## Author
 Giannis Neokleous
 
 www.giann.is
